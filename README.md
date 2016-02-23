@@ -1,6 +1,6 @@
 #PyGame-Learning-Environment
 
-### Probably as bugs and issues so proceed with caution.
+#### Probably has bugs so proceed with caution.
 
 Wrapper that mimics Arcade Learning Enviroment.
 
@@ -22,9 +22,9 @@ There are some examples of games in the examples folder. WaterWorld and PuckWorl
 # Getting Started
 Pygame-Learning-Enviroment (PLE) expects each game to expose some methods and information to it. The wrapper itself is simple and makes life easier when switching between games.
 
-See `examples/skeleton_game.py` for the required methods and fields along with comments.
+See `PLE/examples/skeleton_game.py` for the required methods and fields along with comments.
 
-After its as simple as this to get the game running with agent inputs:
+After setting a game up to allow agent inputs:
 
 ```python
 game = PuckWorld()
