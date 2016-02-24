@@ -65,7 +65,7 @@ class PLE(object):
 			Should be fine since many RL agents only consider state.
 		"""
 		sum_rewards = 0
-
+		print "fps", self.game.clock.get_fps()
 		for i in range(self.frame_skip):
 			sum_rewards += self._oneStepAct(action)
 

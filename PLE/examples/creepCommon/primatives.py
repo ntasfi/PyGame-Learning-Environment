@@ -31,8 +31,7 @@ class PuckCreep(pygame.sprite.Sprite):
 
         image = pygame.Surface((self.attr["radius_outer"]*2, self.attr["radius_outer"]*2))
         image.fill((0, 0, 0, 0))
-        image.set_colorkey((0,0,0))
-
+        image.set_colorkey((0,0,0))       
         pygame.draw.circle(
                 image,
                 self.attr["color_outer"],
@@ -41,10 +40,12 @@ class PuckCreep(pygame.sprite.Sprite):
                 0
         )
 
+        image.set_alpha(int(255*0.75))
+
         pygame.draw.circle(
                 image,
                 self.attr["color_center"],
-                (self.attr["radius_outer"], self.attr["radius_outer"]),
+                (self.attr["radius_outer"],self.attr["radius_outer"]),
                 self.attr["radius_center"],
                 0
         )

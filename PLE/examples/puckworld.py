@@ -31,7 +31,7 @@ class PuckWorld(object):
         self.CREEP_BAD = {
             "radius_center": 3,
             "radius_outer": 13,
-            "color_center": (120, 55, 55, 1.0),
+            "color_center": (110, 45, 45, 1.0),
             "color_outer": (150, 95, 95, 0.5),
             "speed": creep_speed
         }
@@ -102,8 +102,6 @@ class PuckWorld(object):
         self.player_group = pygame.sprite.Group()
         self.player_group.add( self.player )
 
-        self.bad_creep = PuckCreep((self.screen_dim[0], self.screen_dim[1]), self.CREEP_BAD, self.screen_dim[0]*0.75, self.screen_dim[1]*0.75)
-
         self.good_creep = Creep(
             self.CREEP_GOOD['color'], 
             self.CREEP_GOOD['radius'], 
@@ -117,9 +115,12 @@ class PuckWorld(object):
             0
         )
 
+        self.bad_creep = PuckCreep((self.screen_dim[0], self.screen_dim[1]), self.CREEP_BAD, self.screen_dim[0]*0.75, self.screen_dim[1]*0.75)
+
         self.creeps = pygame.sprite.Group()
-        self.creeps.add(self.bad_creep)
         self.creeps.add(self.good_creep)
+        self.creeps.add(self.bad_creep)
+        
 
         self.score = 0
         self.ticks = 0
