@@ -1,6 +1,6 @@
 import time
 import numpy as np
-from ple import PLE
+from PLE import PLE
 from examples.waterworld import WaterWorld
 
 game = WaterWorld(num_creeps=10)

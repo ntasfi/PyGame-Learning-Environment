@@ -38,11 +38,3 @@ for i in range(frames_per_episode):
 	reward = p.act(action)
 
 ```
-
-
-#Potential caveats & considerations.
-We currently perform one step of game emulation (draw/update), more if frame_skip is enabled, per `.act(_action_)` call. 
-
-Which means if your agent requires alot of work between each `.act(_action_)` call it can slow down the fps. The delay only becomes an issue at high fps (above 40) and high delay (75 - 100 ms). This can be mitigated in many ways such as setting a `frame_skip` or increasing `fps`. 
-
-Currently unsure if this is a big issue since we generally care about number of frames seen rather than the time per frame or true fps.
