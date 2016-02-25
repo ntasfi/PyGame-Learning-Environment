@@ -50,40 +50,13 @@ class PuckCreep(pygame.sprite.Sprite):
                 0
         )
 
-        self.vel = vec2d((0,0))
         self.image = image
         self.rect = self.image.get_rect()
         self.rect.center = pos_init
 
     def update(self, ndx, ndy, time_elapsed):
-        self.vel.x += ndx * self.attr['speed'] * time_elapsed
-        self.vel.y += ndy * self.attr['speed'] * time_elapsed
-
-        self.vel.x = self.vel.x*0.5
-        self.vel.y = self.vel.y*0.5
-
-        self.pos.x += self.vel.x
-        self.pos.y += self.vel.y
-
-        if self.pos.x < self.attr["radius_outer"]:
-            self.pos.x = self.attr["radius_outer"]
-            self.vel.x = 0
-            self.vel.y = 0
-
-        if self.pos.x > self.SCREEN_WIDTH-(self.attr["radius_outer"]):
-            self.pos.x = self.SCREEN_WIDTH-(self.attr["radius_outer"])
-            self.vel.x = 0
-            self.vel.y = 0
-
-        if self.pos.y < self.attr["radius_outer"]:
-            self.pos.y = self.attr["radius_outer"]
-            self.vel.x = 0
-            self.vel.y = 0
-
-        if self.pos.y > self.SCREEN_HEIGHT-(self.attr["radius_outer"]):
-            self.pos.y = self.SCREEN_HEIGHT-(self.attr["radius_outer"])
-            self.vel.x = 0
-            self.vel.y = 0
+        self.pos.x += ndx * self.attr['speed'] * time_elapsed
+        self.pos.y += ndy * self.attr['speed'] * time_elapsed
 
         self.rect.center = (self.pos.x, self.pos.y)    
 
@@ -184,6 +157,8 @@ class Player(pygame.sprite.Sprite):
 
         pygame.sprite.Sprite.__init__(self)
         
+        self.bounce_force = -0.5 #decays
+
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
  
@@ -192,7 +167,7 @@ class Player(pygame.sprite.Sprite):
 
         image = pygame.Surface([radius*2, radius*2])
         image.set_colorkey((0,0,0))
-        
+
         pygame.draw.circle(
                 image,
                 color,
@@ -215,31 +190,25 @@ class Player(pygame.sprite.Sprite):
         self.pos.x += self.vel.x
         self.pos.y += self.vel.y
 
-        if self.pos.x < 0.0:
-            self.pos.x = 0.0
-
-        if self.pos.y < 0.0:
-            self.pos.y = 0.0
-
         if self.pos.x < self.radius:
             self.pos.x = self.radius
-            self.vel.x = 0
-            self.vel.y = 0
+            self.vel.x *= self.bounce_force
+            #self.vel.y *= -0.5 
 
         if self.pos.x > self.SCREEN_WIDTH-(self.radius):
             self.pos.x = self.SCREEN_WIDTH-(self.radius)
-            self.vel.x = 0
-            self.vel.y = 0
+            self.vel.x *= self.bounce_force
+            #self.vel.y *= -0.5
 
         if self.pos.y < self.radius:
             self.pos.y = self.radius
-            self.vel.x = 0
-            self.vel.y = 0
+            self.vel.x *= self.bounce_force
+            #self.vel.y *= -0.5
 
         if self.pos.y > self.SCREEN_HEIGHT-(self.radius):
             self.pos.y = self.SCREEN_HEIGHT-(self.radius)
-            self.vel.x = 0
-            self.vel.y = 0
+            #self.vel.x *= bounce_force
+            self.vel.y *= self.bounce_force
 
         self.rect.center = (self.pos.x, self.pos.y)     
 

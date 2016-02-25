@@ -9,7 +9,7 @@ from random import uniform
 class PuckWorld(object):
 
     def __init__(self, 
-        creep_speed=0.0025, 
+        creep_speed=0.003, 
         agent_speed=0.009):
 
         actions = {
@@ -30,9 +30,9 @@ class PuckWorld(object):
 
         self.CREEP_BAD = {
             "radius_center": 3,
-            "radius_outer": 13,
-            "color_center": (110, 45, 45, 1.0),
-            "color_outer": (150, 95, 95, 0.5),
+            "radius_outer": 17,
+            "color_center": (110, 45, 45),
+            "color_outer": (150, 95, 95),
             "speed": creep_speed
         }
 
