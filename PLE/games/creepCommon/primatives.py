@@ -157,7 +157,7 @@ class Player(pygame.sprite.Sprite):
 
         pygame.sprite.Sprite.__init__(self)
         
-        self.bounce_force = -0.5 #decays
+        self.bounce_force = 0.0 #decays
 
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
