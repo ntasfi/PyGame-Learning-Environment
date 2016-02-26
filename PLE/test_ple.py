@@ -1,7 +1,7 @@
 import time
 import numpy as np
 from PLE import PLE
-from examples.waterworld import WaterWorld
+from games.waterworld import WaterWorld
 
 game = WaterWorld(num_creeps=10)
 p = PLE(game, fps=30, frame_skip=1, num_steps=1, display_screen=False)
