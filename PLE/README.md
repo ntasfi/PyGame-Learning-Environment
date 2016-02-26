@@ -62,7 +62,7 @@ This allows you to control games from a common interface via a learning agent.
 
 
 
-## Action and Interaction Methods
+## Action and Perceiving Methods
 
 
 
