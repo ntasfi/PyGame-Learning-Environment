@@ -156,7 +156,6 @@ class WaterWorld(object):
 
         self._handle_player_events()
         self.player_group.update(self.dx, self.dy, time_elapsed)
-        self.player_group.draw(self.screen)
         
         hits = pygame.sprite.spritecollide(self.player, self.creeps, True)
         for creep in hits:
@@ -165,8 +164,9 @@ class WaterWorld(object):
             self._add_creep()
 
         self.creeps.update(time_elapsed)
+
+        self.player_group.draw(self.screen)
         self.creeps.draw(self.screen)
-        pygame.display.update()
 
 if __name__ == "__main__":
         pygame.init()
@@ -178,3 +178,4 @@ if __name__ == "__main__":
         while True:
             time_elapsed = game.clock.tick_busy_loop(30)
             game.step(time_elapsed)
+            pygame.display.update()

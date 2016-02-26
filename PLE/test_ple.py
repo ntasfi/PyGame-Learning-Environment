@@ -4,7 +4,7 @@ from PLE import PLE
 from examples.waterworld import WaterWorld
 
 game = WaterWorld(num_creeps=10)
-p = PLE(game, fps=30, frame_skip=1, num_steps=1)
+p = PLE(game, fps=30, frame_skip=1, num_steps=1, display_screen=False)
 
 print "Initial information..."
 print "getActionSet", p.getActionSet()

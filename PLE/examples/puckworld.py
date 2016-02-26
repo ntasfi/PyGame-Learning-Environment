@@ -139,7 +139,6 @@ class PuckWorld(object):
 
         self._handle_player_events()
         self.player_group.update(self.dx, self.dy, time_elapsed)
-        self.player_group.draw(self.screen)
         
         dx = self.player.pos.x-self.good_creep.pos.x
         dy = self.player.pos.y-self.good_creep.pos.y
@@ -160,15 +159,15 @@ class PuckWorld(object):
             self.good_creep.pos.x = x
             self.good_creep.pos.y = y
 
-        ndx = dx/dist_to_bad
-        ndy = dy/dist_to_bad
+        ndx = 0.0 if dist_to_bad == 0.0 else dx/dist_to_bad
+        ndy = 0.0 if dist_to_bad == 0.0 else dy/dist_to_bad
 
         self.bad_creep.update(ndx, ndy, time_elapsed)
         self.good_creep.update(time_elapsed)
-        
 
+        self.player_group.draw(self.screen)
         self.creeps.draw(self.screen)
-        pygame.display.update()
+
 
 if __name__ == "__main__":
         pygame.init()
@@ -180,3 +179,4 @@ if __name__ == "__main__":
         while True:
             time_elapsed = game.clock.tick_busy_loop(60)
             game.step(time_elapsed)
+            pygame.display.update()

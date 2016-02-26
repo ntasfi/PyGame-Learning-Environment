@@ -6,13 +6,14 @@ from pygame.constants import KEYDOWN, KEYUP, K_F15 #this is our NOOP?
 
 class PLE(object):
 
-	def __init__(self, game, fps=30, frame_skip=1, num_steps=1, force_fps=True, NOOP=K_F15):
+	def __init__(self, game, fps=30, frame_skip=1, num_steps=1, force_fps=True, display_screen=True, NOOP=K_F15):
 		self.game = game
 		self.fps = fps
 		self.frame_skip = frame_skip
 		self.NOOP = NOOP
 		self.num_steps = num_steps
 		self.force_fps = force_fps
+		self.display_screen = display_screen
 
 		self.last_action = []
 		self.action = []
@@ -88,6 +89,9 @@ class PLE(object):
 
 		return sum_rewards
 
+	def _draw_frame(self):
+		if self.display_screen == True:
+			pygame.display.update()
 
 	def _oneStepAct(self, action):
 		if self.game_over():
@@ -100,6 +104,7 @@ class PLE(object):
 		for i in range(self.num_steps):
 			time_elapsed = self._tick()
 			self.game.step(time_elapsed)
+			self._draw_frame()
 
 		self.frame_count += self.num_steps
 
