@@ -10,6 +10,15 @@ class Game(object):
         self.clock = None #must be set to None
         self.screen_dim = (0, 0) #width and height
 
+    def getScreenDims(self):
+        """
+            Return a tuple of screen_dim
+        """
+        return self.screen_dim
+
+    def getActions(self):
+        return self.actions
+
     def init(self):
         """
             Set the games initial state.
@@ -22,15 +31,6 @@ class Game(object):
             Resets the game. Can usually just wrap init() in here.
             Unless the game has some notion of check points
         """
-        raise NotImplementedError("Please override this method")
-
-    def getScreenDims(self):
-        """
-            Return a tuple of 
-        """
-        raise NotImplementedError("Please override this method")
-
-    def getActions(self):
         raise NotImplementedError("Please override this method")
 
     def getScore(self):

@@ -6,7 +6,7 @@ from pygame.constants import KEYDOWN, KEYUP, K_F15 #this is our NOOP?
 
 class PLE(object):
 
-	def __init__(self, game, fps=30, frame_skip=1, num_steps=1, force_fps=True, display_screen=True, NOOP=K_F15):
+	def __init__(self, game, fps=30, frame_skip=1, num_steps=1, force_fps=True, display_screen=False, NOOP=K_F15):
 		self.game = game
 		self.fps = fps
 		self.frame_skip = frame_skip
@@ -20,9 +20,6 @@ class PLE(object):
 		self.score = 0
 		self.previous_score = 0
 		self.frame_count = 0
-
-		self.init()
-		self.game.init()
 
 	def _tick(self):
 		"""
@@ -46,9 +43,13 @@ class PLE(object):
 		pygame.init()
 		self.game.screen = pygame.display.set_mode( self.getScreenDims(), 0, 32)
 		self.game.clock = pygame.time.Clock()
+		self.game.init()
 
 	def getActionSet(self):
 		return self.game.actions.values()
+
+	def getFrameNumber(self):
+		return self.frame_count
 
 	def game_over(self):
 		return self.game.game_over()
@@ -83,7 +84,7 @@ class PLE(object):
 		"""
 			Perform an action on the game. We lockstep frames with actions. If act is not called the game will not run.
 		"""
-		sum_rewards = 0
+		sum_rewards = 0.0
 		for i in range(self.frame_skip):
 			sum_rewards += self._oneStepAct(action)
 
@@ -95,7 +96,7 @@ class PLE(object):
 
 	def _oneStepAct(self, action):
 		if self.game_over():
-			return 0
+			return 0.0
 
 		if action not in self.getActionSet():
 			action = self.NOOP
