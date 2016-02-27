@@ -10,11 +10,11 @@ Wrapper that mimics Arcade Learning Enviroment.
 You can easily make arbitrary games quickly in PyGame. I attemping to do some work with Reinforcement Learning and found this useful to have!
 
 ## Games (current)
-The plan is to eventually build up a games library of different tasks. Original author is in brackets. Current games:
+The plan is to eventually build up a games library of different tasks. I'm currently going through and porting games to PyGame. Original games author is in brackets. Current games:
 
 * WaterWorld (Karpathy)
 * PuckWorld (Karpathy)
-
+* Pong (marti1125)
 
 ## Examples
 There are some examples of games in the examples folder. WaterWorld and PuckWorld are both inspired/taken from Andrej Karpathy's reinforcejs. Porting both games took a very short amount of time.

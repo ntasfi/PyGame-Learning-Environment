@@ -3,7 +3,7 @@ import sys
 import math
 
 from pygame.constants import K_w, K_a, K_s, K_d
-from creepCommon.primatives import Player, Creep
+from creepCommon.primitives import Player, Creep
 from random import uniform, choice
 
 class WaterWorld(object):

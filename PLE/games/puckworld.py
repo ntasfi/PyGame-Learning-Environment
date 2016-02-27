@@ -3,7 +3,7 @@ import sys
 import math
 
 from pygame.constants import K_w, K_a, K_s, K_d
-from creepCommon.primatives import Player, Creep, PuckCreep
+from creepCommon.primitives import Player, Creep, PuckCreep
 from random import uniform
 
 class PuckWorld(object):
