@@ -70,7 +70,7 @@ class Player(pygame.sprite.Sprite):
 
 		self.speed = speed
 		self.pos = vec2d(pos_init)
-		self.vel = vec2d((speed, -1*speed))
+		self.vel = vec2d((0, 0))
 
 		self.rect_height = rect_height
 		self.rect_width = rect_width
@@ -92,18 +92,19 @@ class Player(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.center = pos_init
 
-	def updateAgent(self, direction, time_elapsed):
-		#direction is 0 if no key press
-		#1 if up
-		#-1 if down
+	def updateAgent(self, dy, time_elapsed):
+                self.vel.y += dy
+                self.vel.y *= 0.9
+                
+                self.pos.y += self.vel.y
 
-		if self.pos.y-self.rect_height/2 >= 0:
-                    if direction == 1:
-			self.pos.y -= self.speed * time_elapsed
+                if self.pos.y-self.rect_height/2 <= 0:
+                    self.pos.y = self.rect_height/2
+                    self.vel.y = 0.0
 
-		if self.pos.y+self.rect_height/2 <= self.SCREEN_HEIGHT:
-                    if direction == -1:
-			self.pos.y += self.speed * time_elapsed
+                if self.pos.y+self.rect_height/2 >= self.SCREEN_HEIGHT:
+                    self.pos.y = self.SCREEN_HEIGHT-self.rect_height/2
+                    self.vel.y = 0.0
 
 		self.rect.center = (self.pos.x, self.pos.y)
 
@@ -149,7 +150,7 @@ class Pong():
                 self.paddle_height = paddle_height
                 self.paddle_dist_to_wall = paddle_dist_to_wall
 
-                self.direction = 0.0
+                self.dy = 0.0
 		self.score_sum = 0.0 #need to deal with 11 on either side winning
 		self.score_counts = {
 			"agent": 0.0,
@@ -160,21 +161,19 @@ class Pong():
                 self.SCREEN_HEIGHT = SCREEN_HEIGHT
 
 	def _handle_player_events(self):
+		self.dy = 0
 		for event in pygame.event.get():
-			self.direction = 0.0
 			if event.type == pygame.QUIT:
 				pygame.quit()
 				sys.exit()
 
 			if event.type == pygame.KEYDOWN:
 				key = event.key
-
-
 				if key == self.actions['up']:
-					self.direction = 1.0
+                                        self.dy -= self.players_speed
 
 				if key == self.actions['down']:
-					self.direction = -1.0
+					self.dy += self.players_speed
 
 	def getScreenDims(self):
 		return self.screen_dim
@@ -255,7 +254,7 @@ class Pong():
 			self._reset_ball(1)
 
                 self.ball.update(self.agentPlayer, self.cpuPlayer, time_elapsed)
-		self.agentPlayer.updateAgent(self.direction, time_elapsed)
+		self.agentPlayer.updateAgent(self.dy, time_elapsed)
 		self.cpuPlayer.updateCpu(self.ball, time_elapsed)
 		
 		self.players_group.draw(self.screen)
