@@ -39,6 +39,3 @@ See `examples/random_agent.py`
 
 ### Game creation
 See `examples/skeleton_game.py` for the required methods and attributes along with comments.
-
-
-```
