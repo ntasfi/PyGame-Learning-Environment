@@ -15,6 +15,7 @@ The plan is to eventually build up a games library of different tasks. I'm curre
 * WaterWorld (Karpathy)
 * PuckWorld (Karpathy)
 * Pong (marti1125)
+* Pixelcopter - Helicopter clone
 
 ## Examples
 There are some examples of games in the examples folder. WaterWorld and PuckWorld are both inspired/taken from Andrej Karpathy's reinforcejs. Porting both games took a very short amount of time.
