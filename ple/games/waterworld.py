@@ -3,7 +3,7 @@ import sys
 import math
 
 from pygame.constants import K_w, K_a, K_s, K_d
-from creepCommon.primitives import Player, Creep
+from primitives import Player, Creep
 from random import uniform, choice
 
 class WaterWorld(object):
@@ -147,7 +147,7 @@ class WaterWorld(object):
     def reset(self):
         self.init()
 
-    def step(self, time_elapsed):
+    def step(self, dt):
         """
             Perform one step of game emulation.
         """
@@ -155,7 +155,7 @@ class WaterWorld(object):
         self.screen.fill(self.BG_COLOR)
 
         self._handle_player_events()
-        self.player_group.update(self.dx, self.dy, time_elapsed)
+        self.player_group.update(self.dx, self.dy, dt)
         
         hits = pygame.sprite.spritecollide(self.player, self.creeps, True)
         for creep in hits:
@@ -163,7 +163,7 @@ class WaterWorld(object):
             self.score += creep.reward
             self._add_creep()
 
-        self.creeps.update(time_elapsed)
+        self.creeps.update(dt)
 
         self.player_group.draw(self.screen)
         self.creeps.draw(self.screen)
@@ -176,6 +176,6 @@ if __name__ == "__main__":
         game.init()
 
         while True:
-            time_elapsed = game.clock.tick_busy_loop(30)
-            game.step(time_elapsed)
+            dt = game.clock.tick_busy_loop(30)
+            game.step(dt)
             pygame.display.update()

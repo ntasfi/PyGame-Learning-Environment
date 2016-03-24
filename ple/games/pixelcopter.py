@@ -4,7 +4,7 @@ import sys
 
 import pygame
 from pygame.constants import K_w, K_s
-from creepCommon.primitives import vec2d
+from utils.vec2d import vec2d
 
 class Block(pygame.sprite.Sprite):
 
@@ -35,8 +35,8 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos_init
 
-    def update(self, time_passed):
-        self.pos.x -= self.speed*time_passed
+    def update(self, dt):
+        self.pos.x -= self.speed*dt
 
         self.rect.center = (self.pos.x, self.pos.y)
 
@@ -71,8 +71,8 @@ class HelicopterPlayer(pygame.sprite.Sprite):
         self.rect.center = pos_init
 
 
-    def update(self, is_climbing, time_passed):
-        self.momentum += (self.climb_speed if is_climbing else self.fall_speed)*time_passed
+    def update(self, is_climbing, dt):
+        self.momentum += (self.climb_speed if is_climbing else self.fall_speed)*dt
         self.momentum *= 0.99
         self.pos.y += self.momentum 
 
@@ -113,8 +113,8 @@ class Terrain(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos_init
 
-    def update(self, time_passed):
-        self.pos.x -= self.speed*time_passed
+    def update(self, dt):
+        self.pos.x -= self.speed*dt
         self.rect.center = (self.pos.x, self.pos.y)
 
 class Pixelcopter():
@@ -220,13 +220,13 @@ class Pixelcopter():
     def reset(self):
         self.init()
 
-    def step(self, time_passed):
+    def step(self, dt):
         self.screen.fill((0,0,0))
         self._handle_player_events()
         
-        self.player.update(self.is_climbing, time_passed)
-        self.block_group.update(time_passed)
-        self.terrain_group.update(time_passed)
+        self.player.update(self.is_climbing, dt)
+        self.block_group.update(dt)
+        self.terrain_group.update(dt)
 
         hits = pygame.sprite.spritecollide(self.player, self.block_group, False)
         for creep in hits:
@@ -270,6 +270,6 @@ if __name__ == "__main__":
     game.init()
 
     while True:
-        time_passed = game.clock.tick_busy_loop(30)
-        game.step(time_passed)
+        dt = game.clock.tick_busy_loop(30)
+        game.step(dt)
         pygame.display.update()

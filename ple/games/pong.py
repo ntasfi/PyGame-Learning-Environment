@@ -4,7 +4,7 @@ import sys
 
 import pygame
 from pygame.constants import K_w, K_s
-from creepCommon.primitives import vec2d
+from utils.vec2d import vec2d
 
 class Ball(pygame.sprite.Sprite):
 
@@ -37,7 +37,7 @@ class Ball(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.center = pos_init
 
-	def update(self, agentPlayer, cpuPlayer, time_elapsed):
+	def update(self, agentPlayer, cpuPlayer, dt):
 		
                 if self.pos.y-self.radius <= 0: 
                         self.vel.y *= -1.0
@@ -55,8 +55,8 @@ class Ball(pygame.sprite.Sprite):
 			self.vel.x = -1*(self.vel.x + self.speed*0.1)
                         self.pos.x -= 1.0
 
-                self.pos.x += self.vel.x * time_elapsed
-		self.pos.y += self.vel.y * time_elapsed
+                self.pos.x += self.vel.x * dt
+		self.pos.y += self.vel.y * dt
 
 		self.rect.center = (self.pos.x, self.pos.y)
 
@@ -92,7 +92,7 @@ class Player(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.center = pos_init
 
-	def updateAgent(self, dy, time_elapsed):
+	def updateAgent(self, dy, dt):
                 self.vel.y += dy
                 self.vel.y *= 0.9
                 
@@ -108,13 +108,13 @@ class Player(pygame.sprite.Sprite):
 
 		self.rect.center = (self.pos.x, self.pos.y)
 
-	def updateCpu(self, ball, time_elapsed):
+	def updateCpu(self, ball, dt):
 		if ball.vel.x >= 0 and ball.pos.x >= self.SCREEN_WIDTH/2:
 			if self.pos.y < ball.pos.y:
-				self.pos.y += self.speed * time_elapsed
+				self.pos.y += self.speed * dt
 
 			if self.pos.y > ball.pos.y:
-				self.pos.y -= self.speed * time_elapsed
+				self.pos.y -= self.speed * dt
 
 		self.rect.center = (self.pos.x, self.pos.y)
 
@@ -236,7 +236,7 @@ class Pong():
             self.ball.vel.x = self.ball_speed*direction
             self.ball.vel.y = (random.random()*self.ball_speed)-self.ball_speed
 
-	def step(self, time_elapsed):
+	def step(self, dt):
 
 		self.screen.fill((0,0,0))
 
@@ -253,9 +253,9 @@ class Pong():
 			self.score_counts["agent"] += 1.0
 			self._reset_ball(1)
 
-                self.ball.update(self.agentPlayer, self.cpuPlayer, time_elapsed)
-		self.agentPlayer.updateAgent(self.dy, time_elapsed)
-		self.cpuPlayer.updateCpu(self.ball, time_elapsed)
+                self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
+		self.agentPlayer.updateAgent(self.dy, dt)
+		self.cpuPlayer.updateCpu(self.ball, dt)
 		
 		self.players_group.draw(self.screen)
 		self.ball_group.draw(self.screen)
@@ -268,6 +268,6 @@ if __name__ == "__main__":
     game.init()
 
     while True:
-        time_elapsed = game.clock.tick_busy_loop(60)
-        game.step(time_elapsed)
+        dt = game.clock.tick_busy_loop(60)
+        game.step(dt)
         pygame.display.update()

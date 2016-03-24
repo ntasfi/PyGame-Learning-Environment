@@ -1,64 +1,7 @@
 import pygame
 import math
 from random import random
-
-class vec2d():
-
-    def __init__(self, pos):
-        self.x = pos[0]
-        self.y = pos[1]
-
-    def __add__(self, o):
-        x = self.x + o.x
-        y = self.y + o.y
-
-        return vec2d((x,y))
-
-    def normalize(self):
-        norm = math.sqrt( self.x**2 + self.y**2 )
-        self.x /= norm
-        self.y /= norm
-
-class PuckCreep(pygame.sprite.Sprite):
-
-    def __init__(self, pos_init, attr, SCREEN_WIDTH, SCREEN_HEIGHT):
-        pygame.sprite.Sprite.__init__(self)        
-
-        self.pos = vec2d(pos_init)
-        self.attr = attr
-        self.SCREEN_WIDTH = SCREEN_WIDTH
-        self.SCREEN_HEIGHT = SCREEN_HEIGHT
-
-        image = pygame.Surface((self.attr["radius_outer"]*2, self.attr["radius_outer"]*2))
-        image.fill((0, 0, 0, 0))
-        image.set_colorkey((0,0,0))       
-        pygame.draw.circle(
-                image,
-                self.attr["color_outer"],
-                (self.attr["radius_outer"], self.attr["radius_outer"]),
-                self.attr["radius_outer"],
-                0
-        )
-
-        image.set_alpha(int(255*0.75))
-
-        pygame.draw.circle(
-                image,
-                self.attr["color_center"],
-                (self.attr["radius_outer"],self.attr["radius_outer"]),
-                self.attr["radius_center"],
-                0
-        )
-
-        self.image = image
-        self.rect = self.image.get_rect()
-        self.rect.center = pos_init
-
-    def update(self, ndx, ndy, time_elapsed):
-        self.pos.x += ndx * self.attr['speed'] * time_elapsed
-        self.pos.y += ndy * self.attr['speed'] * time_elapsed
-
-        self.rect.center = (self.pos.x, self.pos.y)    
+from utils.vec2d import vec2d
 
 class Creep(pygame.sprite.Sprite):
 
@@ -105,7 +48,7 @@ class Creep(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos_init
 
-    def update(self, time_passed):
+    def update(self, dt):
         jitter_x, jitter_y = 0, 0
         if self.pos.x-self.radius > self.SCREEN_WIDTH-1 or self.pos.x <= self.radius*3:
             self.direction.x *= -1
@@ -116,8 +59,8 @@ class Creep(pygame.sprite.Sprite):
             jitter_y = self.jitter_speed*self.direction.y*random()
 
         displacement = vec2d((
-                self.direction.x * self.speed * time_passed,
-                self.direction.y * self.speed * time_passed))
+                self.direction.x * self.speed * dt,
+                self.direction.y * self.speed * dt))
 
         self.pos += displacement
 
@@ -180,7 +123,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = radius
 
-    def update(self, dx, dy, time_passed):
+    def update(self, dx, dy, dt):
         self.vel.x += dx
         self.vel.y += dy
 
@@ -193,21 +136,17 @@ class Player(pygame.sprite.Sprite):
         if self.pos.x < self.radius:
             self.pos.x = self.radius
             self.vel.x *= self.bounce_force
-            #self.vel.y *= -0.5 
 
         if self.pos.x > self.SCREEN_WIDTH-(self.radius):
             self.pos.x = self.SCREEN_WIDTH-(self.radius)
             self.vel.x *= self.bounce_force
-            #self.vel.y *= -0.5
 
         if self.pos.y < self.radius:
             self.pos.y = self.radius
             self.vel.x *= self.bounce_force
-            #self.vel.y *= -0.5
 
         if self.pos.y > self.SCREEN_HEIGHT-(self.radius):
             self.pos.y = self.SCREEN_HEIGHT-(self.radius)
-            #self.vel.x *= bounce_force
             self.vel.y *= self.bounce_force
 
         self.rect.center = (self.pos.x, self.pos.y)     

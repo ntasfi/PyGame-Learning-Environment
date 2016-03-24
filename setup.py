@@ -24,6 +24,7 @@ setup(
 	packages=find_packages(),
 	install_requires = [
 		"pygame",
-		"numpy"
+		"numpy",
+                "pillow"
 	]
 )

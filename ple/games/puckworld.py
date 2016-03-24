@@ -3,8 +3,51 @@ import sys
 import math
 
 from pygame.constants import K_w, K_a, K_s, K_d
-from creepCommon.primitives import Player, Creep, PuckCreep
+from primitives import Player, Creep
+from utils.vec2d import vec2d
 from random import uniform
+
+class PuckCreep(pygame.sprite.Sprite):
+
+    def __init__(self, pos_init, attr, SCREEN_WIDTH, SCREEN_HEIGHT):
+        pygame.sprite.Sprite.__init__(self)        
+
+        self.pos = vec2d(pos_init)
+        self.attr = attr
+        self.SCREEN_WIDTH = SCREEN_WIDTH
+        self.SCREEN_HEIGHT = SCREEN_HEIGHT
+
+        image = pygame.Surface((self.attr["radius_outer"]*2, self.attr["radius_outer"]*2))
+        image.fill((0, 0, 0, 0))
+        image.set_colorkey((0,0,0))       
+        pygame.draw.circle(
+                image,
+                self.attr["color_outer"],
+                (self.attr["radius_outer"], self.attr["radius_outer"]),
+                self.attr["radius_outer"],
+                0
+        )
+
+        image.set_alpha(int(255*0.75))
+
+        pygame.draw.circle(
+                image,
+                self.attr["color_center"],
+                (self.attr["radius_outer"],self.attr["radius_outer"]),
+                self.attr["radius_center"],
+                0
+        )
+
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.center = pos_init
+
+    def update(self, ndx, ndy, dt):
+        self.pos.x += ndx * self.attr['speed'] * dt
+        self.pos.y += ndy * self.attr['speed'] * dt
+
+        self.rect.center = (self.pos.x, self.pos.y)    
+
 
 class PuckWorld(object):
 
@@ -129,7 +172,7 @@ class PuckWorld(object):
     def reset(self):
         self.init()
 
-    def step(self, time_elapsed):
+    def step(self, dt):
         """
             Perform one step of game emulation.
         """
@@ -138,7 +181,7 @@ class PuckWorld(object):
         self.screen.fill(self.BG_COLOR)
 
         self._handle_player_events()
-        self.player_group.update(self.dx, self.dy, time_elapsed)
+        self.player_group.update(self.dx, self.dy, dt)
         
         dx = self.player.pos.x-self.good_creep.pos.x
         dy = self.player.pos.y-self.good_creep.pos.y
@@ -162,8 +205,8 @@ class PuckWorld(object):
         ndx = 0.0 if dist_to_bad == 0.0 else dx/dist_to_bad
         ndy = 0.0 if dist_to_bad == 0.0 else dy/dist_to_bad
 
-        self.bad_creep.update(ndx, ndy, time_elapsed)
-        self.good_creep.update(time_elapsed)
+        self.bad_creep.update(ndx, ndy, dt)
+        self.good_creep.update(dt)
 
         self.player_group.draw(self.screen)
         self.creeps.draw(self.screen)
@@ -177,6 +220,6 @@ if __name__ == "__main__":
         game.init()
 
         while True:
-            time_elapsed = game.clock.tick_busy_loop(60)
-            game.step(time_elapsed)
+            dt = game.clock.tick_busy_loop(60)
+            game.step(dt)
             pygame.display.update()

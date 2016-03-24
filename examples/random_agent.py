@@ -1,6 +1,6 @@
 import numpy as np
-from PLE import PLE
-from PLE.games.waterworld import WaterWorld
+from ple import ple
+from ple.games.waterworld import WaterWorld
 
 class NaiveAgent():
 	"""
