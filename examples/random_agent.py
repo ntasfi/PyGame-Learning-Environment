@@ -1,6 +1,6 @@
 import numpy as np
-from ple import ple
-from ple.games.waterworld import WaterWorld
+from ple import PLE
+from ple.games.raycast_maze import RaycastMaze
 
 class NaiveAgent():
 	"""
@@ -13,7 +13,10 @@ class NaiveAgent():
 		return self.actions[np.random.randint(0, len(self.actions))]
 
 ###################################
-game = WaterWorld(num_creeps=10) #create our game
+game = RaycastMaze(
+        map_size=6
+        ) #create our game
+
 fps = 30 #fps we want to run at
 frame_skip = 2
 num_steps = 1
@@ -41,12 +44,12 @@ for i in range(np.random.randint(0, max_noops)):
 #start our training loop
 for f in range(nb_frames):
 	#if the game is over
-	if p.game_over():
-		p.reset_game()
-
-	obs = p.getScreenRGB()
-	action = agent.pickAction(reward, obs)
-	reward = p.act(action)
+        if p.game_over():
+            p.reset_game()
+            
+        obs = p.getScreenRGB()
+        action = agent.pickAction(reward, obs)
+        reward = p.act(action)
 
 	if f % 50 == 0:
 		p.saveScreen("screen_capture.png")
