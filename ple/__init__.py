@@ -7,8 +7,8 @@ from pygame.constants import KEYDOWN, KEYUP, K_F15 #this is our NOOP?
 class PLE(object):
 
 	def __init__(self, 
-                game, fps=30, frame_skip=1, num_steps=1, 
-                force_fps=True, display_screen=False, NOOP=K_F15):
+                game, fps=30, frame_skip=1, num_steps=1, force_fps=True, 
+                display_screen=False, add_noop_action=True, NOOP=K_F15):
 
 		self.game = game
 		self.fps = fps
@@ -17,6 +17,7 @@ class PLE(object):
 		self.num_steps = num_steps
 		self.force_fps = force_fps
 		self.display_screen = display_screen
+                self.add_noop_action = add_noop_action
 
 		self.last_action = []
 		self.action = []
@@ -49,7 +50,12 @@ class PLE(object):
 		self.game.init()
 
 	def getActionSet(self):
-		return self.game.actions.values()
+		actions = self.game.actions.values()
+
+                if self.add_noop_action:
+                    actions.append(self.NOOP)
+
+                return actions
 
 	def getFrameNumber(self):
 		return self.frame_count

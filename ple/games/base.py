@@ -1,14 +1,15 @@
 class Game(object):
 
-    def __init__(self, actions={}, fps=30):
+    def __init__(self, width, height, actions={}):
 
         #Required fields
         self.actions = actions #holds actions
+
         self.score = 0.0 #required.
         self.lives = 0 #required. Can be 0 or -1 if not required.
         self.screen = None #must be set to None
         self.clock = None #must be set to None
-        self.screen_dim = (0, 0) #width and height
+        self.screen_dim = (width, height) #width and height
 
     def getScreenDims(self):
         """
@@ -17,7 +18,7 @@ class Game(object):
         return self.screen_dim
 
     def getActions(self):
-        return self.actions
+        return self.actions.values()
 
     def init(self):
         """
@@ -31,13 +32,13 @@ class Game(object):
             Resets the game. Can usually just wrap init() in here.
             Unless the game has some notion of check points
         """
-        raise NotImplementedError("Please override this method")
+        self.init()
 
     def getScore(self):
         """
-            Return the score
+            Return the score of the game.
         """
-        return self.score
+        raise NotImplementedError("Please override this method")
 
     def game_over(self):
         """
@@ -45,7 +46,7 @@ class Game(object):
         """
         raise NotImplementedError("Please override this method")
 
-    def step(self, time_elapsed):
+    def step(self, dt):
         """
             Perform one step of game emulation.
         """

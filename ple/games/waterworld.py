@@ -2,11 +2,13 @@ import pygame
 import sys
 import math
 
+import base
+
 from pygame.constants import K_w, K_a, K_s, K_d
 from primitives import Player, Creep
 from random import uniform, choice
 
-class WaterWorld(object):
+class WaterWorld(base.Game):
 
     def __init__(self, 
         creeps_speed=0.0035, 
@@ -20,15 +22,10 @@ class WaterWorld(object):
             "down": K_s
         }
 
-        #Required fields
-        self.actions = actions #holds actions
-        self.score = 0.0
-        self.screen = None
-        self.clock = None
-        self.lives = -1 #doesnt apply
-        self.screen_dim = ( 48, 48 )
-
-        #end required
+        width = 48
+        height = 48
+        
+        base.Game.__init__(self, width, height, actions=actions)
 
         self.BG_COLOR = (255, 255, 255)
         self.N_CREEPS = num_creeps
@@ -110,12 +107,6 @@ class WaterWorld(object):
 
         self.creep_counts[ self.CREEP_TYPES[creep_type] ] += 1
 
-    def getScreenDims(self):
-        return self.screen_dim
-
-    def getActions(self):
-        return self.actions.values()
-
     def getScore(self):
         return self.score
 
@@ -143,9 +134,6 @@ class WaterWorld(object):
         self.score = 0
         self.ticks = 0
         self.lives = -1
-
-    def reset(self):
-        self.init()
 
     def step(self, dt):
         """

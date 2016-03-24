@@ -2,6 +2,8 @@ import pygame
 import sys
 import math
 
+import base
+
 from pygame.constants import K_w, K_a, K_s, K_d
 from primitives import Player, Creep
 from utils.vec2d import vec2d
@@ -49,7 +51,7 @@ class PuckCreep(pygame.sprite.Sprite):
         self.rect.center = (self.pos.x, self.pos.y)    
 
 
-class PuckWorld(object):
+class PuckWorld(base.Game):
 
     def __init__(self, 
         creep_speed=0.003, 
@@ -62,14 +64,10 @@ class PuckWorld(object):
             "down": K_s
         }
 
-        #Required fields
-        self.actions = actions #holds actions
-        self.score = 0.0
-        self.screen = None
-        self.clock = None
-        self.lives = -1 #doesnt apply
-        self.screen_dim = ( 64, 64 )
-        #end required
+        width = 64
+        height = 64
+
+        base.Game.__init__(self, width, height, actions=actions)
 
         self.CREEP_BAD = {
             "radius_center": 3,
@@ -118,12 +116,6 @@ class PuckWorld(object):
                 if key == self.actions["down"]:
                     self.dy += self.AGENT_SPEED
 
-    def getScreenDims(self):
-        return self.screen_dim
-
-    def getActions(self):
-        return self.actions.values()
-
     def getScore(self):
         return self.score
 
@@ -168,9 +160,6 @@ class PuckWorld(object):
         self.score = 0
         self.ticks = 0
         self.lives = -1
-
-    def reset(self):
-        self.init()
 
     def step(self, dt):
         """

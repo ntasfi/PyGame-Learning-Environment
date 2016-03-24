@@ -1,17 +1,18 @@
+import base
 import pygame
 import numpy as np
 from raycast import RayCastPlayer
+from pygame.constants import K_w, K_a, K_d, K_s
 
-class RaycastMaze(RayCastPlayer):
+class RaycastMaze(base.Game, RayCastPlayer):
 
 
     def __init__(self,
             init_dir=(1.0, 0.0), init_pos=(1,1), resolution=1,
-            move_speed=10, turn_speed=7, 
+            move_speed=10, turn_speed=7, init_plane=(0.0, 0.66),
             map_size=10, height=48, width=48):
 
         assert map_size >= 5, "map_size must be gte 5"
-
 
         block_types = {
             0: {
@@ -27,22 +28,25 @@ class RaycastMaze(RayCastPlayer):
                 "color": (255, 100, 100)
             }
         }
+        actions = {
+            "forward": K_w,
+            "left": K_a,
+            "right": K_d,
+            "backward": K_s
+        }
 
-        self.init_pos = np.array([init_pos], dtype=np.float32)
-        self.init_dir = np.array([init_dir], dtype=np.float32)
-        self.init_plane = np.array([(0.0, 0.66)], dtype=np.float32)
-        
+        base.Game.__init__(self, width, height, actions=actions)
+
         RayCastPlayer.__init__(self, None,
                 init_pos, init_dir, width, height, resolution, 
-                move_speed, turn_speed, self.init_plane, block_types)
+                move_speed, turn_speed, init_plane, actions, block_types)
+        
+        self.init_pos = np.array([init_pos], dtype=np.float32)
+        self.init_dir = np.array([init_dir], dtype=np.float32)
+        self.init_plane = np.array([init_plane], dtype=np.float32)
 
         self.height = height
         self.width = width
-        self.score = 0.0
-        self.screen = None
-        self.clock = None
-        self.screen_dim = ( self.height, self.width )
-
         self.obj_loc = None
         self.map_size = map_size
 

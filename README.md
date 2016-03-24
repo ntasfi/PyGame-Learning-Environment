@@ -6,7 +6,7 @@ PLE hopes to eventually build an expansive library of primitives and games.
 
 Documentation is currently in progress.
 
-## Games (current)
+## Games
 Current games, with original games author in brackets:
 
 * WaterWorld (Karpathy)
@@ -17,7 +17,7 @@ Current games, with original games author in brackets:
 
 ## Getting started
 
-A `PLE` instance requires a game exposing a set of control methods. To see the required methods look at `examples/skeleton_game.py` or examine the games within `ple/games`. 
+A `PLE` instance requires a game exposing a set of control methods. To see the required methods look at `ple/games/base.py`. 
 
 Here's an example of importing Pong from the games library within PLE:
 
@@ -80,7 +80,7 @@ pip install -e .
 
 ## Updating
 
-`cd` into the `PyGame-Learning-Environment` and run the following:
+`cd` into the `PyGame-Learning-Environment` directory and run the following:
 
 ```bash
 git pull

@@ -5,7 +5,6 @@ import sys
 
 import pygame
 import numpy as np
-from pygame.constants import K_w, K_a, K_d, K_s
 
 class RayCastPlayer():
     """
@@ -15,14 +14,7 @@ class RayCastPlayer():
 
     def __init__(self, map_, init_pos, init_dir,
         width, height, resolution, move_speed,
-        turn_speed, plane, block_types):
-
-        actions = {
-            "forward": K_w,
-            "left": K_a,
-            "right": K_d,
-            "backward": K_s
-        }
+        turn_speed, plane, actions, block_types):
 
         self.actions = actions
         

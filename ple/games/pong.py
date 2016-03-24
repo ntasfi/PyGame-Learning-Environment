@@ -6,6 +6,8 @@ import pygame
 from pygame.constants import K_w, K_s
 from utils.vec2d import vec2d
 
+import base
+
 class Ball(pygame.sprite.Sprite):
 
 	def __init__(self, radius, speed,
@@ -118,7 +120,7 @@ class Player(pygame.sprite.Sprite):
 
 		self.rect.center = (self.pos.x, self.pos.y)
 
-class Pong():
+class Pong(base.Game):
         """
             loosely based on code from marti1125s pong lib.
             https://github.com/marti1125/pong/
@@ -135,13 +137,7 @@ class Pong():
                 SCREEN_WIDTH = 64
                 SCREEN_HEIGHT = 48
 
-		#required fields
-		self.actions = actions
-
-		self.screen = None
-		self.clock = None
-		self.lives = -1
-		self.screen_dim = (SCREEN_WIDTH, SCREEN_HEIGHT)
+                base.Game.__init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, actions=actions)
 
                 self.ball_radius = ball_radius
 		self.ball_speed = ball_speed
@@ -174,12 +170,6 @@ class Pong():
 
 				if key == self.actions['down']:
 					self.dy += self.players_speed
-
-	def getScreenDims(self):
-		return self.screen_dim
-
-	def getActions(self):
-		return self.actions.values()
 
 	def getScore(self):
 		return self.score_sum
@@ -226,9 +216,6 @@ class Pong():
             self.ball_group = pygame.sprite.Group()
             self.ball_group.add( self.ball )
 	
-        def reset(self):
-		self.init()
-
 	def _reset_ball(self, direction):
             self.ball.pos.x = self.SCREEN_WIDTH/2 #move it to the center
             

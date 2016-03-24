@@ -2,6 +2,8 @@ import math
 import random
 import sys
 
+import base
+
 import pygame
 from pygame.constants import K_w, K_s
 from utils.vec2d import vec2d
@@ -117,7 +119,7 @@ class Terrain(pygame.sprite.Sprite):
         self.pos.x -= self.speed*dt
         self.rect.center = (self.pos.x, self.pos.y)
 
-class Pixelcopter():
+class Pixelcopter(base.Game):
 
     def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, speed=0.05):
         actions = {
@@ -125,12 +127,7 @@ class Pixelcopter():
                 "nothing": K_s
         }
 
-        self.actions = actions
-        self.screen = None
-        self.clock = None
-        self.lives = 1
-        self.screen_dim = (SCREEN_WIDTH, SCREEN_HEIGHT)
-        self.score = 0.0
+        base.Game.__init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, actions=actions)
 
         self.is_climbing = False
         self.speed = speed
