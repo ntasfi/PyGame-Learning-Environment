@@ -6,7 +6,10 @@ from pygame.constants import KEYDOWN, KEYUP, K_F15 #this is our NOOP?
 
 class PLE(object):
 
-	def __init__(self, game, fps=30, frame_skip=1, num_steps=1, force_fps=True, display_screen=False, NOOP=K_F15):
+	def __init__(self, 
+                game, fps=30, frame_skip=1, num_steps=1, 
+                force_fps=True, display_screen=False, NOOP=K_F15):
+
 		self.game = game
 		self.fps = fps
 		self.frame_skip = frame_skip
