@@ -144,8 +144,7 @@ class PuckWorld(base.Game):
             1.0,
             "GOOD", 
             self.screen_dim[0], 
-            self.screen_dim[1],
-            0
+            self.screen_dim[1]
         )
 
         self.bad_creep = PuckCreep((self.screen_dim[0], self.screen_dim[1]), self.CREEP_BAD, self.screen_dim[0]*0.75, self.screen_dim[1]*0.75)
