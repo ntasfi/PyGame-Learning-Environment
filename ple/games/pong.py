@@ -5,6 +5,7 @@ import sys
 import pygame
 from pygame.constants import K_w, K_s
 from utils.vec2d import vec2d
+from utils import percent_round_int
 
 import base
 
@@ -111,8 +112,12 @@ class Player(pygame.sprite.Sprite):
 		self.rect.center = (self.pos.x, self.pos.y)
 
 	def updateCpu(self, ball, dt):
-		if ball.vel.x >= 0 and ball.pos.x >= self.SCREEN_WIDTH/2:
+		print ball.pos.y, self.pos.y
+                if ball.vel.x >= 0 and ball.pos.x >= self.SCREEN_WIDTH/2:
 			if self.pos.y < ball.pos.y:
+                                print dt
+                                print self.pos.y
+                                print self.speed
 				self.pos.y += self.speed * dt
 
 			if self.pos.y > ball.pos.y:
@@ -125,26 +130,25 @@ class Pong(base.Game):
             loosely based on code from marti1125s pong lib.
             https://github.com/marti1125/pong/
         """
-	def __init__(self, players_speed=0.05, 
-                ball_speed=0.05, ball_radius=3, paddle_width=3, 
-                paddle_height=11, paddle_dist_to_wall=4):
+	def __init__(self, width=64, height=48, MAX_SCORE=11):
 
 		actions = {
 			"up": K_w,
 			"down": K_s
 		}
 
-                SCREEN_WIDTH = 64
-                SCREEN_HEIGHT = 48
+                base.Game.__init__(self, width, height, actions=actions)
 
-                base.Game.__init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, actions=actions)
-
-                self.ball_radius = ball_radius
-		self.ball_speed = ball_speed
-                self.players_speed = players_speed
-                self.paddle_width = paddle_width
-                self.paddle_height = paddle_height
-                self.paddle_dist_to_wall = paddle_dist_to_wall
+                #the %'s come from original values, wanted to keep same ratio when you 
+                #increase the resolution.
+                self.ball_radius = percent_round_int(height, 0.06)
+                self.players_speed = 0.015*height
+                self.cpu_speed = 0.15 #has to be small because its pressed much faster than player
+		self.ball_speed = 0.001*height 
+                self.paddle_width = percent_round_int(width, 0.05)
+                self.paddle_height = percent_round_int(height, 0.23) 
+                self.paddle_dist_to_wall = percent_round_int(width, 0.0625)
+                self.MAX_SCORE = MAX_SCORE
 
                 self.dy = 0.0
 		self.score_sum = 0.0 #need to deal with 11 on either side winning
@@ -153,8 +157,15 @@ class Pong(base.Game):
 			"cpu": 0.0
 		}
 
-                self.SCREEN_WIDTH = SCREEN_WIDTH
-                self.SCREEN_HEIGHT = SCREEN_HEIGHT
+                self.SCREEN_WIDTH = width
+                self.SCREEN_HEIGHT = height
+
+                print "self.ball_radius", self.ball_radius
+                print "self.players_speed", self.players_speed
+                print "self.ball_speed", self.ball_speed
+                print "self.paddle_width", self.paddle_width
+                print "self.paddle_height", self.paddle_height
+                print "self.paddle_dist_to_wall", self.paddle_dist_to_wall
 
 	def _handle_player_events(self):
 		self.dy = 0
@@ -176,7 +187,7 @@ class Pong(base.Game):
 
 	def game_over(self):
 		#pong used 11 as max score
-		return (self.score_counts['agent'] == 11.0) or (self.score_counts['cpu'] == 11.0)
+		return (self.score_counts['agent'] == self.MAX_SCORE) or (self.score_counts['cpu'] == self.MAX_SCORE)
 
 	def init(self):
             self.score_counts = {
@@ -202,7 +213,7 @@ class Pong(base.Game):
 		self.SCREEN_HEIGHT)
 
             self.cpuPlayer = Player(
-		self.players_speed,
+		self.cpu_speed,
 		self.paddle_width,
 		self.paddle_height,
 		(self.SCREEN_WIDTH-self.paddle_dist_to_wall, self.SCREEN_HEIGHT/2),
@@ -249,7 +260,7 @@ class Pong(base.Game):
 
 if __name__ == "__main__":
     pygame.init()
-    game = Pong()
+    game = Pong(width=256, height=200)
     game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
     game.clock = pygame.time.Clock()
     game.init()
