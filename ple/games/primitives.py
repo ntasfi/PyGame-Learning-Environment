@@ -14,8 +14,7 @@ class Creep(pygame.sprite.Sprite):
             reward, 
             TYPE,
             SCREEN_WIDTH,
-            SCREEN_HEIGHT,
-            life):
+            SCREEN_HEIGHT):
 
         pygame.sprite.Sprite.__init__(self)
         
@@ -25,7 +24,6 @@ class Creep(pygame.sprite.Sprite):
         self.jitter_speed = 0.003
         self.speed = speed
         self.reward = reward
-        self.life = life
         self.radius = radius
         self.pos = vec2d(pos_init)
 

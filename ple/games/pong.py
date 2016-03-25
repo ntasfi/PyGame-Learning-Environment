@@ -112,12 +112,8 @@ class Player(pygame.sprite.Sprite):
 		self.rect.center = (self.pos.x, self.pos.y)
 
 	def updateCpu(self, ball, dt):
-		print ball.pos.y, self.pos.y
                 if ball.vel.x >= 0 and ball.pos.x >= self.SCREEN_WIDTH/2:
 			if self.pos.y < ball.pos.y:
-                                print dt
-                                print self.pos.y
-                                print self.speed
 				self.pos.y += self.speed * dt
 
 			if self.pos.y > ball.pos.y:
@@ -159,13 +155,6 @@ class Pong(base.Game):
 
                 self.SCREEN_WIDTH = width
                 self.SCREEN_HEIGHT = height
-
-                print "self.ball_radius", self.ball_radius
-                print "self.players_speed", self.players_speed
-                print "self.ball_speed", self.ball_speed
-                print "self.paddle_width", self.paddle_width
-                print "self.paddle_height", self.paddle_height
-                print "self.paddle_dist_to_wall", self.paddle_dist_to_wall
 
 	def _handle_player_events(self):
 		self.dy = 0

@@ -50,12 +50,12 @@ class HelicopterPlayer(pygame.sprite.Sprite):
         pos_init = ( int( SCREEN_WIDTH*0.35  ), SCREEN_HEIGHT/2 )
         self.pos = vec2d(pos_init)
         self.speed = speed
-        self.climb_speed = -0.0175
-        self.fall_speed = 0.0019
+        self.climb_speed = speed*-0.875 #-0.0175
+        self.fall_speed = speed*0.095 #0.0019
         self.momentum = 0
         
-        self.width = SCREEN_WIDTH*0.075
-        self.height = SCREEN_HEIGHT*0.075
+        self.width = SCREEN_WIDTH*0.05
+        self.height = SCREEN_HEIGHT*0.05
 
         image = pygame.Surface((self.width, self.height))
         image.fill((0, 0, 0, 0))
@@ -121,18 +121,18 @@ class Terrain(pygame.sprite.Sprite):
 
 class Pixelcopter(base.Game):
 
-    def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, speed=0.05):
+    def __init__(self, width=48, height=48):
         actions = {
                 "up": K_w,
                 "nothing": K_s
         }
 
-        base.Game.__init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, actions=actions)
+        base.Game.__init__(self, widht, height, actions=actions)
 
         self.is_climbing = False
-        self.speed = speed
-        self.SCREEN_WIDTH = SCREEN_WIDTH
-        self.SCREEN_HEIGHT = SCREEN_HEIGHT
+        self.speed = 0.0004*width
+        self.SCREEN_WIDTH = width 
+        self.SCREEN_HEIGHT = height 
 
     def _handle_player_events(self):
         self.is_climbing = False
@@ -261,7 +261,7 @@ class Pixelcopter(base.Game):
 
 if __name__ == "__main__":
     pygame.init()
-    game = Pixelcopter(48, 48, speed=0.02)
+    game = Pixelcopter(width=256, height=256)
     game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
     game.clock = pygame.time.Clock()
     game.init()

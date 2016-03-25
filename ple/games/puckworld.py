@@ -7,6 +7,7 @@ import base
 from pygame.constants import K_w, K_a, K_s, K_d
 from primitives import Player, Creep
 from utils.vec2d import vec2d
+from utils import percent_round_int
 from random import uniform
 
 class PuckCreep(pygame.sprite.Sprite):
@@ -53,9 +54,9 @@ class PuckCreep(pygame.sprite.Sprite):
 
 class PuckWorld(base.Game):
 
-    def __init__(self, 
-        creep_speed=0.003, 
-        agent_speed=0.009):
+    def __init__(self,
+        width=64,
+        height=64):
 
         actions = {
             "up": K_w,
@@ -64,27 +65,24 @@ class PuckWorld(base.Game):
             "down": K_s
         }
 
-        width = 64
-        height = 64
-
         base.Game.__init__(self, width, height, actions=actions)
 
         self.CREEP_BAD = {
-            "radius_center": 3,
-            "radius_outer": 17,
+            "radius_center": percent_round_int(width, 0.047),
+            "radius_outer": percent_round_int(width, 0.265),
             "color_center": (110, 45, 45),
             "color_outer": (150, 95, 95),
-            "speed": creep_speed
+            "speed": 0.00005*width
         }
 
         self.CREEP_GOOD = {
-            "radius": 3,
+            "radius": percent_round_int(width, 0.047),
             "color": (40, 140, 40)
         }
 
         self.AGENT_COLOR = (60, 60, 140)
-        self.AGENT_SPEED = agent_speed 
-        self.AGENT_RADIUS = 3
+        self.AGENT_SPEED = 0.00015*width 
+        self.AGENT_RADIUS = percent_round_int(width, 0.047)
         self.AGENT_INIT_POS = (0,0)
 
         self.BG_COLOR = (255, 255, 255)
@@ -203,7 +201,7 @@ class PuckWorld(base.Game):
 
 if __name__ == "__main__":
         pygame.init()
-        game = PuckWorld()
+        game = PuckWorld(width=256, height=256)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
         game.init()

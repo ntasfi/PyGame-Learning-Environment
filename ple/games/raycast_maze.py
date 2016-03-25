@@ -140,6 +140,8 @@ if __name__ == "__main__":
     pygame.init()
 
     game = RaycastMaze(
+        height=256,
+        width=256,
         map_size=5
     )
 
@@ -151,8 +153,9 @@ if __name__ == "__main__":
         dt = game.clock.tick_busy_loop(fps)
         
         if game.game_over():
-            game.reset()
             print "Game over!"
+            print "Resetting!"
+            game.reset()
 
         game.step(dt)
         

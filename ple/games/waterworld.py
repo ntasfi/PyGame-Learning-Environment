@@ -4,15 +4,16 @@ import math
 
 import base
 
+from utils import percent_round_int
 from pygame.constants import K_w, K_a, K_s, K_d
 from primitives import Player, Creep
 from random import uniform, choice
 
 class WaterWorld(base.Game):
 
-    def __init__(self, 
-        creeps_speed=0.0035, 
-        agent_speed=0.009,
+    def __init__(self,
+        width=48,
+        height=48,
         num_creeps=3):
 
         actions = {
@@ -22,22 +23,19 @@ class WaterWorld(base.Game):
             "down": K_s
         }
 
-        width = 48
-        height = 48
-        
         base.Game.__init__(self, width, height, actions=actions)
 
         self.BG_COLOR = (255, 255, 255)
         self.N_CREEPS = num_creeps
         self.CREEP_TYPES = [ "GOOD", "BAD" ]
         self.CREEP_COLORS = [ (40, 140, 40), (150, 95, 95) ]
-        self.CREEP_RADII = [ 3, 3 ]
+        radius = percent_round_int(width, 0.047)
+        self.CREEP_RADII = [ radius, radius ]
         self.CREEP_REWARD = [ 1, -1 ]
-        self.CREEP_LIFE = [ 10, 20 ]
-        self.CREEP_SPEED = creeps_speed
+        self.CREEP_SPEED = 0.00015*width 
         self.AGENT_COLOR = (60, 60, 140)
-        self.AGENT_SPEED = agent_speed 
-        self.AGENT_RADIUS = 3
+        self.AGENT_SPEED = 0.00045*width 
+        self.AGENT_RADIUS = radius 
         self.AGENT_INIT_POS = (self.screen_dim[0]/2, self.screen_dim[1]/2)
 
         self.creep_counts = {
@@ -97,8 +95,7 @@ class WaterWorld(base.Game):
                 self.CREEP_REWARD[creep_type],
                 self.CREEP_TYPES[creep_type], 
                 self.screen_dim[0], 
-                self.screen_dim[1],
-                self.CREEP_LIFE[creep_type]
+                self.screen_dim[1]
             )
 
             creep_hits = pygame.sprite.spritecollide(creep, self.creeps, False) #check if we are hitting another other creeps if it was placed here
@@ -158,7 +155,7 @@ class WaterWorld(base.Game):
 
 if __name__ == "__main__":
         pygame.init()
-        game = WaterWorld()
+        game = WaterWorld(width=256, height=256)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
         game.init()
