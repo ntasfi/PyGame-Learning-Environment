@@ -25,6 +25,9 @@ class PLE(object):
 		self.previous_score = 0
 		self.frame_count = 0
 
+                if game.allowed_fps != None and self.fps != game.allowed_fps:
+                    raise ValueError("Game requires %dfps, was given %d." % (game.allowed_fps, game.allowed_fps))
+
 	def _tick(self):
 		"""
 			In physics games the movements are updated based on how much time has elapsed between ticks. 

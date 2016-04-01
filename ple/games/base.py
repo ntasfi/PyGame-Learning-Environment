@@ -10,6 +10,7 @@ class Game(object):
         self.screen = None #must be set to None
         self.clock = None #must be set to None
         self.screen_dim = (width, height) #width and height
+        self.allowed_fps = None #fps that the game is allowed to run at.
 
     def getScreenDims(self):
         """

@@ -127,7 +127,7 @@ class Pixelcopter(base.Game):
                 "nothing": K_s
         }
 
-        base.Game.__init__(self, widht, height, actions=actions)
+        base.Game.__init__(self, width, height, actions=actions)
 
         self.is_climbing = False
         self.speed = 0.0004*width
