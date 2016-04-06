@@ -9,6 +9,8 @@ class Game(object):
         self.lives = 0 #required. Can be 0 or -1 if not required.
         self.screen = None #must be set to None
         self.clock = None #must be set to None
+        self.height = height
+        self.width = width
         self.screen_dim = (width, height) #width and height
         self.allowed_fps = None #fps that the game is allowed to run at.
 

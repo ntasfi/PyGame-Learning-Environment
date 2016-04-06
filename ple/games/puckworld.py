@@ -124,14 +124,14 @@ class PuckWorld(base.Game):
         return False
 
     def _rngCreepPos(self):
-        return ( int(uniform(self.CREEP_GOOD['radius']*3, self.screen_dim[0]-self.CREEP_GOOD['radius']*2.5)), int(uniform(self.CREEP_GOOD['radius']*3, self.screen_dim[1]-self.CREEP_GOOD['radius']*2.5)) )
+        return ( int(uniform(self.CREEP_GOOD['radius']*3, self.width-self.CREEP_GOOD['radius']*2.5)), int(uniform(self.CREEP_GOOD['radius']*3, self.height-self.CREEP_GOOD['radius']*2.5)) )
 
     def init(self):
         """
             Starts/Resets the game to its inital state
         """
 
-        self.player = Player(self.AGENT_RADIUS, self.AGENT_COLOR, self.AGENT_SPEED, self.AGENT_INIT_POS, self.screen_dim[0], self.screen_dim[1]) 
+        self.player = Player(self.AGENT_RADIUS, self.AGENT_COLOR, self.AGENT_SPEED, self.AGENT_INIT_POS, self.width, self.height) 
         self.player_group = pygame.sprite.Group()
         self.player_group.add( self.player )
 
@@ -143,11 +143,11 @@ class PuckWorld(base.Game):
             0.0,
             1.0,
             "GOOD", 
-            self.screen_dim[0], 
-            self.screen_dim[1]
+            self.width, 
+            self.height
         )
 
-        self.bad_creep = PuckCreep((self.screen_dim[0], self.screen_dim[1]), self.CREEP_BAD, self.screen_dim[0]*0.75, self.screen_dim[1]*0.75)
+        self.bad_creep = PuckCreep((self.width, self.height), self.CREEP_BAD, self.screen_dim[0]*0.75, self.screen_dim[1]*0.75)
 
         self.creeps = pygame.sprite.Group()
         self.creeps.add(self.good_creep)

@@ -45,8 +45,6 @@ class RaycastMaze(base.Game, RayCastPlayer):
         self.init_dir = np.array([init_dir], dtype=np.float32)
         self.init_plane = np.array([init_plane], dtype=np.float32)
 
-        self.height = height
-        self.width = width
         self.obj_loc = None
         self.map_size = map_size
 
@@ -85,12 +83,6 @@ class RaycastMaze(base.Game, RayCastPlayer):
                         x, y = x_, y_
 
         return Z.astype(int)
-
-    def getScreenDims(self):
-        return self.screen_dim
-
-    def getActions(self):
-        return self.actions.values()
 
     def getScore(self):
         return self.score
@@ -142,7 +134,7 @@ if __name__ == "__main__":
     game = RaycastMaze(
         height=256,
         width=256,
-        map_size=5
+        map_size=10
     )
 
     game.screen = pygame.display.set_mode(game.getScreenDims(), 0, 32)

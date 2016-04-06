@@ -36,7 +36,7 @@ class WaterWorld(base.Game):
         self.AGENT_COLOR = (60, 60, 140)
         self.AGENT_SPEED = 0.00045*width 
         self.AGENT_RADIUS = radius 
-        self.AGENT_INIT_POS = (self.screen_dim[0]/2, self.screen_dim[1]/2)
+        self.AGENT_INIT_POS = (self.width/2, self.height/2)
 
         self.creep_counts = {
             "GOOD": 0,
@@ -81,8 +81,8 @@ class WaterWorld(base.Game):
 
         while len(creep_hits) > 0 and dist < 2.0:
             pos = ( 
-                int(uniform(self.CREEP_RADII[creep_type]*2.5, self.screen_dim[0]-self.CREEP_RADII[creep_type]*2.5)), 
-                int(uniform(self.CREEP_RADII[creep_type]*2.5, self.screen_dim[1]-self.CREEP_RADII[creep_type]*2.5)) 
+                int(uniform(self.CREEP_RADII[creep_type]*2.5, self.width-self.CREEP_RADII[creep_type]*2.5)), 
+                int(uniform(self.CREEP_RADII[creep_type]*2.5, self.height-self.CREEP_RADII[creep_type]*2.5)) 
             )  
             dist = math.sqrt( (self.player.pos.x - pos[0])**2 + (self.player.pos.y - pos[1])**2 )
   
@@ -94,8 +94,8 @@ class WaterWorld(base.Game):
                 self.CREEP_SPEED,
                 self.CREEP_REWARD[creep_type],
                 self.CREEP_TYPES[creep_type], 
-                self.screen_dim[0], 
-                self.screen_dim[1]
+                self.width, 
+                self.height
             )
 
             creep_hits = pygame.sprite.spritecollide(creep, self.creeps, False) #check if we are hitting another other creeps if it was placed here
@@ -119,7 +119,7 @@ class WaterWorld(base.Game):
         """
         self.creep_counts = { "GOOD":0, "BAD":0 }
 
-        self.player = Player(self.AGENT_RADIUS, self.AGENT_COLOR, self.AGENT_SPEED, self.AGENT_INIT_POS, self.screen_dim[0], self.screen_dim[1]) 
+        self.player = Player(self.AGENT_RADIUS, self.AGENT_COLOR, self.AGENT_SPEED, self.AGENT_INIT_POS, self.width, self.height) 
         self.player_group = pygame.sprite.Group()
         self.player_group.add( self.player )
 
@@ -155,7 +155,7 @@ class WaterWorld(base.Game):
 
 if __name__ == "__main__":
         pygame.init()
-        game = WaterWorld(width=256, height=256)
+        game = WaterWorld(width=256, height=256, num_creeps=15)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
         game.init()

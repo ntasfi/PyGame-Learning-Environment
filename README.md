@@ -16,6 +16,7 @@ Original games author in brackets:
 * Pixelcopter - Helicopter clone
 * Raycast Maze
 * FlappyBird 
+* Snake
 
 ## Getting started
 

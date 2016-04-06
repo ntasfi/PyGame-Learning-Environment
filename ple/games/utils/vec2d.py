@@ -12,6 +12,9 @@ class vec2d():
 
         return vec2d((x,y))
 
+    def __eq__(self, o):
+        return self.x == o.x and self.y == o.y
+
     def normalize(self):
         norm = math.sqrt( self.x**2 + self.y**2 )
         self.x /= norm

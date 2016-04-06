@@ -176,10 +176,6 @@ class FlappyBird(base.Game):
     
         self.allowed_fps = 30 #restrict the fps
         
-        self.SCREEN_WIDTH = width
-        self.SCREEN_HEIGHT = height
-        self.screen_dim = (width, height)
-
         self.pipe_gap = 100
         self.pipe_color = "red"
         self.images = {}
@@ -191,26 +187,26 @@ class FlappyBird(base.Game):
         self._asset_dir = os.path.join( self._dir_, "assets/" )
         self._load_images()
         
-        self.pipe_offsets = [0, self.SCREEN_WIDTH*0.5, self.SCREEN_WIDTH]
+        self.pipe_offsets = [0, self.width*0.5, self.width]
         self.init_pos = (
-                int( self.SCREEN_WIDTH * 0.2), 
-                int( self.SCREEN_HEIGHT / 2 )
+                int( self.width * 0.2), 
+                int( self.height / 2 )
         )
 
         self.pipe_min = int(self.pipe_gap/4) 
-        self.pipe_max = int(self.SCREEN_HEIGHT*0.79*0.6 - self.pipe_gap/2)
+        self.pipe_max = int(self.height*0.79*0.6 - self.pipe_gap/2)
 
         self.backdrop = Backdrop(
-                self.SCREEN_WIDTH,
-                self.SCREEN_HEIGHT,
+                self.width,
+                self.height,
                 self.images["background"]["day"],
                 self.images["base"],
                 self.scale
                 )
         
         self.player = BirdPlayer(
-                self.SCREEN_WIDTH, 
-                self.SCREEN_HEIGHT, 
+                self.width, 
+                self.height, 
                 self.init_pos, 
                 self.images["player"],
                 color="red",
@@ -219,8 +215,8 @@ class FlappyBird(base.Game):
         
         self.pipe_group = pygame.sprite.Group([
                         self._generatePipes(offset=-75),
-                        self._generatePipes(offset=-75+self.SCREEN_WIDTH/2),
-                        self._generatePipes(offset=-75+self.SCREEN_WIDTH*1.5)
+                        self._generatePipes(offset=-75+self.width/2),
+                        self._generatePipes(offset=-75+self.width*1.5)
                     ])
     
     def _load_images(self):
@@ -279,8 +275,8 @@ class FlappyBird(base.Game):
 
         if pipe == None:
             pipe = Pipe(
-                        self.SCREEN_WIDTH, 
-                        self.SCREEN_HEIGHT,
+                        self.width, 
+                        self.height,
                         start_gap, 
                         self.pipe_gap,
                         self.images["pipes"],
@@ -334,10 +330,10 @@ class FlappyBird(base.Game):
 
             #is out out of the screen?
             if p.x < -p.width:
-                self._generatePipes(offset=self.SCREEN_WIDTH*0.2, pipe=p)
+                self._generatePipes(offset=self.width*0.2, pipe=p)
 
         #fell on the ground
-        if self.player.pos_y >= 0.79*self.SCREEN_HEIGHT - self.player.height:
+        if self.player.pos_y >= 0.79*self.height - self.player.height:
             self.lives = -1
 
         #went above the screen

@@ -51,7 +51,7 @@ class HelicopterPlayer(pygame.sprite.Sprite):
         self.pos = vec2d(pos_init)
         self.speed = speed
         self.climb_speed = speed*-0.875 #-0.0175
-        self.fall_speed = speed*0.095 #0.0019
+        self.fall_speed = speed*0.09 #0.0019
         self.momentum = 0
         
         self.width = SCREEN_WIDTH*0.05
@@ -131,8 +131,6 @@ class Pixelcopter(base.Game):
 
         self.is_climbing = False
         self.speed = 0.0004*width
-        self.SCREEN_WIDTH = width 
-        self.SCREEN_HEIGHT = height 
 
     def _handle_player_events(self):
         self.is_climbing = False
@@ -165,8 +163,8 @@ class Pixelcopter(base.Game):
 
         self.player = HelicopterPlayer(
                 self.speed,
-                self.SCREEN_WIDTH,
-                self.SCREEN_HEIGHT
+                self.width,
+                self.height
         )
 
         self.player_group = pygame.sprite.Group()
@@ -176,41 +174,41 @@ class Pixelcopter(base.Game):
         self._add_blocks()
        
         self.terrain_group = pygame.sprite.Group()
-        self._add_terrain(0, self.SCREEN_WIDTH*4)
+        self._add_terrain(0, self.width*4)
 
     def _add_terrain(self, start, end):
-        w = int(self.SCREEN_WIDTH*0.1)
+        w = int(self.width*0.1)
         steps = range(start+(w/2), end+(w/2), w) #each block takes up 10 units.
         y_jitter = []
 
-        freq = 4.5/self.SCREEN_WIDTH + random.uniform(-0.01, 0.01)
+        freq = 4.5/self.width + random.uniform(-0.01, 0.01)
         for step in steps:
-            jitter = (self.SCREEN_HEIGHT*0.125)*math.sin( freq*step + random.uniform(0.0, 0.5) )
+            jitter = (self.height*0.125)*math.sin( freq*step + random.uniform(0.0, 0.5) )
             y_jitter.append(jitter)
 
-        y_pos = [ int( (self.SCREEN_HEIGHT/2.0)+y_jit ) for y_jit in y_jitter ]
+        y_pos = [ int( (self.height/2.0)+y_jit ) for y_jit in y_jitter ]
        
         for i in range(0, len(steps)):
             self.terrain_group.add(Terrain(
                     (steps[i], y_pos[i]),
                     self.speed,
-                    self.SCREEN_WIDTH,
-                    self.SCREEN_HEIGHT
+                    self.width,
+                    self.height
                 )
             )
 
     def _add_blocks(self):
-        x_pos = random.randint(self.SCREEN_WIDTH, int(self.SCREEN_WIDTH*1.5))
+        x_pos = random.randint(self.width, int(self.width*1.5))
         y_pos = random.randint(
-                int(self.SCREEN_HEIGHT*0.25), 
-                int(self.SCREEN_HEIGHT*0.75)
+                int(self.height*0.25), 
+                int(self.height*0.75)
         ) 
         self.block_group.add(
             Block(
                 (x_pos, y_pos),
                 self.speed,
-                self.SCREEN_WIDTH,
-                self.SCREEN_HEIGHT
+                self.width,
+                self.height
             )
         )
 
@@ -232,11 +230,11 @@ class Pixelcopter(base.Game):
 
         hits = pygame.sprite.spritecollide(self.player, self.terrain_group, False)
         for t in hits:
-            if self.player.pos.y-self.player.height <= t.pos.y-self.SCREEN_HEIGHT*0.25:
+            if self.player.pos.y-self.player.height <= t.pos.y-self.height*0.25:
                 self.score -= 1
                 self.lives -= 1
 
-            if self.player.pos.y >= t.pos.y+self.SCREEN_HEIGHT*0.25:
+            if self.player.pos.y >= t.pos.y+self.height*0.25:
                 self.score -= 1
                 self.lives -= 1
 
@@ -253,7 +251,7 @@ class Pixelcopter(base.Game):
                 t.kill()
 
         if len(self.terrain_group) <= (10+3): #10% per terrain, offset of ~2 with 1 extra
-            self._add_terrain(self.SCREEN_WIDTH, self.SCREEN_WIDTH*5)
+            self._add_terrain(self.width, self.width*5)
 
         self.player_group.draw(self.screen)
         self.block_group.draw(self.screen)

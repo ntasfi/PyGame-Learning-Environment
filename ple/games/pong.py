@@ -153,9 +153,6 @@ class Pong(base.Game):
 			"cpu": 0.0
 		}
 
-                self.SCREEN_WIDTH = width
-                self.SCREEN_HEIGHT = height
-
 	def _handle_player_events(self):
 		self.dy = 0
 		for event in pygame.event.get():
@@ -188,26 +185,26 @@ class Pong(base.Game):
             self.ball = Ball(
         	self.ball_radius,
 		self.ball_speed,
-		(self.SCREEN_WIDTH/2, self.SCREEN_HEIGHT/2),
-                self.SCREEN_WIDTH,
-                self.SCREEN_HEIGHT
+		(self.width/2, self.height/2),
+                self.width,
+                self.height
             )
             
             self.agentPlayer = Player(
 		self.players_speed,
 		self.paddle_width,
 		self.paddle_height,
-		(self.paddle_dist_to_wall, self.SCREEN_HEIGHT/2),
-		self.SCREEN_WIDTH,
-		self.SCREEN_HEIGHT)
+		(self.paddle_dist_to_wall, self.height/2),
+		self.width,
+		self.height)
 
             self.cpuPlayer = Player(
 		self.cpu_speed,
 		self.paddle_width,
 		self.paddle_height,
-		(self.SCREEN_WIDTH-self.paddle_dist_to_wall, self.SCREEN_HEIGHT/2),
-		self.SCREEN_WIDTH,
-		self.SCREEN_HEIGHT)
+		(self.width-self.paddle_dist_to_wall, self.height/2),
+		self.width,
+		self.height)
 
             self.players_group = pygame.sprite.Group()
             self.players_group.add( self.agentPlayer )
@@ -217,7 +214,7 @@ class Pong(base.Game):
             self.ball_group.add( self.ball )
 	
 	def _reset_ball(self, direction):
-            self.ball.pos.x = self.SCREEN_WIDTH/2 #move it to the center
+            self.ball.pos.x = self.width/2 #move it to the center
             
             #we go in the same direction that they lost in but at starting vel.
             self.ball.vel.x = self.ball_speed*direction
@@ -235,7 +232,7 @@ class Pong(base.Game):
 			self.score_counts["cpu"] += 1.0
 			self._reset_ball(-1)
 
-		if self.ball.pos.x >= self.SCREEN_WIDTH:
+		if self.ball.pos.x >= self.width:
 			self.score_sum += 1.0
 			self.score_counts["agent"] += 1.0
 			self._reset_ball(1)
