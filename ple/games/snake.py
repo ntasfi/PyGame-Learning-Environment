@@ -242,12 +242,14 @@ class Snake(base.Game):
 
         hits = pygame.sprite.spritecollide(self.player.head, self.player.body_group, False)
         if len(hits) > 0:
+            self.score -= 1
             self.lives = -1
 
         x_check = (self.player.head.pos.x < 0) or (self.player.head.pos.x+self.player_width/2 > self.width)
         y_check = (self.player.head.pos.y < 0) or (self.player.head.pos.y+self.player_width/2 > self.height)
         
         if x_check or y_check:
+            self.score -= 1
             self.lives = -1
 
         self._handle_player_events()
