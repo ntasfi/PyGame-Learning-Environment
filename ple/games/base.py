@@ -1,5 +1,29 @@
 class Game(object):
+    """Game base class
 
+    ple.games.base.Game(width, height, actions={})
+    
+    This :class:`Game` class sets methods all games require. It should be subclassed when creating new games.
+
+    Parameters
+    ----------
+    width: int
+        The width of the game screen.
+
+    height: int
+        The height of the game screen.
+
+    actions: dict
+        Contains possible actions that the game responds too. The dict keys are used by the game, while the values are `pygame.constants` referring the keys. 
+        
+        Possible actions dict:
+
+        >>> from pygame.constants import K_w, K_s
+        >>> actions = {
+        >>>     "up": K_w,
+        >>>     "down": K_s
+        >>> }
+    """
     def __init__(self, width, height, actions={}):
 
         #Required fields
@@ -16,41 +40,75 @@ class Game(object):
 
     def getScreenDims(self):
         """
-            Return a tuple of screen_dim
+        Gets the screen dimensions of the game in tuple form.
+
+        Returns
+        -------
+        tuple of int
+            Returns tuple as follows (width, height).
+
         """
         return self.screen_dim
 
     def getActions(self):
+        """
+        Gets the actions used within the game.
+
+        Returns
+        -------
+        list of `pygame.constants`
+
+        """
         return self.actions.values()
 
     def init(self):
         """
-            Set the games initial state.
-            Reset score, player/enemy positions etc.
+        This is used to initialize the game, such reseting the score, lives, and player position. 
+
+        This is game dependent.
+
         """
         raise NotImplementedError("Please override this method")
 
     def reset(self):
         """
-            Resets the game. Can usually just wrap init() in here.
-            Unless the game has some notion of check points
+        Wraps the init() function, can be setup to reset certain poritions of the game only if needed. 
         """
         self.init()
 
     def getScore(self):
         """
-            Return the score of the game.
+        Return the current score of the game.
+
+
+        Returns
+        -------
+        int 
+            The current reward the agent has received since the last init() or reset() call. 
         """
         raise NotImplementedError("Please override this method")
 
     def game_over(self):
         """
-            Return bool if the game has 'finished'
+        Gets the status of the game, returns True if game has hit a terminal state. False otherwise. 
+
+        This is game dependent.
+
+        Returns
+        -------
+        bool
+
         """
         raise NotImplementedError("Please override this method")
 
     def step(self, dt):
         """
-            Perform one step of game emulation.
+        This method steps the game forward one step in time equal to the dt parameter. The game does not run unless this method is called.
+
+        Parameters
+        ----------
+        dt : integer
+            This is the amount of time elapsed since the last frame in milliseconds.
+        
         """
         raise NotImplementedError("Please override this method")
