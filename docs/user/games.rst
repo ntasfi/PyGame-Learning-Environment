@@ -1,4 +1,4 @@
-Games
+Available Games
 ------
 
 .. toctree::
