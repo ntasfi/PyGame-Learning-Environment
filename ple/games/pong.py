@@ -123,8 +123,21 @@ class Player(pygame.sprite.Sprite):
 
 class Pong(base.Game):
         """
-            loosely based on code from marti1125s pong lib.
-            https://github.com/marti1125/pong/
+        Loosely based on code from marti1125's `pong game`_.
+        
+        .. _pong game: https://github.com/marti1125/pong/
+
+        Parameters
+        ----------
+        width : int
+            Screen width.
+
+        height : int
+            Screen height, recommended to be same dimension as width.
+
+        MAX_SCORE : int (default: 11)
+            The max number of points the agent or cpu need to score to cause a terminal state.
+
         """
 	def __init__(self, width=64, height=48, MAX_SCORE=11):
 

@@ -10,7 +10,22 @@ from primitives import Player, Creep
 from random import uniform, choice
 
 class WaterWorld(base.Game):
+    """
+    Based Karpthy's WaterWorld in `REINFORCEjs`_.
+    
+    .. _REINFORCEjs: https://github.com/karpathy/reinforcejs 
 
+    Parameters
+    ----------
+    width : int
+        Screen width.
+
+    height : int
+        Screen height, recommended to be same dimension as width.
+
+    num_creeps : int (default: 3)
+        The number of creeps on the screen at once.
+    """
     def __init__(self,
         width=48,
         height=48,
@@ -155,7 +170,7 @@ class WaterWorld(base.Game):
 
 if __name__ == "__main__":
         pygame.init()
-        game = WaterWorld(width=256, height=256, num_creeps=15)
+        game = WaterWorld(width=256, height=256, num_creeps=8)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
         game.init()

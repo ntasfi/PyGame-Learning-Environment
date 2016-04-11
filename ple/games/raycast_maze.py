@@ -5,14 +5,42 @@ from raycast import RayCastPlayer
 from pygame.constants import K_w, K_a, K_d, K_s
 
 class RaycastMaze(base.Game, RayCastPlayer):
+    """
+    Parameters
+    ----------
+    init_pos : tuple of int (default: (1,1))
+        The position the player starts on in the grid. The grid is zero indexed.
 
+    resolution : int (default: 1)
+        This instructs the Raycast engine on how many vertical lines to use when drawing the screen. The number is equal to the width / resolution. 
+
+    move_speed : int (default: 20)
+        How fast the agent moves forwards or backwards.
+
+    turn_speed : int (default: 13)
+        The speed at which the agent turns left or right.
+
+    map_size : int (default: 10)
+        The size of the maze that is generated. Must be greater then 5. Can be incremented to increase difficulty by adjusting the attribute between game resets.
+
+    width : int (default: 48)
+        Screen width.
+
+    height : int (default: 48)
+        Screen height, recommended to be same dimension as width.
+
+    """
 
     def __init__(self,
-            init_dir=(1.0, 0.0), init_pos=(1,1), resolution=1,
-            move_speed=10, turn_speed=7, init_plane=(0.0, 0.66),
+            init_pos=(1,1), resolution=1,
+            move_speed=20, turn_speed=13, 
             map_size=10, height=48, width=48):
 
-        assert map_size >= 5, "map_size must be gte 5"
+        assert map_size > 5, "map_size must be gte 5"
+
+        #do not change
+        init_dir=(1.0, 0.0)
+        init_plane=(0.0, 0.66)
 
         block_types = {
             0: {

@@ -159,17 +159,33 @@ class Backdrop():
         screen.blit(self.background_image, (0,0))
 
 class FlappyBird(base.Game):
+    """
+    Used physics values from sourabhv's `clone`_.
 
-    def __init__(self, fps, width=288, height=512, pipe_gap=100):
-        """
-            Clone of FlappyBird. Used values from https://github.com/sourabhv/FlapPyBird
-            It still feels slightly off at higher fps. Keep at 30fps. 
-        """
+    .. _clone: https://github.com/sourabhv/FlapPyBird
+
+
+    Parameters
+    ----------
+    width : int (default: 288)
+        Screen width. Consistent gameplay is not promised for different widths or heights, therefore the width and height should not be altered.
+
+    height : inti (default: 512)
+        Screen height.
+
+    pipe_gap : int (default: 100)
+        The gap in pixels left between the top and bottom pipes. 
+
+    """
+    
+    def __init__(self, width=288, height=512, pipe_gap=100):
         
         actions = {
             "up": K_w        
         }
-        
+       
+        fps = 30
+
         base.Game.__init__(self, width, height, actions=actions)
         
         self.scale = 30.0/fps

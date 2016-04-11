@@ -137,7 +137,19 @@ class SnakePlayer():
             b.draw(screen)
 
 class Snake(base.Game):
+    """
+    Parameters
+    ----------
+    width : int
+        Screen width.
 
+    height : int
+        Screen height, recommended to be same dimension as width.
+
+    init_length : int (default: 3)
+        The starting number of segments the snake has. Do not set below 3 segments. Has issues with hitbox detection with the body for lower values.
+
+    """
     def __init__(self,
         width=64,
         height=64,

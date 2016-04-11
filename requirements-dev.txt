@@ -1,0 +1,3 @@
+mock
+numpydoc
+Sphinx==1.2.3

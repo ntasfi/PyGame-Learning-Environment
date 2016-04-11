@@ -2,7 +2,7 @@
 
 ![Games](ple_games.jpg?raw=True "Games!")
 
-PyGame-Learning-Environment (PLE) is a learning environment, mimicking the [Arcade Learning Environment](https://github.com/mgbellemare/Arcade-Learning-Environment) interface, allowing a quick start to Reinforcement Learning with Python. It focuses on allowing the practitioner to focus on the model allowing fast iteration cycles. 
+**PyGame-Learning-Environment** (PLE) is a learning environment, mimicking the [Arcade Learning Environment](https://github.com/mgbellemare/Arcade-Learning-Environment) interface, allowing a quick start to Reinforcement Learning with Python. It focuses on allowing the practitioner to focus on the model allowing fast iteration cycles. 
 
 PLE hopes to eventually build an expansive library of primitives and games.
 
@@ -94,4 +94,5 @@ git pull
  * Tests
  * Parallel Learning (One agent, many game copies)
  * Add games
+ * Generalize the library (eg. add Pyglet support)
 

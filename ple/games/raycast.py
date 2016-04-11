@@ -8,8 +8,11 @@ import numpy as np
 
 class RayCastPlayer():
     """
-        Takes input from key presses and traverses a map
+    Loosely based on code from Lode's `Computer Graphics Tutorial`_.
 
+    .. _Computer Graphics Tutorial: http://lodev.org/cgtutor/raycasting.html
+
+    Takes input from key presses and traverses a map
     """
 
     def __init__(self, map_, init_pos, init_dir,

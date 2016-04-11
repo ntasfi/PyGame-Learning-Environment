@@ -5,6 +5,11 @@ from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+install_requires = [
+    "numpy",
+    "Pillow"
+]
+
 setup(
 	name='ple',
 	version='0.0.1',
@@ -22,9 +27,7 @@ setup(
 	keywords='',
 	license="MIT",
 	packages=find_packages(),
-	install_requires = [
-		"pygame",
-		"numpy",
-                "pillow"
-	]
+        include_package_data=False,
+        zip_safe=False,
+        install_requires=install_requires
 )

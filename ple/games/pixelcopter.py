@@ -120,11 +120,19 @@ class Terrain(pygame.sprite.Sprite):
         self.rect.center = (self.pos.x, self.pos.y)
 
 class Pixelcopter(base.Game):
+    """
+    Parameters
+    ----------
+    width : int
+        Screen width.
 
+    height : int
+        Screen height, recommended to be same dimension as width.
+
+    """
     def __init__(self, width=48, height=48):
         actions = {
-                "up": K_w,
-                "nothing": K_s
+                "up": K_w
         }
 
         base.Game.__init__(self, width, height, actions=actions)
@@ -265,6 +273,8 @@ if __name__ == "__main__":
     game.init()
 
     while True:
+        if game.game_over():
+            game.reset()
         dt = game.clock.tick_busy_loop(30)
         game.step(dt)
         pygame.display.update()

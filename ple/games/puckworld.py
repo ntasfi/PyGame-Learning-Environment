@@ -53,7 +53,20 @@ class PuckCreep(pygame.sprite.Sprite):
 
 
 class PuckWorld(base.Game):
+    """
+    Based Karpthy's PuckWorld in `REINFORCEjs`_.
+    
+    .. _REINFORCEjs: https://github.com/karpathy/reinforcejs 
 
+    Parameters
+    ----------
+    width : int
+        Screen width.
+
+    height : int
+        Screen height, recommended to be same dimension as width.
+
+    """
     def __init__(self,
         width=64,
         height=64):
