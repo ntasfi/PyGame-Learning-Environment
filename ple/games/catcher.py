@@ -31,7 +31,7 @@ class Paddle(pygame.sprite.Sprite):
 
         self.image = image
         self.rect = self.image.get_rect()
-        self.rect.center = (SCREEN_WIDTH/2, SCREEN_HEIGHT-height-3)
+        self.rect.center = (SCREEN_WIDTH/2 - self.width/2, SCREEN_HEIGHT-height-3)
 
     def update(self, dx, dt):
         self.vel += dx
@@ -156,6 +156,36 @@ class Catcher(base.Game):
 
         self.fruit = Fruit(self.fruit_fall_speed, self.fruit_size, self.width, self.height)
         self.fruit.reset()
+
+    def getGameState(self):
+        """
+        Gets a non-visual state representation of the game.
+        
+        Returns
+        -------
+
+        dict
+            * player x position.
+            * players velocity.
+            * fruits x position. 
+            * fruits y position.
+
+            See code for structure.
+
+        """
+        state = {
+            "player": {
+                "x": self.player.rect.center[0],
+                "vel": self.player.vel
+            },
+
+            "fruit": {
+                "x": self.fruit.rect.center[0],
+                "y": self.fruit.rect.center[1]
+            }
+        }
+
+        return state
 
     def getScore(self):
         return self.score

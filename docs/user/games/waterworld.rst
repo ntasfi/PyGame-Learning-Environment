@@ -21,3 +21,4 @@ For each green circle captured the agent receives a positive reward of +1; while
 
 .. currentmodule:: ple.games.waterworld
 .. autoclass:: WaterWorld
+   :members: __init__, getGameState

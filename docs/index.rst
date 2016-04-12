@@ -1,7 +1,7 @@
 PLE: A Reinforcement Learning Environment
 =====================================================================
 
-**PyGame Learning Environment (PLE)** is a learning environment, mimicking the Arcade Learning Environment interface, allowing a quick start to Reinforcement Learning in Python. It focuses on allowing the practitioner to focus on the design of models and experiments.
+**PyGame Learning Environment (PLE)** is a learning environment, mimicking the Arcade Learning Environment interface, allowing a quick start to Reinforcement Learning in Python. The goal of PLE is allow practitioners to focus design of models and experiments instead of environment design.
 
 PLE has only been tested with **Python 2.7.6**.
 

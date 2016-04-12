@@ -19,3 +19,4 @@ For each vertical block it passes through it gains a positive reward of +1. Each
 
 .. currentmodule:: ple.games.pixelcopter
 .. autoclass:: Pixelcopter
+   :members: __init__, getGameState

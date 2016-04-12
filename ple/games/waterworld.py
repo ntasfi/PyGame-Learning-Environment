@@ -52,7 +52,7 @@ class WaterWorld(base.Game):
         self.AGENT_SPEED = 0.00045*width 
         self.AGENT_RADIUS = radius 
         self.AGENT_INIT_POS = (self.width/2, self.height/2)
-
+        
         self.creep_counts = {
             "GOOD": 0,
             "BAD": 0
@@ -118,6 +118,43 @@ class WaterWorld(base.Game):
         self.creeps.add(creep)
 
         self.creep_counts[ self.CREEP_TYPES[creep_type] ] += 1
+
+    def getGameState(self):
+        """
+
+        Returns
+        -------
+
+        dict
+            * player x position.
+            * player y position.
+            * player x velocity.
+            * player y velocity.
+            * player distance to each creep
+
+
+        """
+
+        state = {
+            "player": {
+                "x": self.player.pos.x,
+                "y": self.player.pos.y,
+                "velocity": {
+                    "x": self.player.vel.x,
+                    "y": self.player.vel.y
+                }
+            },
+            "creep_dist": {
+                "GOOD": [],
+                "BAD": []
+            }
+        }
+
+        for c in self.creeps:
+            dist = math.sqrt( (self.player.pos.x - c.pos.x)**2 + (self.player.pos.y - c.pos.y)**2 )
+            state["creep_dist"][c.TYPE].append(dist)
+
+        return state
 
     def getScore(self):
         return self.score

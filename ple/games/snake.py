@@ -203,6 +203,41 @@ class Snake(base.Game):
                 if key == self.actions["down"] and self.player.dir.y != -1:
                     self.player.dir = vec2d((0, 1))
 
+    def getGameState(self):
+        """
+
+        Returns
+        -------
+
+        dict
+            * snake head x position.
+            * snake head y position.
+            * food x position.
+            * food y position.
+            * distance from head to each snake segment.
+
+            See code for structure.
+
+        """
+        
+        state = {
+                "snake_head": {
+                    "x": self.player.head.pos.x, 
+                    "y": self.player.head.pos.y
+                },
+                "food": {
+                    "x": self.food.pos.x, 
+                    "y": self.food.pos.y
+                },
+                "snake_body":[]
+        }
+
+        for s in self.player.body:
+           dist = math.sqrt((self.player.head.pos.x - s.pos.x)**2 + (self.player.head.pos.y - s.pos.y)**2) 
+           state["snake_body"].append(dist)
+
+        return state
+
     def getScore(self):
         return self.score
 

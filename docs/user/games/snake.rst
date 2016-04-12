@@ -25,3 +25,4 @@ It recieves a positive reward, +1, for each red square the head comes in contact
 
 .. currentmodule:: ple.games.snake
 .. autoclass:: Snake
+   :members: __init__, getGameState

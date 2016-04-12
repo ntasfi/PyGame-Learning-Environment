@@ -23,3 +23,4 @@ The agent receives a positive reward, of +1, for each successful ball placed beh
 
 .. currentmodule:: ple.games.pong
 .. autoclass:: Pong
+   :members: __init__, getGameState

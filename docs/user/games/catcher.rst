@@ -21,4 +21,5 @@ Rewards
 The agent receives a positive reward, of +1, for each successful fruit catch, while it loses a point, -1, if the fruit is not caught.
 
 .. currentmodule:: ple.games.catcher
-.. autoclass:: Catcher 
+.. autoclass:: Catcher
+   :members: __init__, getGameState

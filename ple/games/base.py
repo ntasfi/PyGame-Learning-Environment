@@ -38,6 +38,19 @@ class Game(object):
         self.screen_dim = (width, height) #width and height
         self.allowed_fps = None #fps that the game is allowed to run at.
 
+
+    def getGameState(self):
+        """
+        Gets a non-visual state representation of the game.
+
+        Returns
+        -------
+        dict or None
+            dict if the game supports it and None otherwise.
+
+        """
+        return None
+
     def getScreenDims(self):
         """
         Gets the screen dimensions of the game in tuple form.

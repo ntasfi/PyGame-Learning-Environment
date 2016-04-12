@@ -43,19 +43,23 @@ class Ball(pygame.sprite.Sprite):
 	def update(self, agentPlayer, cpuPlayer, dt):
 		
                 if self.pos.y-self.radius <= 0: 
-                        self.vel.y *= -1.0
+                        self.vel.y *= -0.99
                         self.pos.y += 1.0
 
                 if self.pos.y+self.radius >= self.SCREEN_HEIGHT:
-			self.vel.y *= -1.0
+			self.vel.y *= -0.99
                         self.pos.y -= 1.0
 
-                if pygame.sprite.collide_rect(self, agentPlayer):
-                        self.vel.x = (-1*self.vel.x + self.speed*0.1)
+                if self.pos.x <= agentPlayer.pos.x+agentPlayer.rect_width:
+                    if pygame.sprite.collide_rect(self, agentPlayer):
+                        self.vel.x = -1*(self.vel.x + self.speed*0.05)
+                        self.vel.y += agentPlayer.vel.y*0.01
                         self.pos.x += 1.0
 
-                if pygame.sprite.collide_rect(self, cpuPlayer):
-			self.vel.x = -1*(self.vel.x + self.speed*0.1)
+                if self.pos.x >= cpuPlayer.pos.x-cpuPlayer.rect_width:
+                    if pygame.sprite.collide_rect(self, cpuPlayer):
+                        self.vel.x = -1*(self.vel.x + self.speed*0.05)
+                        self.vel.y += cpuPlayer.vel.y*0.03
                         self.pos.x -= 1.0
 
                 self.pos.x += self.vel.x * dt
@@ -115,9 +119,11 @@ class Player(pygame.sprite.Sprite):
                 if ball.vel.x >= 0 and ball.pos.x >= self.SCREEN_WIDTH/2:
 			if self.pos.y < ball.pos.y:
 				self.pos.y += self.speed * dt
+                                self.vel.y = self.speed*dt
 
 			if self.pos.y > ball.pos.y:
 				self.pos.y -= self.speed * dt
+                                self.vel.y = -1*self.speed*dt
 
 		self.rect.center = (self.pos.x, self.pos.y)
 
@@ -150,12 +156,12 @@ class Pong(base.Game):
 
                 #the %'s come from original values, wanted to keep same ratio when you 
                 #increase the resolution.
-                self.ball_radius = percent_round_int(height, 0.06)
-                self.players_speed = 0.015*height
-                self.cpu_speed = 0.15 #has to be small because its pressed much faster than player
-		self.ball_speed = 0.001*height 
-                self.paddle_width = percent_round_int(width, 0.05)
-                self.paddle_height = percent_round_int(height, 0.23) 
+                self.ball_radius = percent_round_int(height, 0.03)
+                self.players_speed = 0.022*height
+                self.cpu_speed = 0.175 #has to be small because its pressed much faster than player
+		self.ball_speed = 0.00075*height 
+                self.paddle_width = percent_round_int(width, 0.023)
+                self.paddle_height = percent_round_int(height, 0.15) 
                 self.paddle_dist_to_wall = percent_round_int(width, 0.0625)
                 self.MAX_SCORE = MAX_SCORE
 
@@ -181,7 +187,46 @@ class Pong(base.Game):
 				if key == self.actions['down']:
 					self.dy += self.players_speed
 
-	def getScore(self):
+        def getGameState(self):
+            """
+            Gets a non-visual state representation of the game.
+            
+            Returns
+            -------
+
+            dict
+                * player y position.
+                * players velocity.
+                * cpu y position. 
+                * ball x position.
+                * ball y position.
+                * ball x velocity.
+                * ball y velocity.
+
+                See code for structure.
+
+            """
+            state = {
+                    "player": {
+                        "y": self.agentPlayer.pos.y,
+                        "velocity": self.agentPlayer.vel.y
+                    },
+                    "cpu": {
+                        "y": self.cpuPlayer.pos.y
+                    },
+                    "ball": {
+                        "x": self.ball.pos.x,
+                        "y": self.ball.pos.y,
+                        "velocity": {
+                            "x": self.ball.pos.x,
+                            "y": self.ball.pos.y
+                        }
+                    }
+            }
+
+            return state
+	
+        def getScore(self):
 		return self.score_sum
 
 	def game_over(self):

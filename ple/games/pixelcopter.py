@@ -153,6 +153,51 @@ class Pixelcopter(base.Game):
                 if key == self.actions['up']:
                     self.is_climbing = True
 
+    def getGameState(self):
+        """
+        Gets a non-visual state representation of the game.
+
+        Returns
+        -------
+
+        dict
+            * player y position.
+            * player velocity.
+            * player distance to floor.
+            * player distance to ceiling.
+            * next block x distance to player.
+            * next blocks top y location,
+            * next blocks bottom y location.
+
+            See code for structure.
+
+        """
+
+        min_dist = 999
+        min_block = None
+        for b in self.block_group: #Groups do not return in order
+            dist_to = b.pos.x - self.player.pos.x
+            if dist_to > 0 and dist_to < min_dist:
+                min_block = b
+                min_dist = dist_to
+                
+        current_terrain = pygame.sprite.spritecollide(self.player, self.terrain_group, False)[0]
+        state = {
+            "player": {
+                "y": self.player.pos.y,
+                "vel": self.player.momentum,
+                "dist_to_ceil": self.player.pos.y-(current_terrain.pos.y-self.height*0.25),
+                "dist_to_floor": (current_terrain.pos.y+self.height*0.25)-self.player.pos.y
+            },
+            "next_gate": {
+                "dist_to_player": min_dist,
+                "block_top": min_block.pos.y,
+                "block_bottom": min_block.pos.y+min_block.height
+            }
+        }
+
+        return state
+
     def getScreenDims(self):
         return self.screen_dim
 
@@ -275,6 +320,6 @@ if __name__ == "__main__":
     while True:
         if game.game_over():
             game.reset()
-        dt = game.clock.tick_busy_loop(30)
+        dt = game.clock.tick_busy_loop(5)
         game.step(dt)
         pygame.display.update()

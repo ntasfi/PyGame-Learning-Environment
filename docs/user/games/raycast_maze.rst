@@ -31,3 +31,4 @@ Currently it receives a postive reward of +1 when it finds the red block.
 
 .. currentmodule:: ple.games.raycast_maze
 .. autoclass:: RaycastMaze
+   :members: __init__, getGameState

@@ -280,6 +280,59 @@ class FlappyBird(base.Game):
         self.lives = 1
         self.tick = 0
 
+    def getGameState(self):
+        """
+        Gets a non-visual state representation of the game.
+        
+        Returns
+        -------
+
+        dict
+            * player y position.
+            * players velocity.
+            * next pipe distance to player
+            * next pipe top y position
+            * next pipe bottom y position
+            * next next pipe distance to player
+            * next next pipe top y position
+            * next next pipe bottom y position
+
+
+            See code for structure.
+
+        """
+        pipes = []
+        for p in self.pipe_group:
+            if p.x > self.player.pos_x:
+                pipes.append((p, p.x - self.player.pos_x))
+              
+        sorted(pipes, key=lambda p: p[1])
+
+        next_pipe = pipes[1][0] 
+        next_next_pipe = pipes[0][0] 
+        
+        if next_next_pipe.x < next_pipe.x:
+            next_pipe, next_next_pipe = next_next_pipe, next_pipe
+
+        state = {
+            "player": {
+                "y": self.player.pos_y,
+                "vel": self.player.vel
+            },
+            "next_pipe": {
+                "dist_to_player": next_pipe.x - self.player.pos_x,
+                "top_y": next_pipe.gap_start,
+                "bottom_y": next_pipe.gap_start+self.pipe_gap 
+            },
+            "next_next_pipe": {
+                "dist_to_player": next_next_pipe.x - self.player.pos_x,
+                "top_y": next_next_pipe.gap_start,
+                "bottom_y": next_next_pipe.gap_start+self.pipe_gap 
+            }
+        }
+
+        return state
+
     def getScore(self):
         return self.score
 

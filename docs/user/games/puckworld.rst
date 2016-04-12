@@ -21,3 +21,4 @@ The agent is rewarded based on its distance to the green dot, where lower values
 
 .. currentmodule:: ple.games.puckworld
 .. autoclass:: PuckWorld
+   :members: __init__, getGameState

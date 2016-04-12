@@ -112,6 +112,19 @@ class RaycastMaze(base.Game, RayCastPlayer):
 
         return Z.astype(int)
 
+    def getGameState(self):
+        """
+
+        Returns
+        -------
+
+        None
+            Does not have a non-visual representation of game state.
+            Would be possible to return the location of the maze end.
+
+        """
+        return None
+
     def getScore(self):
         return self.score
 
@@ -126,7 +139,6 @@ class RaycastMaze(base.Game, RayCastPlayer):
             return False
 
     def init(self):
-        self.screen.fill((0,0,0))
         self.pos = np.copy(self.init_pos)
         self.dir = np.copy(self.init_dir)
         self.plane = np.copy(self.init_plane)

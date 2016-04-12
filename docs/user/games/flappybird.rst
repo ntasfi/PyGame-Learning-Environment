@@ -23,3 +23,4 @@ For each pipe it passes through it gains a positive reward of +1. Each time a te
 
 .. currentmodule:: ple.games.flappybird
 .. autoclass:: FlappyBird
+   :members: __init__, getGameState

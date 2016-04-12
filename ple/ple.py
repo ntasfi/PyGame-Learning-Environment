@@ -36,11 +36,14 @@ class PLE(object):
         NOOP: pygame.constants (default: K_F15)
             The key we want our agent to send that represents a NOOP. This is currently set to F15.
 
+        state_preprocessor: python function (default: None)
+            Python function which takes a dict representing game state and returns a numpy array.
 
         """
 	def __init__(self, 
                 game, fps=30, frame_skip=1, num_steps=1, force_fps=True, 
-                display_screen=False, add_noop_action=True, NOOP=K_F15):
+                display_screen=False, add_noop_action=True, 
+                NOOP=K_F15, state_preprocessor=None):
 
 		self.game = game
 		self.fps = fps
@@ -57,6 +60,19 @@ class PLE(object):
 		self.previous_score = 0
 		self.frame_count = 0
 
+		self.game.init()
+
+                self.state_preprocessor = state_preprocessor
+                self.state_dim = None
+
+                if self.state_preprocessor != None:
+                    self.state_dim = self.game.getGameState()
+
+                    if self.state_dim == None:
+                        raise ValueError("Asked to return non-visual state on game that does not support it!")
+                    else:
+                        self.state_dim = self.state_preprocessor(self.state_dim).shape
+
                 if game.allowed_fps != None and self.fps != game.allowed_fps:
                     raise ValueError("Game requires %dfps, was given %d." % (game.allowed_fps, game.allowed_fps))
 
@@ -71,14 +87,13 @@ class PLE(object):
 
 	def init(self):
                 """
-                Initializes the pygame environement, setup the display, game clock, and calls the games init() function.
+                Initializes the pygame environement, setup the display, and game clock.
 
                 This method should be explicitly called.
                 """
 		pygame.init()
 		self.game.screen = pygame.display.set_mode( self.getScreenDims(), 0, 32)
 		self.game.clock = pygame.time.Clock()
-		self.game.init()
 
 	def getActionSet(self):
                 """
@@ -201,6 +216,38 @@ class PLE(object):
                     Returns a tuple of the following format (screen_width, screen_height).
 		"""
 		return self.game.getScreenDims()
+
+	def getGameStateDims(self):
+		"""
+		Gets the games non-visual state dimensions.
+                
+                Returns
+                -------
+                
+                tuple of int or None
+                    Returns a tuple of the state vectors shape or None if the game does not support it.
+		"""
+		return self.state_dim
+
+        def getGameState(self):
+                """
+                Gets a non-visual state representation of the game.
+
+                This can include items such as player position, velocity, ball location and velocity etc.
+                
+                Returns
+                -------
+
+                dict or None
+                    It returns a dict of game information. This greatly depends on the game in question and must be referenced against each game.
+                    If no state is available or supported None will be returned back.
+
+                """
+                state = self.game.getGameState()
+                if state != None and self.state_preprocessor != None:
+                    return self.state_preprocessor(state)
+                else: 
+                    raise ValueError("Was asked to return state vector for game that does not support it!")
 
 	def act(self, action):
 		"""

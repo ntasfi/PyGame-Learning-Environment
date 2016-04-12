@@ -127,6 +127,47 @@ class PuckWorld(base.Game):
                 if key == self.actions["down"]:
                     self.dy += self.AGENT_SPEED
 
+    def getGameState(self):
+        """
+        Gets a non-visual state representation of the game.
+        
+        Returns
+        -------
+
+        dict
+            * player x position.
+            * player y position.
+            * players x velocity.
+            * players y velocity.
+            * good creep x position.
+            * good creep y position.
+            * bad creep x position.
+            * bad creep y position.
+
+            See code for structure.
+
+        """
+        state = {
+                "player": {
+                    "x": self.player.pos.x,
+                    "y": self.player.pos.y,
+                    "velocity": {
+                        "x": self.player.vel.x,
+                        "y": self.player.vel.y
+                    }
+                },
+                "good_creep": {
+                    "x": self.good_creep.pos.x,
+                    "y": self.good_creep.pos.y
+                },
+                "bad_creep": {
+                    "x": self.bad_creep.pos.x,
+                    "y": self.bad_creep.pos.y
+                },
+        }
+
+        return state
+
     def getScore(self):
         return self.score
 
