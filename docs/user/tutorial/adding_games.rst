@@ -60,13 +60,13 @@ The code below is within our ``Catcher`` class and has the class definition repe
                         #remove lives
 
 
-The ``init`` method sets the game to a clean state. The minimum this method must do is to reset the ``self.score`` attribute of the game. It is also strongly recommended this method perform other game specific functions such as paddle position and cleaning the screen. This is important as the game might be still in a terminal state if the player and object positions are not reset; which would result in endless resetting of the environment.
+The ``init`` method sets the game to a clean state. The minimum this method must do is to reset the ``self.score`` attribute of the game. It is also strongly recommended this method perform other game specific functions such as player position and clearing the screen. This is important as the game might still be in a terminal state if the player and object positions are not reset; which would result in endless resetting of the environment.
 
 ``getScore`` returns the current score of the agent. You are free to pull information from the game to decide on a score, such as the number of lives left etc. or you can simply return the ``self.score`` attribute.
 
 ``game_over`` must return True if the game has hit a terminal state. This depends greatly on game. In this case the agent loses a life for each fruit it fails to catch and causes the game to end if it hits 0.
 
-``step`` method is responsible for the main logic of the game. It is called everytime our agent performs an action on the game environment. ``step`` perform a step in game time equal to ``dt``. ``dt`` is required to allow the game to run at different frame rates such that the movement speeds of objects are scaled by elapsed time. With that said the game can be locked to a specific frame rate, by setting ``self.allowed_fps``, and written such that ``step`` moves game objects at rates suitable for the locked frame rate. The function signature always expects ``dt`` to be passed, the game logic does not have to use it though. 
+``step`` method is responsible for the main logic of the game. It is called everytime our agent performs an action on the game environment. ``step`` performs a step in game time equal to ``dt``. ``dt`` is required to allow the game to run at different frame rates such that the movement speeds of objects are scaled by elapsed time. With that said the game can be locked to a specific frame rate, by setting ``self.allowed_fps``, and written such that ``step`` moves game objects at rates suitable for the locked frame rate. The function signature always expects ``dt`` to be passed, the game logic does not have to use it though. 
 
 Thats it! You only need a handful of methods defined to be able to interface your game with PLE. It is suggested to look through the different games inside of the `games folder`_. 
 

@@ -6,6 +6,9 @@
 
 PLE hopes to eventually build an expansive library of games.
 
+## Documentation
+
+Docs for the project can be [found here](http://pygame-learning-environment.readthedocs.org/). They are current a WIP.
 
 ## Games
 Original games author in brackets:
