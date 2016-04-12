@@ -8,19 +8,11 @@ PLE hopes to eventually build an expansive library of games.
 
 ## Documentation
 
-Docs for the project can be [found here](http://pygame-learning-environment.readthedocs.org/). They are current a WIP.
+Docs for the project can be [found here](http://pygame-learning-environment.readthedocs.org/). They are currently WIP.
 
 ## Games
-Original games author in brackets:
 
-* WaterWorld (Karpathy)
-* PuckWorld (Karpathy)
-* Pong (marti1125)
-* Pixelcopter - Helicopter clone
-* Raycast Maze
-* FlappyBird 
-* Snake
-* Catcher (EderSantana)
+Available games can be found in the [docs](http://pygame-learning-environment.readthedocs.org/en/latest/user/games.html).
 
 ## Getting started
 
