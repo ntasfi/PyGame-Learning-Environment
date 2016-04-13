@@ -78,7 +78,7 @@ class Wall(pygame.sprite.Sprite):
         
         image = pygame.Surface([w, h])
         image.fill( (10, 10, 10) )
-        self.image = image.convert_alpha()
+        self.image = image.convert()
 
         self.rect = self.image.get_rect()
         self.rect.center = pos
@@ -117,7 +117,7 @@ class Player(pygame.sprite.Sprite):
                 0
         )
         
-        self.image = image.convert_alpha()
+        self.image = image.convert()
         self.rect = self.image.get_rect()
         self.radius = radius
 

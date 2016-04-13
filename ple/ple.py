@@ -59,6 +59,9 @@ class PLE(object):
 		self.score = 0
 		self.previous_score = 0
 		self.frame_count = 0
+                
+                #some games need a screen setup for convert images
+                pygame.display.set_mode((1,1), pygame.NOFRAME)
 
 		self.game.init()
 

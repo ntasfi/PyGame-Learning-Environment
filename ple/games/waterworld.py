@@ -96,8 +96,8 @@ class WaterWorld(base.Game):
 
         while len(creep_hits) > 0 and dist < 2.0:
             pos = ( 
-                int(uniform(self.CREEP_RADII[creep_type]*2.5, self.width-self.CREEP_RADII[creep_type]*2.5)), 
-                int(uniform(self.CREEP_RADII[creep_type]*2.5, self.height-self.CREEP_RADII[creep_type]*2.5)) 
+                int(uniform(self.CREEP_RADII[creep_type]*3, self.width-self.CREEP_RADII[creep_type]*3)), 
+                int(uniform(self.CREEP_RADII[creep_type]*3, self.height-self.CREEP_RADII[creep_type]*3)) 
             )  
             dist = math.sqrt( (self.player.pos.x - pos[0])**2 + (self.player.pos.y - pos[1])**2 )
   
