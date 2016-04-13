@@ -47,9 +47,9 @@ class WaterWorld(base.Game):
         radius = percent_round_int(width, 0.047)
         self.CREEP_RADII = [ radius, radius ]
         self.CREEP_REWARD = [ 1, -1 ]
-        self.CREEP_SPEED = 0.00015*width 
+        self.CREEP_SPEED = 0.25*width 
         self.AGENT_COLOR = (60, 60, 140)
-        self.AGENT_SPEED = 0.00045*width 
+        self.AGENT_SPEED = 0.25*width 
         self.AGENT_RADIUS = radius 
         self.AGENT_INIT_POS = (self.width/2, self.height/2)
         
@@ -62,6 +62,8 @@ class WaterWorld(base.Game):
         self.dy = 0
 
     def _handle_player_events(self):
+        self.dx = 0
+        self.dy = 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -70,9 +72,6 @@ class WaterWorld(base.Game):
             if event.type == pygame.KEYDOWN:
                 key = event.key
                 
-                self.dx *= 0.9
-                self.dy *= 0.9
-
                 if key == self.actions["left"]:
                     self.dx -= self.AGENT_SPEED
 
@@ -188,7 +187,7 @@ class WaterWorld(base.Game):
         """
             Perform one step of game emulation.
         """
-
+        dt /= 1000.0
         self.screen.fill(self.BG_COLOR)
 
         self._handle_player_events()

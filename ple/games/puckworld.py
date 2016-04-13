@@ -85,7 +85,7 @@ class PuckWorld(base.Game):
             "radius_outer": percent_round_int(width, 0.265),
             "color_center": (110, 45, 45),
             "color_outer": (150, 95, 95),
-            "speed": 0.00005*width
+            "speed": 0.05*width
         }
 
         self.CREEP_GOOD = {
@@ -94,9 +94,9 @@ class PuckWorld(base.Game):
         }
 
         self.AGENT_COLOR = (60, 60, 140)
-        self.AGENT_SPEED = 0.00015*width 
+        self.AGENT_SPEED = 0.2*width 
         self.AGENT_RADIUS = percent_round_int(width, 0.047)
-        self.AGENT_INIT_POS = (0,0)
+        self.AGENT_INIT_POS = (self.AGENT_RADIUS, self.AGENT_RADIUS)
 
         self.BG_COLOR = (255, 255, 255)
         self.dx = 0
@@ -104,6 +104,8 @@ class PuckWorld(base.Game):
         self.ticks = 0
 
     def _handle_player_events(self):
+        self.dx = 0.0
+        self.dy = 0.0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -112,8 +114,6 @@ class PuckWorld(base.Game):
             if event.type == pygame.KEYDOWN:
                 key = event.key
                 
-                self.dx *= 0.9
-                self.dy *= 0.9
 
                 if key == self.actions["left"]:
                     self.dx -= self.AGENT_SPEED
@@ -216,7 +216,7 @@ class PuckWorld(base.Game):
         """
             Perform one step of game emulation.
         """
-
+        dt /= 1000.0
         self.ticks += 1
         self.screen.fill(self.BG_COLOR)
 

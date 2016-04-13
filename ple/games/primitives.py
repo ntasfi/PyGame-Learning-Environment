@@ -21,7 +21,7 @@ class Creep(pygame.sprite.Sprite):
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
         self.TYPE = TYPE
-        self.jitter_speed = 0.003
+        self.jitter_speed = 0.9
         self.speed = speed
         self.reward = reward
         self.radius = radius
@@ -98,8 +98,6 @@ class Player(pygame.sprite.Sprite):
 
         pygame.sprite.Sprite.__init__(self)
         
-        self.bounce_force = 0.0 #decays
-
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
  
@@ -125,27 +123,28 @@ class Player(pygame.sprite.Sprite):
         self.vel.x += dx
         self.vel.y += dy
 
-        self.vel.x = self.vel.x*0.9
-        self.vel.y = self.vel.y*0.9
+        new_x = self.pos.x + self.vel.x*dt
+        new_y = self.pos.y + self.vel.y*dt
 
-        self.pos.x += self.vel.x
-        self.pos.y += self.vel.y
-
-        if self.pos.x < self.radius:
+        #if its not against a wall we want a total decay of 50
+        if new_x >= self.SCREEN_WIDTH-self.radius:
+            self.pos.x = self.SCREEN_WIDTH-self.radius
+            self.vel.x = 0.0
+        elif new_x < self.radius:
             self.pos.x = self.radius
-            self.vel.x *= self.bounce_force
+            self.vel.x = 0.0
+        else:
+            self.pos.x = new_x
+            self.vel.x = self.vel.x*0.975
 
-        if self.pos.x > self.SCREEN_WIDTH-(self.radius):
-            self.pos.x = self.SCREEN_WIDTH-(self.radius)
-            self.vel.x *= self.bounce_force
-
-        if self.pos.y < self.radius:
+        if new_y > self.SCREEN_HEIGHT-self.radius:
+            self.pos.y = self.SCREEN_HEIGHT-self.radius
+            self.vel.y = 0.0
+        elif new_y < self.radius:
             self.pos.y = self.radius
-            self.vel.x *= self.bounce_force
-
-        if self.pos.y > self.SCREEN_HEIGHT-(self.radius):
-            self.pos.y = self.SCREEN_HEIGHT-(self.radius)
-            self.vel.y *= self.bounce_force
-
+            self.vel.y = 0.0
+        else:
+            self.pos.y = new_y
+            self.vel.y = self.vel.y*0.975
+       
         self.rect.center = (self.pos.x, self.pos.y)     
-
