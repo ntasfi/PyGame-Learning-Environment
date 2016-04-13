@@ -1,7 +1,7 @@
 RaycastMaze
 ============
 
-.. image:: /_static/raycast_maze.gif
+.. image:: /_static/raycastmaze.gif
 
 In RaycastMaze the agent must navigate a 3D environment searching for the exit denoted with a bright red square.
 
@@ -29,6 +29,6 @@ Rewards
 -------
 Currently it receives a postive reward of +1 when it finds the red block.
 
-.. currentmodule:: ple.games.raycast_maze
+.. currentmodule:: ple.games.raycastmaze
 .. autoclass:: RaycastMaze
    :members: __init__, getGameState
