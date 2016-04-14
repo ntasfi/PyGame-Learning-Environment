@@ -1,6 +1,6 @@
 import numpy as np
 from ple import PLE
-from ple.games.raycast_maze import RaycastMaze
+from ple.games.raycastmaze import RaycastMaze
 
 class NaiveAgent():
 	"""
