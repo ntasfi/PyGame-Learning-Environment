@@ -161,6 +161,7 @@ class PLE(object):
                 """ 
                 Performs a reset of the games to a clean initial state.
                 """
+                self.previous_score = 0.0
 		self.game.reset()
 
 	def getScreenRGB(self):

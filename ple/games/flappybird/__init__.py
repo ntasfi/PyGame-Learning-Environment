@@ -404,6 +404,7 @@ class FlappyBird(base.Game):
         #fell on the ground
         if self.player.pos_y >= 0.79*self.height - self.player.height:
             self.lives = -1
+            self.score -= 1.0 
 
         #went above the screen
         if self.player.pos_y < -self.player.height:
