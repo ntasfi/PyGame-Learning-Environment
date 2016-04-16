@@ -21,7 +21,6 @@ class Creep(pygame.sprite.Sprite):
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
         self.TYPE = TYPE
-        self.jitter_speed = 0.9
         self.speed = speed
         self.reward = reward
         self.radius = radius
@@ -47,24 +46,32 @@ class Creep(pygame.sprite.Sprite):
         self.rect.center = pos_init
 
     def update(self, dt):
-        jitter_x, jitter_y = 0, 0
-        if self.pos.x-self.radius > self.SCREEN_WIDTH-1 or self.pos.x <= self.radius*3:
-            self.direction.x *= -1
-            jitter_x = self.jitter_speed*self.direction.x*random()
 
-        if self.pos.y-self.radius > self.SCREEN_HEIGHT-1 or self.pos.y <= self.radius*3:
-            self.direction.y *= -1
-            jitter_y = self.jitter_speed*self.direction.y*random()
+        dx = self.direction.x*self.speed*dt
+        dy = self.direction.y*self.speed*dt
 
-        displacement = vec2d((
-                self.direction.x * self.speed * dt,
-                self.direction.y * self.speed * dt))
+        if self.pos.x + dx > self.SCREEN_WIDTH - self.radius:
+            self.pos.x = self.SCREEN_WIDTH - self.radius
+            self.direction.x = -1*self.direction.x*(1 + 0.5*random()) #a little jitter
+        elif self.pos.x + dx <= self.radius:
+            self.pos.x = self.radius
+            self.direction.x = -1*self.direction.x*(1 + 0.5*random()) #a little jitter
+        else:
+            self.pos.x = self.pos.x + dx
 
-        self.pos += displacement
+        if self.pos.y + dy > self.SCREEN_HEIGHT - self.radius:
+            self.pos.y = self.SCREEN_HEIGHT - self.radius
+            self.direction.y = -1*self.direction.y*(1 + 0.5*random()) #a little jitter
+        elif self.pos.y + dy <= self.radius:
+            self.pos.y = self.radius
+            self.direction.y = -1*self.direction.y*(1 + 0.5*random()) #a little jitter
+        else:
+            self.pos.y = self.pos.y + dy
 
-        self.rect.center = ((
-                self.pos.x - self.image.get_size()[0],
-                self.pos.y - self.image.get_size()[1]))
+        self.direction.normalize()
+
+        
+        self.rect.center = ((self.pos.x, self.pos.y))
 
 
 class Wall(pygame.sprite.Sprite):

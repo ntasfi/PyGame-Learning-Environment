@@ -58,17 +58,20 @@ class RayCastPlayer():
                 new_location = new_location.astype(int)
                 
                 newX, newY = new_location[0,:]
-                new_map = self.map_[ newX, newY ]
 
-                if self.block_types[new_map]["pass_through"]:
 
-                    if key == self.actions["forward"]:
-                        self.pos[0,0] += self.dir[0,0]*self.move_speed*dt
-                        self.pos[0,1] += self.dir[0,1]*self.move_speed*dt
+                if newX < self.map_.shape[0] and newY < self.map_.shape[1]:
+                    new_map = self.map_[ newX, newY ]
 
-                    if key == self.actions["backward"]:
-                        self.pos[0,0] -= self.dir[0,0]*self.move_speed*dt
-                        self.pos[0,1] -= self.dir[0,1]*self.move_speed*dt
+                    if self.block_types[new_map]["pass_through"]:
+
+                        if key == self.actions["forward"]:
+                            self.pos[0,0] += self.dir[0,0]*self.move_speed*dt
+                            self.pos[0,1] += self.dir[0,1]*self.move_speed*dt
+
+                        if key == self.actions["backward"]:
+                            self.pos[0,0] -= self.dir[0,0]*self.move_speed*dt
+                            self.pos[0,1] -= self.dir[0,1]*self.move_speed*dt
 
                 if key == self.actions["right"]:
                     X_TURN = np.cos(self.turn_speed*dt)

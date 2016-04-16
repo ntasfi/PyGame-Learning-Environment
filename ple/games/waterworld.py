@@ -94,9 +94,10 @@ class WaterWorld(base.Game):
         dist = 0.0
 
         while len(creep_hits) > 0 and dist < 2.0:
+            radius = self.CREEP_RADII[creep_type]*3
             pos = ( 
-                int(uniform(self.CREEP_RADII[creep_type]*3, self.width-self.CREEP_RADII[creep_type]*3)), 
-                int(uniform(self.CREEP_RADII[creep_type]*3, self.height-self.CREEP_RADII[creep_type]*3)) 
+                int(uniform(radius, self.width-radius)), 
+                int(uniform(radius, self.height-radius)) 
             )  
             dist = math.sqrt( (self.player.pos.x - pos[0])**2 + (self.player.pos.y - pos[1])**2 )
   
@@ -162,6 +163,7 @@ class WaterWorld(base.Game):
         """
             Return bool if the game has 'finished'
         """
+        self.score += self.N_CREEPS/2
         return ( self.creep_counts['GOOD'] == 0 )
 
     def init(self):
@@ -200,7 +202,7 @@ class WaterWorld(base.Game):
             self._add_creep()
 
         self.creeps.update(dt)
-
+        
         self.player_group.draw(self.screen)
         self.creeps.draw(self.screen)
 

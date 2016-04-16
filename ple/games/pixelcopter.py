@@ -303,6 +303,12 @@ class Pixelcopter(base.Game):
                 self.score += 1.0
                 t.kill()
 
+        if self.player.pos.y < self.height*0.25: #its above
+            self.lives -= 1
+
+        if self.player.pos.y > self.height*0.75: #its below the lowest possible block
+            self.lives -= 1
+
         if len(self.terrain_group) <= (10+3): #10% per terrain, offset of ~2 with 1 extra
             self._add_terrain(self.width, self.width*5)
 
@@ -320,6 +326,6 @@ if __name__ == "__main__":
     while True:
         if game.game_over():
             game.reset()
-        dt = game.clock.tick_busy_loop(5)
+        dt = game.clock.tick_busy_loop(30)
         game.step(dt)
         pygame.display.update()
