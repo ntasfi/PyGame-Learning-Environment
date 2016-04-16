@@ -93,8 +93,8 @@ class RaycastMaze(base.Game, RayCastPlayer):
         Z[:,0] = Z[:,-1] = 1
         # Make isles
         for i in range(density):
-            x = np.random.random_integers(0,shape[1]//2)*2
-            y = np.random.random_integers(0,shape[0]//2)*2
+            x = self.rng.random_integers(0,shape[1]//2)*2
+            y = self.rng.random_integers(0,shape[0]//2)*2
 
             Z[y,x] = 1
             for j in range(complexity):
@@ -104,7 +104,7 @@ class RaycastMaze(base.Game, RayCastPlayer):
                 if y > 1:           neighbours.append( (y-2,x) )
                 if y < shape[0]-2:  neighbours.append( (y+2,x) )
                 if len(neighbours):
-                    y_,x_ = neighbours[np.random.random_integers(0,len(neighbours)-1)]
+                    y_,x_ = neighbours[self.rng.random_integers(0,len(neighbours)-1)]
                     if Z[y_,x_] == 0:
                         Z[y_,x_] = 1
                         Z[y_+(y-y_)//2, x_+(x-x_)//2] = 1
@@ -145,7 +145,7 @@ class RaycastMaze(base.Game, RayCastPlayer):
 
         self.map_ = self._make_maze()
         
-        self.obj_loc = np.random.randint(3, high=self.map_size-1, size=(2))
+        self.obj_loc = self.rng.randint(3, high=self.map_size-1, size=(2))
         self.map_[ self.obj_loc[0], self.obj_loc[1] ] = 2
 
     def reset(self):
@@ -168,6 +168,8 @@ class RaycastMaze(base.Game, RayCastPlayer):
             pygame.draw.line(self.screen, color, p0, p1, self.resolution)
 
 if __name__ == "__main__":
+    import numpy as np
+
     fps = 60
     pygame.init()
 
@@ -179,6 +181,7 @@ if __name__ == "__main__":
 
     game.screen = pygame.display.set_mode(game.getScreenDims(), 0, 32)
     game.clock = pygame.time.Clock()
+    game.rng = np.random.RandomState(24)
     game.init()
 
     while True:

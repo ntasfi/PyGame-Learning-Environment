@@ -7,11 +7,10 @@ import base
 from pygame.constants import K_w, K_a, K_s, K_d
 from utils.vec2d import vec2d
 from utils import percent_round_int
-import random
 
 class Food(pygame.sprite.Sprite):
 
-    def __init__(self, pos_init, width, color, SCREEN_WIDTH, SCREEN_HEIGHT):
+    def __init__(self, pos_init, width, color, SCREEN_WIDTH, SCREEN_HEIGHT, rng):
         pygame.sprite.Sprite.__init__(self)        
 
         self.pos = vec2d(pos_init)
@@ -20,6 +19,7 @@ class Food(pygame.sprite.Sprite):
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
         self.width = width
+        self.rng = rng
 
         image = pygame.Surface((width, width))
         image.fill((0, 0, 0, 0))
@@ -40,8 +40,14 @@ class Food(pygame.sprite.Sprite):
         snake_body = [ s.pos for s in snake.body ]
 
         while ( new_pos in snake_body ):
-            _x = random.randrange(self.width*2, self.SCREEN_WIDTH-self.width*2, self.width)
-            _y = random.randrange(self.width*2, self.SCREEN_HEIGHT-self.width*2, self.width)
+            _x = self.rng.choice(range(
+                self.width*2, self.SCREEN_WIDTH-self.width*2, self.width
+            ))
+
+            _y = self.rng.choice(range(
+                self.width*2, self.SCREEN_HEIGHT-self.width*2, self.width
+            ))
+
             new_pos = vec2d((_x, _y))
 
         self.pos = new_pos
@@ -263,7 +269,8 @@ class Snake(base.Game):
                 self.food_width, 
                 self.food_color, 
                 self.width, 
-                self.height
+                self.height,
+                self.rng
         )
 
         self.food.new_position(self.player)
@@ -307,10 +314,13 @@ class Snake(base.Game):
 
 
 if __name__ == "__main__":
+        import numpy as np
+
         pygame.init()
         game = Snake(width=64, height=64)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
+        game.rng = np.random.RandomState(24)
         game.init()
 
         while True:

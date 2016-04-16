@@ -37,7 +37,15 @@ class Game(object):
         self.width = width
         self.screen_dim = (width, height) #width and height
         self.allowed_fps = None #fps that the game is allowed to run at.
+        self.rng = None
 
+    def setRNG(self, rng):
+        """
+        Sets the rng for games.
+        """
+
+        if self.rng is None:
+            self.rng = rng
 
     def getGameState(self):
         """

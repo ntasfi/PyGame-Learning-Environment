@@ -1,7 +1,6 @@
 import os
 import sys
 import numpy as np
-import random
 
 import pygame
 from pygame.constants import K_w
@@ -12,7 +11,7 @@ class BirdPlayer(pygame.sprite.Sprite):
 
     def __init__(self, 
             SCREEN_WIDTH, SCREEN_HEIGHT, init_pos,
-            image_assets, color="red", scale=1.0):
+            image_assets, rng, color="red", scale=1.0):
 
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
@@ -35,6 +34,8 @@ class BirdPlayer(pygame.sprite.Sprite):
         self.MAX_DROP_SPEED = 10.0
         self.GRAVITY = 1.0*self.scale
 
+        self.rng = rng
+
         self._oscillateStartPos() #makes the direction and position random
         self.rect.center = (self.pos_x, self.pos_y) #could be done better
     
@@ -51,7 +52,7 @@ class BirdPlayer(pygame.sprite.Sprite):
         self.pos_y = init_pos[1]
         
     def _oscillateStartPos(self):
-        offset = 8*np.sin( np.random.rand() * np.pi )
+        offset = 8*np.sin( self.rng.rand() * np.pi )
         self.pos_y += offset
 
     def flap(self):
@@ -212,28 +213,9 @@ class FlappyBird(base.Game):
         self.pipe_min = int(self.pipe_gap/4) 
         self.pipe_max = int(self.height*0.79*0.6 - self.pipe_gap/2)
 
-        self.backdrop = Backdrop(
-                self.width,
-                self.height,
-                self.images["background"]["day"],
-                self.images["base"],
-                self.scale
-                )
-        
-        self.player = BirdPlayer(
-                self.width, 
-                self.height, 
-                self.init_pos, 
-                self.images["player"],
-                color="red",
-                scale=self.scale
-                )
-        
-        self.pipe_group = pygame.sprite.Group([
-                        self._generatePipes(offset=-75),
-                        self._generatePipes(offset=-75+self.width/2),
-                        self._generatePipes(offset=-75+self.width*1.5)
-                    ])
+        self.backdrop = None
+        self.player = None
+        self.pipe_group = None
     
     def _load_images(self):
         #preload and convert all the images so its faster when we reset
@@ -265,14 +247,41 @@ class FlappyBird(base.Game):
         self.images["base"] = pygame.image.load(path).convert()
 
     def init(self):
-        color = random.choice(["day", "night"])
+        if self.backdrop is None:
+            self.backdrop = Backdrop(
+                    self.width,
+                    self.height,
+                    self.images["background"]["day"],
+                    self.images["base"],
+                    self.scale
+                    )
+
+        if self.player is None: 
+            self.player = BirdPlayer(
+                    self.width, 
+                    self.height, 
+                    self.init_pos, 
+                    self.images["player"],
+                    self.rng,
+                    color="red",
+                    scale=self.scale
+                    )
+        
+        if self.pipe_group is None:
+            self.pipe_group = pygame.sprite.Group([
+                            self._generatePipes(offset=-75),
+                            self._generatePipes(offset=-75+self.width/2),
+                            self._generatePipes(offset=-75+self.width*1.5)
+                        ])
+
+        color = self.rng.choice(["day", "night"])
         self.backdrop.background_image = self.images["background"][color]
        
         #instead of recreating
-        color = random.choice(["red", "blue", "yellow"])
+        color = self.rng.choice(["red", "blue", "yellow"])
         self.player.init(self.init_pos, color)
     
-        self.pipe_color = random.choice(["red", "green"])
+        self.pipe_color = self.rng.choice(["red", "green"])
         for i,p in enumerate(self.pipe_group):
             self._generatePipes(offset=self.pipe_offsets[i], pipe=p)
 
@@ -337,7 +346,7 @@ class FlappyBird(base.Game):
         return self.score
 
     def _generatePipes(self, offset=0, pipe=None):
-        start_gap = np.random.random_integers(
+        start_gap = self.rng.random_integers(
                 self.pipe_min,
                 self.pipe_max
         )  

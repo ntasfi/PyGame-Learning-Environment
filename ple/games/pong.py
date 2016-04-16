@@ -1,5 +1,4 @@
 import math
-import random
 import sys
 
 import pygame
@@ -276,7 +275,7 @@ class Pong(base.Game):
             
             #we go in the same direction that they lost in but at starting vel.
             self.ball.vel.x = self.ball_speed*direction
-            self.ball.vel.y = (random.random()*self.ball_speed)-self.ball_speed
+            self.ball.vel.y = (self.rng.random_sample()*self.ball_speed)-self.ball_speed
 
 	def step(self, dt):
 
@@ -303,10 +302,13 @@ class Pong(base.Game):
 		self.ball_group.draw(self.screen)
 
 if __name__ == "__main__":
+    import numpy as np
+
     pygame.init()
     game = Pong(width=256, height=200)
     game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
     game.clock = pygame.time.Clock()
+    game.rng = np.random.RandomState(24)
     game.init()
 
     while True:

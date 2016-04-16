@@ -1,6 +1,4 @@
 import sys
-import random
-
 import pygame
 from utils import percent_round_int
 
@@ -55,12 +53,14 @@ class Paddle(pygame.sprite.Sprite):
         
 class Fruit(pygame.sprite.Sprite):
 
-    def __init__(self, speed, size, SCREEN_WIDTH, SCREEN_HEIGHT):
+    def __init__(self, speed, size, SCREEN_WIDTH, SCREEN_HEIGHT, rng):
         self.speed = speed
         self.size = size 
-        
+
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
+        
+        self.rng = rng
         
         pygame.sprite.Sprite.__init__(self)
         
@@ -86,8 +86,8 @@ class Fruit(pygame.sprite.Sprite):
         self.rect.center = (x, n_y)
 
     def reset(self):
-        x = random.randrange(self.size*2, self.SCREEN_WIDTH-self.size*2, self.size)
-        y = random.randrange(self.size, self.SCREEN_HEIGHT/2, self.size)
+        x = self.rng.choice( range(self.size*2, self.SCREEN_WIDTH-self.size*2, self.size) )
+        y = self.rng.choice( range(self.size, self.SCREEN_HEIGHT/2, self.size) )
 
         self.rect.center = (x,-1*y)
 
@@ -154,7 +154,9 @@ class Catcher(base.Game):
         self.player = Paddle(self.player_speed, self.paddle_width, 
                 self.paddle_height, self.width, self.height)
 
-        self.fruit = Fruit(self.fruit_fall_speed, self.fruit_size, self.width, self.height)
+        self.fruit = Fruit(self.fruit_fall_speed, self.fruit_size, 
+                self.width, self.height, self.rng)
+
         self.fruit.reset()
 
     def getGameState(self):
@@ -213,8 +215,11 @@ class Catcher(base.Game):
         self.fruit.draw(self.screen)
 
 if __name__ == "__main__":
+    import numpy as np
+    
     pygame.init()
     game = Catcher(width=256, height=256)
+    game.rng = np.random.RandomState(24)
     game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
     game.clock = pygame.time.Clock()
     game.init()

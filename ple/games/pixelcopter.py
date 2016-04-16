@@ -1,5 +1,4 @@
 import math
-import random
 import sys
 
 import base
@@ -234,9 +233,9 @@ class Pixelcopter(base.Game):
         steps = range(start+(w/2), end+(w/2), w) #each block takes up 10 units.
         y_jitter = []
 
-        freq = 4.5/self.width + random.uniform(-0.01, 0.01)
+        freq = 4.5/self.width + self.rng.uniform(-0.01, 0.01)
         for step in steps:
-            jitter = (self.height*0.125)*math.sin( freq*step + random.uniform(0.0, 0.5) )
+            jitter = (self.height*0.125)*math.sin( freq*step + self.rng.uniform(0.0, 0.5) )
             y_jitter.append(jitter)
 
         y_pos = [ int( (self.height/2.0)+y_jit ) for y_jit in y_jitter ]
@@ -251,8 +250,8 @@ class Pixelcopter(base.Game):
             )
 
     def _add_blocks(self):
-        x_pos = random.randint(self.width, int(self.width*1.5))
-        y_pos = random.randint(
+        x_pos = self.rng.randint(self.width, int(self.width*1.5))
+        y_pos = self.rng.randint(
                 int(self.height*0.25), 
                 int(self.height*0.75)
         ) 
@@ -317,10 +316,13 @@ class Pixelcopter(base.Game):
         self.terrain_group.draw(self.screen)
 
 if __name__ == "__main__":
+    import numpy as np
+
     pygame.init()
     game = Pixelcopter(width=256, height=256)
     game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
     game.clock = pygame.time.Clock()
+    game.rng = np.random.RandomState(24)
     game.init()
 
     while True:

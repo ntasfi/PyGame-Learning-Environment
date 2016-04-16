@@ -39,11 +39,14 @@ class PLE(object):
         state_preprocessor: python function (default: None)
             Python function which takes a dict representing game state and returns a numpy array.
 
+        rng: numpy.random.RandomState, int, array_like or None. (default: 24)
+            Number generator which is used by PLE and the games.
+
         """
 	def __init__(self, 
                 game, fps=30, frame_skip=1, num_steps=1, force_fps=True, 
                 display_screen=False, add_noop_action=True, 
-                NOOP=K_F15, state_preprocessor=None):
+                NOOP=K_F15, state_preprocessor=None, rng=24):
 
 		self.game = game
 		self.fps = fps
@@ -59,7 +62,14 @@ class PLE(object):
 		self.score = 0
 		self.previous_score = 0
 		self.frame_count = 0
-                
+               
+                if isinstance(rng, np.random.RandomState):
+                    self.rng = rng
+                else:
+                    self.rng = np.random.RandomState(rng)
+
+                self.game.setRNG(self.rng)
+
                 #some games need a screen setup for convert images
                 pygame.display.set_mode((1,1), pygame.NOFRAME)
 

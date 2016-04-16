@@ -8,7 +8,6 @@ from pygame.constants import K_w, K_a, K_s, K_d
 from primitives import Player, Creep
 from utils.vec2d import vec2d
 from utils import percent_round_int
-from random import uniform
 
 class PuckCreep(pygame.sprite.Sprite):
 
@@ -178,7 +177,10 @@ class PuckWorld(base.Game):
         return False
 
     def _rngCreepPos(self):
-        return ( int(uniform(self.CREEP_GOOD['radius']*3, self.width-self.CREEP_GOOD['radius']*2.5)), int(uniform(self.CREEP_GOOD['radius']*3, self.height-self.CREEP_GOOD['radius']*2.5)) )
+        r = self.CREEP_GOOD['radius']
+        x = self.rng.uniform(r*3, self.width-r*2.5)
+        y = self.rng.uniform(r*3, self.height-r*2.5) 
+        return ( x, y )
 
     def init(self):
         """
@@ -253,10 +255,13 @@ class PuckWorld(base.Game):
 
 
 if __name__ == "__main__":
+        import numpy as np
+
         pygame.init()
         game = PuckWorld(width=256, height=256)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
+        game.rng = np.random.RandomState(24)
         game.init()
 
         while True:

@@ -7,7 +7,6 @@ import base
 from utils import percent_round_int
 from pygame.constants import K_w, K_a, K_s, K_d
 from primitives import Player, Creep
-from random import uniform, choice
 
 class WaterWorld(base.Game):
     """
@@ -86,7 +85,7 @@ class WaterWorld(base.Game):
 
     def _add_creep(self):
         #lame way to do weighted selection. Its 50/50 atm.
-        creep_type = choice([0]*50 + [1]*50) 
+        creep_type = self.rng.choice([0]*50 + [1]*50) 
 
         creep = None
         creep_hits = [None]
@@ -96,8 +95,8 @@ class WaterWorld(base.Game):
         while len(creep_hits) > 0 and dist < 2.0:
             radius = self.CREEP_RADII[creep_type]*3
             pos = ( 
-                int(uniform(radius, self.width-radius)), 
-                int(uniform(radius, self.height-radius)) 
+                int(self.rng.uniform(radius, self.width-radius)), 
+                int(self.rng.uniform(radius, self.height-radius)) 
             )  
             dist = math.sqrt( (self.player.pos.x - pos[0])**2 + (self.player.pos.y - pos[1])**2 )
   
@@ -105,7 +104,7 @@ class WaterWorld(base.Game):
                 self.CREEP_COLORS[creep_type], 
                 self.CREEP_RADII[creep_type], 
                 pos,
-                ( choice([-1,1]), choice([-1,1]) ), 
+                ( self.rng.choice([-1,1]), self.rng.choice([-1,1]) ), 
                 self.CREEP_SPEED,
                 self.CREEP_REWARD[creep_type],
                 self.CREEP_TYPES[creep_type], 
@@ -207,10 +206,13 @@ class WaterWorld(base.Game):
         self.creeps.draw(self.screen)
 
 if __name__ == "__main__":
+        import numpy as np
+
         pygame.init()
         game = WaterWorld(width=256, height=256, num_creeps=8)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
+        game.rng = np.random.RandomState(24)
         game.init()
 
         while True:
