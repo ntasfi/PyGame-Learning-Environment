@@ -92,3 +92,18 @@ git pull
  * Add games
  * Generalize the library (eg. add Pyglet support)
 
+
+## Citing PLE
+
+If PLE has helped your research please cite it in your publications. Example BibTeX entry:
+
+```
+@misc{tasfi2016PLE,
+  author = {Tasfi, Norman},
+  title = {PyGame Learning Environment},
+  year = {2016},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/ntasfi/PyGame-Learning-Environment}}
+}
+```
