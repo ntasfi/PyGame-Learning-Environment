@@ -280,11 +280,7 @@ class PLE(object):
                     Returns the reward that the agent has accumlated while performing the action.
 
 		"""
-		sum_rewards = 0.0
-		for i in range(self.frame_skip):
-			sum_rewards += self._oneStepAct(action)
-
-		return sum_rewards
+		return sum(self._oneStepAct(action) for i in range(self.frame_skip))
 
 	def _draw_frame(self):
                 """
