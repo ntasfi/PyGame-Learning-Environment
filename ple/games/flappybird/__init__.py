@@ -379,7 +379,7 @@ class FlappyBird(base.Game):
                     self.player.flap()
 
     def game_over(self):
-        return self.lives < 0
+        return self.lives <= 0
 
     def step(self, dt):
         self.tick += 1
@@ -395,16 +395,14 @@ class FlappyBird(base.Game):
                 bot_pipe_check = ((self.player.pos_y + self.player.height) > h.gap_start+self.pipe_gap)
 
                 if top_pipe_check:
-                    self.score -= 1.0
-                    self.lives = -1
+                    self.lives -= 1
 
                 if bot_pipe_check:
-                    self.score -= 1.0
-                    self.lives = -1
+                    self.lives -= 1
 
             #is it past the player?
             if (p.x - p.width/2) <= self.player.pos_x < (p.x - p.width/2 + 4):
-                self.score += 1
+                self.score += 1.0
 
             #is out out of the screen?
             if p.x < -p.width:
@@ -412,15 +410,17 @@ class FlappyBird(base.Game):
 
         #fell on the ground
         if self.player.pos_y >= 0.79*self.height - self.player.height:
-            self.lives = -1
-            self.score -= 1.0 
+            self.lives -= 1
 
         #went above the screen
         if self.player.pos_y < -self.player.height:
-            self.lives = -1
+            self.lives -= 1
 
         self.player.update(dt)
         self.pipe_group.update(dt)
+
+        if self.lives <= 0:
+            self.score -= 5.0
 
         self.backdrop.draw_background(self.screen)
         self.pipe_group.draw(self.screen)

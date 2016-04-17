@@ -171,6 +171,9 @@ class PLE(object):
                 """ 
                 Performs a reset of the games to a clean initial state.
                 """
+		self.last_action = []
+		self.action = []
+		self.score = 0
                 self.previous_score = 0.0
 		self.game.reset()
 

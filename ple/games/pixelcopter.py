@@ -268,6 +268,7 @@ class Pixelcopter(base.Game):
         self.init()
 
     def step(self, dt):
+
         self.screen.fill((0,0,0))
         self._handle_player_events()
         
@@ -277,17 +278,14 @@ class Pixelcopter(base.Game):
 
         hits = pygame.sprite.spritecollide(self.player, self.block_group, False)
         for creep in hits:
-            self.score -= 1
             self.lives -= 1
 
         hits = pygame.sprite.spritecollide(self.player, self.terrain_group, False)
         for t in hits:
             if self.player.pos.y-self.player.height <= t.pos.y-self.height*0.25:
-                self.score -= 1
                 self.lives -= 1
 
             if self.player.pos.y >= t.pos.y+self.height*0.25:
-                self.score -= 1
                 self.lives -= 1
 
         for b in self.block_group:
@@ -310,6 +308,9 @@ class Pixelcopter(base.Game):
 
         if len(self.terrain_group) <= (10+3): #10% per terrain, offset of ~2 with 1 extra
             self._add_terrain(self.width, self.width*5)
+
+        if self.lives <= 0.0:
+            self.score -= 5.0 
 
         self.player_group.draw(self.screen)
         self.block_group.draw(self.screen)

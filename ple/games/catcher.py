@@ -211,6 +211,9 @@ class Catcher(base.Game):
         self.player.update(self.dx, dt)
         self.fruit.update(dt)
         
+        if self.lives == 0:
+            self.score -= 10.0
+
         self.player.draw(self.screen)
         self.fruit.draw(self.screen)
 

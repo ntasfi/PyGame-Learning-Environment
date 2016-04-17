@@ -58,7 +58,7 @@ class Ball(pygame.sprite.Sprite):
                 if self.pos.x >= cpuPlayer.pos.x-cpuPlayer.rect_width:
                     if pygame.sprite.collide_rect(self, cpuPlayer):
                         self.vel.x = -1*(self.vel.x + self.speed*0.05)
-                        self.vel.y += cpuPlayer.vel.y*0.03
+                        self.vel.y += cpuPlayer.vel.y*0.006
                         self.pos.x -= 1.0
 
                 self.pos.x += self.vel.x * dt
@@ -294,6 +294,14 @@ class Pong(base.Game):
 			self.score_counts["agent"] += 1.0
 			self._reset_ball(1)
 
+                #winning
+                if self.score_counts['agent'] == self.MAX_SCORE:
+                    self.score_sum += 10.0
+
+                #losing
+                if self.score_counts['cpu'] == self.MAX_SCORE:
+                    self.score_sum -= 10.0
+        
                 self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
 		self.agentPlayer.updateAgent(self.dy, dt)
 		self.cpuPlayer.updateCpu(self.ball, dt)
