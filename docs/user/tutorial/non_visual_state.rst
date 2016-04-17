@@ -40,7 +40,7 @@ This can be accomplished using a recursive method or by hand:
 
         #recursive way
         def get_all_values(d, values):
-                if isintance(d, dict):
+                if isinstance(d, dict):
                         map(lambda _d: get_all_values(_d, values), d.values())
                 else:
                         values.append(d)
@@ -60,7 +60,7 @@ You have control over which values you want to include in the state vector. Trai
         import numpy as np
 
         def get_all_values(d, values):
-                if isintance(d, dict):
+                if isinstance(d, dict):
                         map(lambda _d: get_all_values(_d, values), d.values())
                 else:
                         values.append(d)
@@ -69,7 +69,7 @@ You have control over which values you want to include in the state vector. Trai
                 _state = []
                 get_all_values(state, _state)
 
-                return np.array(_state).reshape((1, len((_state)))
+                return np.array(_state).reshape((1, len((_state))))
 
         game = Pong()
         p = PLE(game, display_screen=True, state_preprocessor=process_state)
