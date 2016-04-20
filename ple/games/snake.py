@@ -284,9 +284,11 @@ class Snake(base.Game):
         self.ticks += 1
         self.screen.fill(self.BG_COLOR)
 
+        self.score += self.rewards["tick"]
+
         hit = pygame.sprite.collide_rect(self.player.head, self.food)
         if hit: #it hit
-            self.score += 1
+            self.score += self.rewards["positive"]
             self.player.grow()
             self.food.new_position(self.player)
 
@@ -301,7 +303,7 @@ class Snake(base.Game):
             self.lives = -1
 
         if self.lives <= 0.0:
-            self.score -= 10.0
+            self.score += self.rewards["loss"]
 
         self._handle_player_events()
         self.player.update(dt)

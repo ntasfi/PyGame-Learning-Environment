@@ -45,7 +45,7 @@ class WaterWorld(base.Game):
         self.CREEP_COLORS = [ (40, 140, 40), (150, 95, 95) ]
         radius = percent_round_int(width, 0.047)
         self.CREEP_RADII = [ radius, radius ]
-        self.CREEP_REWARD = [ 1, -3 ]
+        self.CREEP_REWARD = [ self.rewards["positive"], self.rewards["negative"] ]
         self.CREEP_SPEED = 0.25*width 
         self.AGENT_COLOR = (60, 60, 140)
         self.AGENT_SPEED = 0.25*width 
@@ -193,6 +193,8 @@ class WaterWorld(base.Game):
         dt /= 1000.0
         self.screen.fill(self.BG_COLOR)
 
+        self.score += self.rewards["tick"]
+
         self._handle_player_events()
         self.player.update(self.dx, self.dy, dt)
         
@@ -203,7 +205,7 @@ class WaterWorld(base.Game):
             self._add_creep()
 
         if self.creep_counts["GOOD"] == 0:
-            self.score += self.N_CREEPS/2
+            self.score += self.rewards["win"] 
 
         self.creeps.update(dt)
         

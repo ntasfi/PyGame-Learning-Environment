@@ -24,6 +24,30 @@ class PLE(object):
         num_steps: int (default: 1)
             The number of times we repeat an action.
 
+        reward_values: dict
+            This contains the rewards we wish to set give our agent based on different actions in game. The current defaults are as follows:
+
+            .. code-block:: python
+
+                rewards = {
+                    "positive": 1.0,
+                    "negative": -1.0,
+                    "tick": 0.0,
+                    "loss": -5.0,
+                    "win": 5.0
+                }
+
+            Tick is given to the agent at each game step. You can selectively adjust the rewards by passing a dictonary with the key you want to change. Eg. If we want to adjust the negative reward and the tick reward we would pass in the following:
+
+            .. code-block:: python
+
+                rewards = {
+                    "negative": -2.0,
+                    "tick": -0.01
+                }
+
+            Keep in mind that the tick is applied at each frame. If the game is running at 60fps the agent will get a reward of 60*tick.
+
         force_fps: bool (default: True)
             If False PLE delays between game.step() calls to ensure the fps is specified. If not PLE passes an elapsed time delta to ensure the game steps by an amount of time consistent with the specified fps. This is usally set to True as it allows the game to run as fast as possible which speeds up training.
 
@@ -44,7 +68,7 @@ class PLE(object):
 
         """
 	def __init__(self, 
-                game, fps=30, frame_skip=1, num_steps=1, force_fps=True, 
+                game, fps=30, frame_skip=1, num_steps=1, reward_values={}, force_fps=True, 
                 display_screen=False, add_noop_action=True, 
                 NOOP=K_F15, state_preprocessor=None, rng=24):
 
@@ -59,10 +83,13 @@ class PLE(object):
 
 		self.last_action = []
 		self.action = []
-		self.score = 0
 		self.previous_score = 0
 		self.frame_count = 0
-               
+              
+                #update the scores of games with values we pick
+                if reward_values:
+                    self.game.adjustRewards(reward_values)
+
                 if isinstance(rng, np.random.RandomState):
                     self.rng = rng
                 else:
@@ -154,6 +181,19 @@ class PLE(object):
 
 		return self.game.game_over()
 
+        def score(self):
+                """
+                Gets the score the agent currently has in game.
+
+                Returns
+                -------
+
+                int
+
+                """
+                
+                return self.game.getScore()
+
 	def lives(self):
                 """
                 Gets the number of lives the agent has left. Not all games have the concept of lives.
@@ -173,7 +213,6 @@ class PLE(object):
                 """
 		self.last_action = []
 		self.action = []
-		self.score = 0
                 self.previous_score = 0.0
 		self.game.reset()
 

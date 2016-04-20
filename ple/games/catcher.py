@@ -193,21 +193,23 @@ class Catcher(base.Game):
     def step(self, dt):
         self.screen.fill((0,0,0))
         self._handle_player_events()
+        
+        self.score += self.rewards["tick"]
 
         if self.fruit.rect.center[1] >= self.height:
-            self.score -= 1
+            self.score += self.rewards["negative"]
             self.lives -= 1
             self.fruit.reset()
 
         if pygame.sprite.collide_rect(self.player, self.fruit):
-            self.score += 1
+            self.score += self.rewards["positive"]
             self.fruit.reset()
 
         self.player.update(self.dx, dt)
         self.fruit.update(dt)
         
         if self.lives == 0:
-            self.score -= 10.0
+            self.score += self.rewards["loss"] 
 
         self.player.draw(self.screen)
         self.fruit.draw(self.screen)

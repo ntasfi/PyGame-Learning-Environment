@@ -267,7 +267,9 @@ class Pixelcopter(base.Game):
 
         self.screen.fill((0,0,0))
         self._handle_player_events()
-        
+
+        self.score += self.rewards["tick"]
+
         self.player.update(self.is_climbing, dt)
         self.block_group.update(dt)
         self.terrain_group.update(dt)
@@ -286,6 +288,7 @@ class Pixelcopter(base.Game):
 
         for b in self.block_group:
             if b.pos.x <= self.player.pos.x and len(self.block_group) == 1:
+                self.score += self.rewards["positive"]
                 self._add_blocks()
 
             if b.pos.x <= -b.width:
@@ -293,20 +296,20 @@ class Pixelcopter(base.Game):
 
         for t in self.terrain_group:
             if t.pos.x <= -t.width:
-                self.score += 1.0
+                self.score += self.rewards["positive"] 
                 t.kill()
 
-        if self.player.pos.y < self.height*0.25: #its above
+        if self.player.pos.y < self.height*0.125: #its above
             self.lives -= 1
 
-        if self.player.pos.y > self.height*0.75: #its below the lowest possible block
+        if self.player.pos.y > self.height*0.875: #its below the lowest possible block
             self.lives -= 1
 
         if len(self.terrain_group) <= (10+3): #10% per terrain, offset of ~2 with 1 extra
             self._add_terrain(self.width, self.width*5)
 
         if self.lives <= 0.0:
-            self.score -= 5.0 
+            self.score += self.rewards["loss"] 
 
         self.player_group.draw(self.screen)
         self.block_group.draw(self.screen)

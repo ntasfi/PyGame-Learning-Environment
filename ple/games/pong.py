@@ -53,13 +53,13 @@ class Ball(pygame.sprite.Sprite):
                     if pygame.sprite.collide_rect(self, agentPlayer):
                         self.vel.x = -1*(self.vel.x + self.speed*0.05)
                         self.vel.y += agentPlayer.vel.y*0.01
-                        self.pos.x += 1.0
+                        self.pos.x += self.radius
 
                 if self.pos.x >= cpuPlayer.pos.x-cpuPlayer.rect_width:
                     if pygame.sprite.collide_rect(self, cpuPlayer):
                         self.vel.x = -1*(self.vel.x + self.speed*0.05)
                         self.vel.y += cpuPlayer.vel.y*0.006
-                        self.pos.x -= 1.0
+                        self.pos.x -= self.radius 
 
                 self.pos.x += self.vel.x * dt
 		self.pos.y += self.vel.y * dt
@@ -98,8 +98,8 @@ class Player(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.center = pos_init
 
-	def updateAgent(self, dy, dt):
-                self.vel.y += dy
+	def update(self, dy, dt):
+                self.vel.y += dy*dt
                 self.vel.y *= 0.9
                 
                 self.pos.y += self.vel.y
@@ -115,16 +115,27 @@ class Player(pygame.sprite.Sprite):
 		self.rect.center = (self.pos.x, self.pos.y)
 
 	def updateCpu(self, ball, dt):
+                dy = 0.0
                 if ball.vel.x >= 0 and ball.pos.x >= self.SCREEN_WIDTH/2:
-			if self.pos.y < ball.pos.y:
-				self.pos.y += self.speed * dt
-                                self.vel.y = self.speed*dt
+                    dy = self.speed
+                    if self.pos.y > ball.pos.y:
+                        dy = -1.0*dy
+                else:
+                    dy = 1.0 * self.speed/4.0
 
-			if self.pos.y > ball.pos.y:
-				self.pos.y -= self.speed * dt
-                                self.vel.y = -1*self.speed*dt
+                    if self.pos.y > self.SCREEN_HEIGHT/2.0:
+                        dy = -1.0 * self.speed/4.0
 
-		self.rect.center = (self.pos.x, self.pos.y)
+                if self.pos.y-self.rect_height/2 <= 0:
+                    self.pos.y = self.rect_height/2
+                    self.vel.y = 0.0
+
+                if self.pos.y+self.rect_height/2 >= self.SCREEN_HEIGHT:
+                    self.pos.y = self.SCREEN_HEIGHT-self.rect_height/2
+                    self.vel.y = 0.0
+
+                self.pos.y += dy*dt
+                self.rect.center = (self.pos.x, self.pos.y)
 
 class Pong(base.Game):
         """
@@ -156,9 +167,9 @@ class Pong(base.Game):
                 #the %'s come from original values, wanted to keep same ratio when you 
                 #increase the resolution.
                 self.ball_radius = percent_round_int(height, 0.03)
-                self.players_speed = 0.022*height
-                self.cpu_speed = 0.175 #has to be small because its pressed much faster than player
-		self.ball_speed = 0.00075*height 
+                self.players_speed = 0.22*height
+                self.cpu_speed = 0.7*height
+		self.ball_speed = 0.75*height 
                 self.paddle_width = percent_round_int(width, 0.023)
                 self.paddle_height = percent_round_int(height, 0.15) 
                 self.paddle_dist_to_wall = percent_round_int(width, 0.0625)
@@ -270,32 +281,35 @@ class Pong(base.Game):
             self.ball.vel.y = (self.rng.random_sample()*self.ball_speed)-self.ball_speed
 
 	def step(self, dt):
-
+                dt /= 1000.0
 		self.screen.fill((0,0,0))
 
 		self._handle_player_events()
+                
+                #doesnt make sense to have this, but include if needed.
+                self.score_sum += self.rewards["tick"] 
 
 		#logic
 		if self.ball.pos.x <= 0:
-			self.score_sum -= 1.0
+			self.score_sum += self.rewards["negative"] 
 			self.score_counts["cpu"] += 1.0
 			self._reset_ball(-1)
 
 		if self.ball.pos.x >= self.width:
-			self.score_sum += 1.0
+			self.score_sum += self.rewards["positive"]
 			self.score_counts["agent"] += 1.0
 			self._reset_ball(1)
 
                 #winning
                 if self.score_counts['agent'] == self.MAX_SCORE:
-                    self.score_sum += 10.0
+                    self.score_sum += self.rewards["win"]
 
                 #losing
                 if self.score_counts['cpu'] == self.MAX_SCORE:
-                    self.score_sum -= 10.0
+                    self.score_sum += self.rewards["loss"]
         
                 self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
-		self.agentPlayer.updateAgent(self.dy, dt)
+		self.agentPlayer.update(self.dy, dt)
 		self.cpuPlayer.updateCpu(self.ball, dt)
 		
 		self.players_group.draw(self.screen)

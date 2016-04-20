@@ -213,6 +213,8 @@ class PuckWorld(base.Game):
         self.ticks += 1
         self.screen.fill(self.BG_COLOR)
 
+        self.score += self.rewards["tick"]
+
         self._handle_player_events()
         self.player.update(self.dx, self.dy, dt)
         

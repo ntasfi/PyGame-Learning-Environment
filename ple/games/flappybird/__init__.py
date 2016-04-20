@@ -381,6 +381,8 @@ class FlappyBird(base.Game):
         self.tick += 1
         dt = dt / 1000.0
 
+        self.score += self.rewards["tick"]
+
         #handle player movement
         self._handle_player_events()
 
@@ -398,7 +400,7 @@ class FlappyBird(base.Game):
 
             #is it past the player?
             if (p.x - p.width/2) <= self.player.pos_x < (p.x - p.width/2 + 4):
-                self.score += 1.0
+                self.score += self.rewards["positive"]
 
             #is out out of the screen?
             if p.x < -p.width:
@@ -416,7 +418,7 @@ class FlappyBird(base.Game):
         self.pipe_group.update(dt)
 
         if self.lives <= 0:
-            self.score -= 5.0
+            self.score += self.rewards["loss"]
 
         self.backdrop.draw_background(self.screen)
         self.pipe_group.draw(self.screen)

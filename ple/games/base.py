@@ -38,6 +38,29 @@ class Game(object):
         self.screen_dim = (width, height) #width and height
         self.allowed_fps = None #fps that the game is allowed to run at.
         self.rng = None
+        
+        self.rewards = {
+            "positive": 1.0,
+            "negative": -1.0,
+            "tick": 0.0,
+            "loss": -5.0,
+            "win": 5.0
+        }
+
+    def adjustRewards(self, rewards):
+        """
+
+        Adjusts the rewards the game gives the agent
+
+        Parameters
+        ----------
+        rewards : dict
+            A dictonary of reward events to float rewards. Only updates if key matches those specificed in the init function. 
+
+        """
+        for key in rewards.keys():
+            if key in self.rewards:
+                self.rewards[key] = rewards[key]
 
     def setRNG(self, rng):
         """

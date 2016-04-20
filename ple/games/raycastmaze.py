@@ -133,7 +133,7 @@ class RaycastMaze(base.Game, RayCastPlayer):
         dist = np.sqrt(np.sum((self.pos - obj_loc)**2.0))
         
         if dist < 1.0:
-            self.score += 1.0
+            self.score += self.rewards["win"] 
             return True
         else:
             return False
@@ -153,8 +153,9 @@ class RaycastMaze(base.Game, RayCastPlayer):
 
     def step(self, dt):
         self.screen.fill((0,0,0))
-
         pygame.draw.rect(self.screen, (92,92,92), (0, self.height/2, self.width, self.height))
+        
+        self.score += self.rewards["tick"]
 
         self._handle_player_events(dt)
 
