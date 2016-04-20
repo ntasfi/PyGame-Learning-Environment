@@ -95,7 +95,7 @@ class PuckWorld(base.Game):
         self.AGENT_COLOR = (60, 60, 140)
         self.AGENT_SPEED = 0.2*width 
         self.AGENT_RADIUS = percent_round_int(width, 0.047)
-        self.AGENT_INIT_POS = (self.AGENT_RADIUS, self.AGENT_RADIUS)
+        self.AGENT_INIT_POS = (self.AGENT_RADIUS*1.5, self.AGENT_RADIUS*1.5)
 
         self.BG_COLOR = (255, 255, 255)
         self.dx = 0
@@ -188,8 +188,6 @@ class PuckWorld(base.Game):
         """
 
         self.player = Player(self.AGENT_RADIUS, self.AGENT_COLOR, self.AGENT_SPEED, self.AGENT_INIT_POS, self.width, self.height) 
-        self.player_group = pygame.sprite.Group()
-        self.player_group.add( self.player )
 
         self.good_creep = Creep(
             self.CREEP_GOOD['color'], 
@@ -200,7 +198,8 @@ class PuckWorld(base.Game):
             1.0,
             "GOOD", 
             self.width, 
-            self.height
+            self.height,
+            0.0 #jitter
         )
 
         self.bad_creep = PuckCreep((self.width, self.height), self.CREEP_BAD, self.screen_dim[0]*0.75, self.screen_dim[1]*0.75)
@@ -223,7 +222,7 @@ class PuckWorld(base.Game):
         self.screen.fill(self.BG_COLOR)
 
         self._handle_player_events()
-        self.player_group.update(self.dx, self.dy, dt)
+        self.player.update(self.dx, self.dy, dt)
         
         dx = self.player.pos.x-self.good_creep.pos.x
         dy = self.player.pos.y-self.good_creep.pos.y
@@ -250,7 +249,7 @@ class PuckWorld(base.Game):
         self.bad_creep.update(ndx, ndy, dt)
         self.good_creep.update(dt)
 
-        self.player_group.draw(self.screen)
+        self.player.draw(self.screen)
         self.creeps.draw(self.screen)
 
 
