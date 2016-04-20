@@ -1,6 +1,5 @@
 import pygame
 import math
-from random import random
 from utils.vec2d import vec2d
 
 class Creep(pygame.sprite.Sprite):
@@ -14,13 +13,15 @@ class Creep(pygame.sprite.Sprite):
             reward, 
             TYPE,
             SCREEN_WIDTH,
-            SCREEN_HEIGHT):
+            SCREEN_HEIGHT,
+            jitter_speed):
 
         pygame.sprite.Sprite.__init__(self)
         
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
         self.TYPE = TYPE
+        self.jitter_speed = jitter_speed
         self.speed = speed
         self.reward = reward
         self.radius = radius
@@ -30,7 +31,7 @@ class Creep(pygame.sprite.Sprite):
         self.direction.normalize() #normalized
         
         image = pygame.Surface((radius*2, radius*2))
-        image.fill((0, 0, 0, 0))
+        image.fill((0, 0, 0))
         image.set_colorkey((0,0,0))
  
         pygame.draw.circle(
@@ -41,7 +42,7 @@ class Creep(pygame.sprite.Sprite):
                 0
         )
 
-        self.image = image
+        self.image = image.convert()
         self.rect = self.image.get_rect()
         self.rect.center = pos_init
 
@@ -52,19 +53,19 @@ class Creep(pygame.sprite.Sprite):
 
         if self.pos.x + dx > self.SCREEN_WIDTH - self.radius:
             self.pos.x = self.SCREEN_WIDTH - self.radius
-            self.direction.x = -1*self.direction.x*(1 + 0.5*random()) #a little jitter
+            self.direction.x = -1*self.direction.x*(1 + 0.5*self.jitter_speed) #a little jitter
         elif self.pos.x + dx <= self.radius:
             self.pos.x = self.radius
-            self.direction.x = -1*self.direction.x*(1 + 0.5*random()) #a little jitter
+            self.direction.x = -1*self.direction.x*(1 + 0.5*self.jitter_speed) #a little jitter
         else:
             self.pos.x = self.pos.x + dx
 
         if self.pos.y + dy > self.SCREEN_HEIGHT - self.radius:
             self.pos.y = self.SCREEN_HEIGHT - self.radius
-            self.direction.y = -1*self.direction.y*(1 + 0.5*random()) #a little jitter
+            self.direction.y = -1*self.direction.y*(1 + 0.5*self.jitter_speed) #a little jitter
         elif self.pos.y + dy <= self.radius:
             self.pos.y = self.radius
-            self.direction.y = -1*self.direction.y*(1 + 0.5*random()) #a little jitter
+            self.direction.y = -1*self.direction.y*(1 + 0.5*self.jitter_speed) #a little jitter
         else:
             self.pos.y = self.pos.y + dy
 
@@ -155,3 +156,6 @@ class Player(pygame.sprite.Sprite):
             self.vel.y = self.vel.y*0.975
        
         self.rect.center = (self.pos.x, self.pos.y)     
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect.center)

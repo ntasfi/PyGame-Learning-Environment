@@ -4,6 +4,7 @@ import math
 
 import base
 
+from utils.vec2d import vec2d
 from utils import percent_round_int
 from pygame.constants import K_w, K_a, K_s, K_d
 from primitives import Player, Creep
@@ -38,7 +39,6 @@ class WaterWorld(base.Game):
         }
 
         base.Game.__init__(self, width, height, actions=actions)
-
         self.BG_COLOR = (255, 255, 255)
         self.N_CREEPS = num_creeps
         self.CREEP_TYPES = [ "GOOD", "BAD" ]
@@ -51,7 +51,7 @@ class WaterWorld(base.Game):
         self.AGENT_SPEED = 0.25*width 
         self.AGENT_RADIUS = radius 
         self.AGENT_INIT_POS = (self.width/2, self.height/2)
-        
+
         self.creep_counts = {
             "GOOD": 0,
             "BAD": 0
@@ -59,6 +59,9 @@ class WaterWorld(base.Game):
 
         self.dx = 0
         self.dy = 0
+        self.player = None
+        self.creeps = None
+
 
     def _handle_player_events(self):
         self.dx = 0
@@ -84,35 +87,29 @@ class WaterWorld(base.Game):
                     self.dy += self.AGENT_SPEED
 
     def _add_creep(self):
-        #lame way to do weighted selection. Its 50/50 atm.
-        creep_type = self.rng.choice([0]*50 + [1]*50) 
+        creep_type = self.rng.choice([0, 1]) 
 
         creep = None
-        creep_hits = [None]
         pos = ( 0,0 )
         dist = 0.0
 
-        while len(creep_hits) > 0 and dist < 2.0:
-            radius = self.CREEP_RADII[creep_type]*3
-            pos = ( 
-                int(self.rng.uniform(radius, self.width-radius)), 
-                int(self.rng.uniform(radius, self.height-radius)) 
-            )  
+        while dist < 1.5:
+            radius = self.CREEP_RADII[creep_type]*1.5
+            pos = self.rng.uniform(radius, self.height-radius, size=2) 
             dist = math.sqrt( (self.player.pos.x - pos[0])**2 + (self.player.pos.y - pos[1])**2 )
   
-            creep = Creep(
-                self.CREEP_COLORS[creep_type], 
-                self.CREEP_RADII[creep_type], 
-                pos,
-                ( self.rng.choice([-1,1]), self.rng.choice([-1,1]) ), 
-                self.CREEP_SPEED,
-                self.CREEP_REWARD[creep_type],
-                self.CREEP_TYPES[creep_type], 
-                self.width, 
-                self.height
-            )
-
-            creep_hits = pygame.sprite.spritecollide(creep, self.creeps, False) #check if we are hitting another other creeps if it was placed here
+        creep = Creep(
+            self.CREEP_COLORS[creep_type], 
+            self.CREEP_RADII[creep_type], 
+            pos,
+            self.rng.choice([-1,1], 2), 
+            self.CREEP_SPEED,
+            self.CREEP_REWARD[creep_type],
+            self.CREEP_TYPES[creep_type], 
+            self.width, 
+            self.height,
+            self.rng.rand()
+        )
 
         self.creeps.add(creep)
 
@@ -163,18 +160,28 @@ class WaterWorld(base.Game):
             Return bool if the game has 'finished'
         """
         return ( self.creep_counts['GOOD'] == 0 )
-
+    
     def init(self):
         """
             Starts/Resets the game to its inital state
         """
         self.creep_counts = { "GOOD":0, "BAD":0 }
 
-        self.player = Player(self.AGENT_RADIUS, self.AGENT_COLOR, self.AGENT_SPEED, self.AGENT_INIT_POS, self.width, self.height) 
-        self.player_group = pygame.sprite.Group()
-        self.player_group.add( self.player )
+        if self.player is None: 
+            self.player = Player(
+                    self.AGENT_RADIUS, self.AGENT_COLOR, 
+                    self.AGENT_SPEED, self.AGENT_INIT_POS, 
+                    self.width, self.height
+            ) 
 
-        self.creeps = pygame.sprite.Group()
+        else:
+            self.player.pos = vec2d(self.AGENT_INIT_POS)
+            self.player.vel = vec2d((0.0,0.0))
+
+        if self.creeps is None: 
+            self.creeps = pygame.sprite.Group()
+        else:
+            self.creeps.empty()
 
         for i in range(self.N_CREEPS):
             self._add_creep()
@@ -191,7 +198,7 @@ class WaterWorld(base.Game):
         self.screen.fill(self.BG_COLOR)
 
         self._handle_player_events()
-        self.player_group.update(self.dx, self.dy, dt)
+        self.player.update(self.dx, self.dy, dt)
         
         hits = pygame.sprite.spritecollide(self.player, self.creeps, True)
         for creep in hits:
@@ -204,7 +211,7 @@ class WaterWorld(base.Game):
 
         self.creeps.update(dt)
         
-        self.player_group.draw(self.screen)
+        self.player.draw(self.screen)
         self.creeps.draw(self.screen)
 
 if __name__ == "__main__":

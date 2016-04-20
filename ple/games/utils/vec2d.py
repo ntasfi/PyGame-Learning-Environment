@@ -16,7 +16,7 @@ class vec2d():
         return self.x == o.x and self.y == o.y
 
     def normalize(self):
-        norm = math.sqrt( self.x**2 + self.y**2 )
+        norm = math.sqrt( self.x*self.x + self.y*self.y )
         self.x /= norm
         self.y /= norm
 
