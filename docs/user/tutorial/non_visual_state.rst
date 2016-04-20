@@ -13,41 +13,26 @@ First start by examining the values :class:`Pong <ple.games.pong.Pong>` will ret
             #other code above...
 
             state = {
-                    "player": {
-                        "y": self.agentPlayer.pos.y,
-                        "velocity": self.agentPlayer.vel.y
-                    },
-                    "cpu": {
-                        "y": self.cpuPlayer.pos.y
-                    },
-                    "ball": {
-                        "x": self.ball.pos.x,
-                        "y": self.ball.pos.y,
-                        "velocity": {
-                            "x": self.ball.pos.x,
-                            "y": self.ball.pos.y
-                        }
-                    }
+                "player_y": self.agentPlayer.pos.y,
+                "player_velocity": self.agentPlayer.vel.y,
+                "cpu_y": self.cpuPlayer.pos.y,
+                "ball_x": self.ball.pos.x,
+                "ball_y": self.ball.pos.y,
+                "ball_velocity_x": self.ball.pos.x,
+                "ball_velocity_y": self.ball.pos.y
             }
 
             return state
 
 We see that ``getGameState()`` of Pong returns several values each time it is called. Using the returned dictonary we can create a numpy vector representating our state.
 
-This can be accomplished using a recursive method or by hand:
+This can be accomplished in the following ways:
 
 .. code-block:: python
 
-        #recursive way
-        def get_all_values(d, values):
-                if isinstance(d, dict):
-                        map(lambda _d: get_all_values(_d, values), d.values())
-                else:
-                        values.append(d)
-        my_state = []
-        get_all_values(state, my_state)
-        my_state = np.array(my_state)
-        
+        #easiest
+        my_state = np.array([ state.values() ])
+
         #by-hand
         my_state = np.array([ state["player"]["x"], state["player"]["velocity"], ... ])
 
@@ -59,17 +44,8 @@ You have control over which values you want to include in the state vector. Trai
         from ple import PLE
         import numpy as np
 
-        def get_all_values(d, values):
-                if isinstance(d, dict):
-                        map(lambda _d: get_all_values(_d, values), d.values())
-                else:
-                        values.append(d)
-
         def process_state(state):
-                _state = []
-                get_all_values(state, _state)
-
-                return np.array(_state).reshape((1, len((_state))))
+                return np.array([ state.values() ])
 
         game = Pong()
         p = PLE(game, display_screen=True, state_preprocessor=process_state)
@@ -86,4 +62,19 @@ You have control over which values you want to include in the state vector. Trai
            action = agent.pickAction(reward, state)
            reward = p.act(action)
 
-To mae this work a state processor must be supplied to PLE's ``state_preprocessor`` initialization method. This function will be called each time we request the games state. We can also let our agent know the dimensions of the vector to expect from PLE. In the main loop just simply replace the call to ``getScreenGrayScale`` with ``getGameState``.
+To make this work a state processor must be supplied to PLE's ``state_preprocessor`` initialization method. This function will be called each time we request the games state. We can also let our agent know the dimensions of the vector to expect from PLE. In the main loop just simply replace the call to ``getScreenGrayScale`` with ``getGameState``.
+
+Be aware different games will have different dictonary structures. The majority of games will return back a flat dictory structure but others will have lists inside of them. In particular games with variable objects to track, such as the number of segments in snake, require usage of lists within the dictonary.
+
+
+.. code-block:: python
+
+        state = {
+            "snake_head_x": self.player.head.pos.x, 
+            "snake_head_y": self.player.head.pos.y,
+            "food_x": self.food.pos.x, 
+            "food_y": self.food.pos.y,
+            "snake_body": []
+        }
+
+The ``"snake_body"`` field contains a dynamic number of values. It must be taken into consideration when creating your state preprocessor.

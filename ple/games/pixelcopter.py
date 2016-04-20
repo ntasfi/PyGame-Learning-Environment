@@ -182,17 +182,13 @@ class Pixelcopter(base.Game):
                 
         current_terrain = pygame.sprite.spritecollide(self.player, self.terrain_group, False)[0]
         state = {
-            "player": {
-                "y": self.player.pos.y,
-                "vel": self.player.momentum,
-                "dist_to_ceil": self.player.pos.y-(current_terrain.pos.y-self.height*0.25),
-                "dist_to_floor": (current_terrain.pos.y+self.height*0.25)-self.player.pos.y
-            },
-            "next_gate": {
-                "dist_to_player": min_dist,
-                "block_top": min_block.pos.y,
-                "block_bottom": min_block.pos.y+min_block.height
-            }
+            "player_y": self.player.pos.y,
+            "player_vel": self.player.momentum,
+            "player_dist_to_ceil": self.player.pos.y-(current_terrain.pos.y-self.height*0.25),
+            "player_dist_to_floor": (current_terrain.pos.y+self.height*0.25)-self.player.pos.y,
+            "next_gate_dist_to_player": min_dist,
+            "next_gate_block_top": min_block.pos.y,
+            "next_gate_block_bottom": min_block.pos.y+min_block.height
         }
 
         return state

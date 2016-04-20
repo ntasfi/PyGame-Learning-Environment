@@ -227,20 +227,16 @@ class Snake(base.Game):
         """
         
         state = {
-                "snake_head": {
-                    "x": self.player.head.pos.x, 
-                    "y": self.player.head.pos.y
-                },
-                "food": {
-                    "x": self.food.pos.x, 
-                    "y": self.food.pos.y
-                },
-                "snake_body":[]
+            "snake_head_x": self.player.head.pos.x, 
+            "snake_head_y": self.player.head.pos.y,
+            "food_x": self.food.pos.x, 
+            "food_y": self.food.pos.y,
+            "snake_body": []
         }
 
         for s in self.player.body:
-           dist = math.sqrt((self.player.head.pos.x - s.pos.x)**2 + (self.player.head.pos.y - s.pos.y)**2) 
-           state["snake_body"].append(dist)
+            dist = math.sqrt((self.player.head.pos.x - s.pos.x)**2 + (self.player.head.pos.y - s.pos.y)**2) 
+            state["snake_body"].append(dist)
 
         return state
 

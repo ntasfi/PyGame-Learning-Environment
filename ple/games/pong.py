@@ -206,21 +206,13 @@ class Pong(base.Game):
 
             """
             state = {
-                    "player": {
-                        "y": self.agentPlayer.pos.y,
-                        "velocity": self.agentPlayer.vel.y
-                    },
-                    "cpu": {
-                        "y": self.cpuPlayer.pos.y
-                    },
-                    "ball": {
-                        "x": self.ball.pos.x,
-                        "y": self.ball.pos.y,
-                        "velocity": {
-                            "x": self.ball.pos.x,
-                            "y": self.ball.pos.y
-                        }
-                    }
+                "player_y": self.agentPlayer.pos.y,
+                "player_velocity": self.agentPlayer.vel.y,
+                "cpu_y": self.cpuPlayer.pos.y,
+                "ball_x": self.ball.pos.x,
+                "ball_y": self.ball.pos.y,
+                "ball_velocity_x": self.ball.pos.x,
+                "ball_velocity_y": self.ball.pos.y
             }
 
             return state

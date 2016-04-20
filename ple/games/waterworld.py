@@ -132,14 +132,10 @@ class WaterWorld(base.Game):
         """
 
         state = {
-            "player": {
-                "x": self.player.pos.x,
-                "y": self.player.pos.y,
-                "velocity": {
-                    "x": self.player.vel.x,
-                    "y": self.player.vel.y
-                }
-            },
+            "player_x": self.player.pos.x,
+            "player_y": self.player.pos.y,
+            "player_velocity_x": self.player.vel.x,
+            "player_velocity_y": self.player.vel.y,
             "creep_dist": {
                 "GOOD": [],
                 "BAD": []

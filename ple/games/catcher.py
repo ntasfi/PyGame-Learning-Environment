@@ -176,15 +176,10 @@ class Catcher(base.Game):
 
         """
         state = {
-            "player": {
-                "x": self.player.rect.center[0],
-                "vel": self.player.vel
-            },
-
-            "fruit": {
-                "x": self.fruit.rect.center[0],
-                "y": self.fruit.rect.center[1]
-            }
+            "player_x": self.player.rect.center[0],
+            "player_vel": self.player.vel,
+            "fruit_x": self.fruit.rect.center[0],
+            "fruit_y": self.fruit.rect.center[1]
         }
 
         return state

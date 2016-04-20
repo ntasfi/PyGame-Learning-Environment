@@ -147,22 +147,14 @@ class PuckWorld(base.Game):
 
         """
         state = {
-                "player": {
-                    "x": self.player.pos.x,
-                    "y": self.player.pos.y,
-                    "velocity": {
-                        "x": self.player.vel.x,
-                        "y": self.player.vel.y
-                    }
-                },
-                "good_creep": {
-                    "x": self.good_creep.pos.x,
-                    "y": self.good_creep.pos.y
-                },
-                "bad_creep": {
-                    "x": self.bad_creep.pos.x,
-                    "y": self.bad_creep.pos.y
-                },
+            "player_x": self.player.pos.x,
+            "player_y": self.player.pos.y,
+            "player_velocity_x": self.player.vel.x,
+            "player_velocity_y": self.player.vel.y,
+            "good_creep_x": self.good_creep.pos.x,
+            "good_creep_y": self.good_creep.pos.y,
+            "bad_creep_x": self.bad_creep.pos.x,
+            "bad_creep_y": self.bad_creep.pos.y
         }
 
         return state
