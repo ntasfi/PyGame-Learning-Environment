@@ -6,7 +6,7 @@ from pygame.constants import KEYDOWN, KEYUP, K_F15 #this is our NOOP?
 
 class PLE(object):
         """
-        ple.PLE(game, fps=30, frame_skip=1, num_steps=1, force_fps=True, display_screen=False, add_noop_action=True, NOOP=K_15)
+        ple.PLE(game, fps=30, frame_skip=1, num_steps=1, reward_values={}, force_fps=True, display_screen=False, add_noop_action=True, NOOP=K_F15, state_preprocessor=None, rng=24)
 
         Main wrapper that interacts with games. Provides a similar interface to Arcade Learning Environment.
 

@@ -103,7 +103,7 @@ class WaterWorld(base.Game):
             self.CREEP_RADII[creep_type], 
             pos,
             self.rng.choice([-1,1], 2), 
-            self.CREEP_SPEED,
+            self.rng.rand()*self.CREEP_SPEED,
             self.CREEP_REWARD[creep_type],
             self.CREEP_TYPES[creep_type], 
             self.width, 
@@ -216,7 +216,7 @@ if __name__ == "__main__":
         import numpy as np
 
         pygame.init()
-        game = WaterWorld(width=256, height=256, num_creeps=8)
+        game = WaterWorld(width=256, height=256, num_creeps=10)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
         game.rng = np.random.RandomState(24)
