@@ -58,30 +58,31 @@ class Food(pygame.sprite.Sprite):
 
 class SnakeSegment(pygame.sprite.Sprite):
 
-    def __init__(self, pos_init, width, color):
+    def __init__(self, pos_init, width, height, color):
         pygame.sprite.Sprite.__init__(self)
 
         self.pos = vec2d(pos_init)
         self.color = color
         self.width = width
+        self.height = height
 
-        image = pygame.Surface((width, width))
+        image = pygame.Surface((width, height))
         image.fill((0,0,0))
         image.set_colorkey((0,0,0))
         
         pygame.draw.rect(
                 image,
                 color,
-                (0, 0, self.width, self.width),
+                (0, 0, self.width, self.height),
                 0
         )
 
         self.image = image
-        self.rect = self.image.get_rect()
+        #use half the size
+        self.rect = pygame.Rect(pos_init, (self.width/2, self.height/2))
         self.rect.center = pos_init
 
     def draw(self, screen):
-        self.rect.center = (self.pos.x, self.pos.y)
         screen.blit(self.image, self.rect.center)
 
 
@@ -96,6 +97,7 @@ class SnakePlayer():
         self.width = width
         self.length = length
         self.body = []
+        self.update_head = True
 
         #build our body up
         for i in range(self.length):
@@ -103,9 +105,9 @@ class SnakePlayer():
                     #makes a neat "zapping" in effect
                         SnakeSegment( 
                             (self.pos.x - (width)*i, self.pos.y),
+                            self.width, 
                             self.width,
                             tuple([c-100 for c in self.color]) if i == 0 else self.color
-                            
                         )
             )
         #we dont add the first few because it cause never actually hit it
@@ -114,13 +116,65 @@ class SnakePlayer():
 
     def update(self, dt):
         for i in range(self.length-1, 0, -1):
+            scale = 0.1
+
             self.body[i].pos = vec2d((
-                (0.9*self.body[i-1].pos.x+0.1*self.body[i].pos.x), 
-                (0.9*self.body[i-1].pos.y+0.1*self.body[i].pos.y) 
+                ((1.0-scale)*self.body[i-1].pos.x+scale*self.body[i].pos.x), 
+                ((1.0-scale)*self.body[i-1].pos.y+scale*self.body[i].pos.y) 
                 ))
+
+            self.body[i].rect.center = (self.body[i].pos.x, self.body[i].pos.y)
 
         self.head.pos.x += self.dir.x*self.speed*dt
         self.head.pos.y += self.dir.y*self.speed*dt
+        self.update_hitbox()
+
+    def update_hitbox(self): 
+        #need to make a small rect pointing the direction the snake is
+        #instead of counting the entire head square as a hit box, since 
+        #the head touchs the body on turns and causes game overs.
+
+        x = self.head.pos.x
+        y = self.head.pos.y
+
+        if self.dir.x == 0:
+            w = self.width
+            h = percent_round_int(self.width, 0.25)
+            
+            if self.dir.y == 1:
+                y += percent_round_int(self.width, 1.0)
+
+            if self.dir.y == -1:
+                y -= percent_round_int(self.width, 0.25)
+
+        if self.dir.y == 0:
+            w = percent_round_int(self.width, 0.25)
+            h = self.width
+            
+            if self.dir.x == 1:
+                x += percent_round_int(self.width, 1.0)
+
+            if self.dir.x == -1:
+                x -= percent_round_int(self.width, 0.25)
+
+        if self.update_head:
+            image = pygame.Surface((w, h))
+            image.fill((0,0,0))
+            image.set_colorkey((0,0,0))
+            
+            pygame.draw.rect(
+                    image,
+                    (255, 0, 0),
+                    (0, 0, w, h),
+                    0
+            )
+
+            self.head.image = image
+            self.head.rect = self.head.image.get_rect()
+            self.update_head = False
+
+        self.head.rect.center = (x, y) 
+
 
     def grow(self):
         self.length += 1
@@ -132,14 +186,15 @@ class SnakePlayer():
                     SnakeSegment( 
                         (last.x, last.y), #initially off screen?
                         self.width,
+                        self.width,
                         color
                     )
         )
-        if self.length > 7: #we cant actually hit another segment until this point.
+        if self.length > 3: #we cant actually hit another segment until this point.
             self.body_group.add(self.body[-1])
 
     def draw(self, screen):
-        for b in self.body:
+        for b in self.body[::-1]:
             b.draw(screen)
 
 class Snake(base.Game):
@@ -169,7 +224,6 @@ class Snake(base.Game):
         }
 
         base.Game.__init__(self, width, height, actions=actions)
-        self.allowed_fps = 30 #strange things happen at 60.
 
         self.speed = percent_round_int(width, 0.45) 
 
@@ -208,6 +262,8 @@ class Snake(base.Game):
 
                 if key == self.actions["down"] and self.player.dir.y != -1:
                     self.player.dir = vec2d((0, 1))
+
+                self.player.update_head = True
 
     def getGameState(self):
         """
@@ -283,7 +339,7 @@ class Snake(base.Game):
 
         self.ticks += 1
         self.screen.fill(self.BG_COLOR)
-
+        self._handle_player_events()
         self.score += self.rewards["tick"]
 
         hit = pygame.sprite.collide_rect(self.player.head, self.food)
@@ -305,7 +361,6 @@ class Snake(base.Game):
         if self.lives <= 0.0:
             self.score += self.rewards["loss"]
 
-        self._handle_player_events()
         self.player.update(dt)
 
         self.player.draw(self.screen)
@@ -316,7 +371,7 @@ if __name__ == "__main__":
         import numpy as np
 
         pygame.init()
-        game = Snake(width=64, height=64)
+        game = Snake(width=128, height=128)
         game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
         game.clock = pygame.time.Clock()
         game.rng = np.random.RandomState(24)
