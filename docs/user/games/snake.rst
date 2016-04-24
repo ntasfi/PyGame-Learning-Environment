@@ -7,10 +7,6 @@ Snake is a game where the agent must maneuver a line which grows in length each 
 
 The food is randomly spawned inside of the valid window while checking it does not make contact with the snake body.
 
-FPS Restrictions
-----------------
-This game is restricted to 30fps. Hit detection becomes inconsistent above this value. You can remove this by setting the `allowed_fps` parameter to `None`.
-
 Valid Actions
 -------------
 Up, down, left, and right. It cannot turn back on itself. Eg. if its moving downwards it cannot move up.
