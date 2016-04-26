@@ -13,7 +13,12 @@ PLE requires the following libraries to be installed:
 * pillow
 * pygame
 
-PyGame can be installed using this `tutorial`_.
+PyGame can be installed using this `tutorial`_ (Ubuntu). For mac you can use these following instructions;
+
+.. code-block:: bash
+
+   brew install sdl sdl_ttf sdl_image sdl_mixer portmidi  # brew or use equivalent means
+   conda install -c https://conda.binstar.org/quasiben pygame  # using Anaconda
 
 .. _tutorial: http://www.pygame.org/wiki/CompileUbuntu
 
