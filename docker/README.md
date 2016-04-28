@@ -1,9 +1,9 @@
-# Run PLE on Docker
+# Run PyGame-Learning-Environment on Docker
 
 ## Setup
 `wget http://raw.githubusercontent.com/ntasfi/PyGame-Learning-Environment/master/docker/Dockerfile`
 
-## Build atom image
+## Build PLE image
 `docker build -t ple .`
 
 UBUNTU:
@@ -18,6 +18,6 @@ finally:
   `run ifcongi and look for the ip of vboxnet0, say 192.168.99.1
   docker run -i -t -e DISPLAY=192.168.99.1:0 ple /bin/bash`
 
-USAGE:
+## Usage:
   `cd ple/examples
   python keras_nonvis.py`
