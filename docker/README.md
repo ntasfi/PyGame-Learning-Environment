@@ -6,18 +6,17 @@
 ## Build PLE image
 `docker build -t ple .`
 
-### UBUNTU:  
+#### UBUNTU:  
 `docker run -it -v /tmp/.X11-unix:/tmp/.X11-unix \
   -e DISPLAY=unix$DISPLAY ple /bin/bash`
 
-### MAC:
+#### MAC:
 in a separate window run:  
   `brew install socat`  
   `socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"`
 
-finally:  
+finally, run `ifcongi` and look for the ip of vboxnet0, say `192.168.99.1`  
 
-  `run ifcongi and look for the ip of vboxnet0, say 192.168.99.1`  
   `docker run -i -t -e DISPLAY=192.168.99.1:0 ple /bin/bash`
 
 ## Usage:
