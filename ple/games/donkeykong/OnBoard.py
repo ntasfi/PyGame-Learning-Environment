@@ -9,10 +9,11 @@ Sets up the image and its position for all its child classes.
 
 
 class OnBoard(pygame.sprite.Sprite):
-    def __init__(self, raw_image, position):
+    def __init__(self, raw_image, position, rng):
         super(OnBoard, self).__init__()
         self.__position = position
         self.image = raw_image
+        self.rng = rng
         self.image = pygame.transform.scale(self.image,
                                             (15, 15))  # Image and Rect required for the draw function on sprites
         self.rect = self.image.get_rect()

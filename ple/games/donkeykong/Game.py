@@ -4,6 +4,7 @@ import sys
 from pygame.locals import *
 from Board import Board
 from .. import base
+import numpy as np
 
 '''
 This class defines the logic of the game and how player input is taken etc
@@ -28,14 +29,19 @@ class DonkeyKong(base.Game):
                 "down": K_s
         }
         base.Game.__init__(self, self.width, self.height, actions=actions)
-        self.init()
+        self.rewards = {
+            "positive": 5,
+            "win": 50,
+            "negative": -25,
+            "tick": 0
+        }
 
     def init(self):
         # Font is set to comic sans MS
         self.myFont = pygame.font.SysFont("comicsansms", 30)
 
         # Create a new instance of the Board class
-        self.newGame = Board(self.width, self.height)
+        self.newGame = Board(self.width, self.height, self.rewards, self.rng)
 
         # Initialize the fireball timer
         self.fireballTimer = 0
@@ -49,11 +55,12 @@ class DonkeyKong(base.Game):
         return self.newGame.score
 
     def game_over(self):
-        return len(self.newGame.Hearts) == 1 
+        return len(self.newGame.Hearts) <= 0
 
     def step(self, dt):
-        self.scoreLabel = self.myFont.render(str(self.newGame.score), 1,
+        self.scoreLabel = self.myFont.render(str(self.getScore()), 1,
                                             (0, 0, 0))  # Display the score on the screen
+        self.newGame.score += self.rewards["tick"]
         # This is where the actual game is run
         if self.newGame.gameState == 1:
                 
@@ -190,8 +197,14 @@ if __name__ == "__main__":
     # Instantiate the Game class and run the game
     createdGame = DonkeyKong()
     createdGame.screen = pygame.display.set_mode((1200, 520))
+    createdGame.clock = pygame.time.Clock()
+    createdGame.rng = np.random.RandomState(24)
+    createdGame.init()
  
     while True:
+        if createdGame.game_over():
+            pygame.quit()
+            sys.exit()
         dt = pygame.time.Clock().tick_busy_loop(30)
         createdGame.step(dt);
         pygame.display.update()

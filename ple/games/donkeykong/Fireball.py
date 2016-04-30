@@ -1,6 +1,5 @@
 __author__ = 'Erilyth'
 import pygame
-import random
 import math
 from OnBoard import OnBoard
 
@@ -11,14 +10,19 @@ Each fireball can check for collisions in order to decide when to turn and when 
 '''
 
 class Fireball(OnBoard):
-    def __init__(self, raw_image, position, index,speed):
-        super(Fireball,self).__init__(raw_image, position)
+    def __init__(self, raw_image, position, index, speed, rng):
+        super(Fireball,self).__init__(raw_image, position, rng)
         #Set the fireball direction randomly
-        self.__direction = int(math.floor(random.random() * 100)) % 2
+        self.rng = rng
+        self.__direction = int(math.floor(self.rng.rand() * 100)) % 2
         self.index = index
         self.wallsBelow = []
         self.laddersBelow = []
 
+        self.IMAGES = {
+            "fireballright": pygame.transform.scale(pygame.image.load('Assets/fireballright.png'), (15, 15)), 
+            "fireballleft": pygame.transform.scale(pygame.image.load('Assets/fireballleft.png'), (15, 15))
+        }
         #The newly spawned fireball is not falling
         self.__fall = 0
         #The speed of a fireball is set
@@ -27,7 +31,6 @@ class Fireball(OnBoard):
     #Update the image of a fireball
     def updateImage(self, raw_image):
         self.image = raw_image
-        self.image = pygame.transform.scale(self.image, (15, 15))
 
     #Getters and Setters for some private variables
     def getSpeed(self):
@@ -50,13 +53,13 @@ class Fireball(OnBoard):
                 #We have collided with a wall below, so the fireball can stop falling
                 self.__fall = 0
                 #Set the direction randomly
-                self.__direction = int(math.floor(random.random() * 100)) % 2
+                self.__direction = int(math.floor(self.rng.rand() * 100)) % 2
 
         else:
 
             #While we are on the ladder, we use a probability of 4/20 to make the fireball start falling
             if self.checkCollision(ladderGroup, "V") and len(self.checkCollision(wallGroup, "V")) == 0:
-                randVal = int(math.floor(random.random() * 100)) % 20
+                randVal = int(math.floor(self.rng.rand() * 100)) % 20
                 if randVal < 15:
                     self.__fall = 0
                 else:
@@ -68,7 +71,7 @@ class Fireball(OnBoard):
 
             #We are moving right, so update the fireball image to the right
             if self.__direction == 0:
-                self.update(pygame.image.load('Assets/fireballright.png'), "H", self.__speed)
+                self.update(self.IMAGES["fireballright"], "H", self.__speed)
                 #When we hit a wall, we change direction
                 if self.checkCollision(wallGroup, "H"):
                     self.__direction = 1
@@ -76,7 +79,7 @@ class Fireball(OnBoard):
 
             #We are moving left, so update the fireball image to the left
             else:
-                self.update(pygame.image.load('Assets/fireballleft.png'), "H", -self.__speed)
+                self.update(self.IMAGES["fireballleft"], "H", -self.__speed)
                 #When we hit a wall, we change direction
                 if self.checkCollision(wallGroup, "H"):
                     self.__direction = 0
@@ -87,7 +90,6 @@ class Fireball(OnBoard):
         if direction == "H":
             self.setPosition((self.getPosition()[0] + value, self.getPosition()[1]))
             self.image = raw_image
-            self.image = pygame.transform.scale(self.image, (15, 15))
         if direction == "V":
             self.setPosition((self.getPosition()[0], self.getPosition()[1] + value))
         self.rect.center = self.getPosition()

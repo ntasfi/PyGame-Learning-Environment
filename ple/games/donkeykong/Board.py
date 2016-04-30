@@ -1,7 +1,6 @@
 __author__ = 'Batchu Vishal'
 import pygame
 import math
-import random
 import sys
 
 from Person import Person
@@ -9,7 +8,7 @@ from OnBoard import OnBoard
 from Coin import Coin
 from Player import Player
 from Fireball import Fireball
-from DonkeyKong import DonkeyKong
+from Donkey import Donkey
 
 '''
 This class defines our gameboard.
@@ -19,11 +18,13 @@ The generation of the level also happens in this class.
 
 
 class Board:
-    def __init__(self, width, height):
+    def __init__(self, width, height, rewards, rng):
         self.__width = width
         self.__actHeight = height
         self.__height = self.__actHeight + 10
         self.score = 0
+        self.rng = rng
+        self.rewards = rewards
         self.gameState = 1
         self.cycles = 0  # For the characters animation
         self.direction = 0
@@ -61,25 +62,25 @@ class Board:
     def resetGroups(self):
         self.score = 0
         self.map = []  # We will create the map again when we reset the game
-        self.Players = [Player(pygame.image.load('Assets/still.png'), (50, 440))]
-        self.Enemies = [DonkeyKong(pygame.image.load('Assets/kong0.png'), (100, 117))]
-        self.Allies = [Person(pygame.image.load('Assets/princess.png'), (50, 55))]
+        self.Players = [Player(pygame.image.load('Assets/still.png'), (50, 440), self.rng)]
+        self.Enemies = [Donkey(pygame.image.load('Assets/kong0.png'), (100, 117), self.rng)]
+        self.Allies = [Person(pygame.image.load('Assets/princess.png'), (50, 55), self.rng)]
         self.Allies[0].updateWH(self.Allies[0].image, "H", 0, 25, 25)
         self.Coins = []
         self.Walls = []
         self.Ladders = []
         self.Fireballs = []
-        self.Hearts = [OnBoard(pygame.image.load('Assets/heart.png'), (730, 490)),
-                       OnBoard(pygame.image.load('Assets/heart.png'), (750, 490)),
-                       OnBoard(pygame.image.load('Assets/heart.png'), (770, 490))]
+        self.Hearts = [OnBoard(pygame.image.load('Assets/heart.png'), (730, 490), self.rng),
+                       OnBoard(pygame.image.load('Assets/heart.png'), (750, 490), self.rng),
+                       OnBoard(pygame.image.load('Assets/heart.png'), (770, 490), self.rng)]
         self.Hearts[0].modifySize(pygame.image.load('Assets/heart.png'), 20, 20)
         self.Hearts[1].modifySize(pygame.image.load('Assets/heart.png'), 20, 20)
         self.Hearts[2].modifySize(pygame.image.load('Assets/heart.png'), 20, 20)
-        self.Boards = [OnBoard(pygame.image.load('Assets/board.png'), (200, 480)),
-                       OnBoard(pygame.image.load('Assets/board.png'), (685, 480))]
+        self.Boards = [OnBoard(pygame.image.load('Assets/board.png'), (200, 480), self.rng),
+                       OnBoard(pygame.image.load('Assets/board.png'), (685, 480), self.rng)]
         self.Boards[0].modifySize(self.Boards[0].image, 40, 150)  # Do this on purpose to get a pixelated image
         self.Boards[1].modifySize(self.Boards[1].image, 40, 150)
-        self.FireballEndpoints = [OnBoard(pygame.image.load('Assets/still.png'), (50, 440))]
+        self.FireballEndpoints = [OnBoard(pygame.image.load('Assets/still.png'), (50, 440), self.rng)]
         self.initializeGame()  # This initializes the game and generates our map
         self.createGroups()  # This creates the instance groups
 
@@ -93,7 +94,7 @@ class Board:
         if len(self.Fireballs) < len(self.Enemies) * 6+6:
             self.Fireballs.append(
                 Fireball(pygame.image.load('Assets/fireballright.png'), (location[0], location[1] + 15), len(self.Fireballs),
-                         2 + len(self.Enemies)/2))
+                         2 + len(self.Enemies)/2, self.rng))
             # Starts DonkeyKong's animation
             self.Enemies[kongIndex].setStopDuration(15)
             self.Enemies[kongIndex].setPosition(
@@ -121,14 +122,14 @@ class Board:
             for j in range(len(self.map[i])):
                 if self.map[i][j] == 0 and ((i + 1 < len(self.map) and self.map[i + 1][j] == 1) or (
                             i + 2 < len(self.map) and self.map[i + 2][j] == 1)):
-                    randNumber = math.floor(random.random() * 1000)
+                    randNumber = math.floor(self.rng.rand() * 1000)
                     if randNumber % 35 == 0 and len(self.Coins) <= 25:  # At max there will be 26 coins in the map
                         self.map[i][j] = 3
                         if j - 1 >= 0 and self.map[i][j - 1] == 3:
                             self.map[i][j] = 0
                         if self.map[i][j] == 3:
                             # Add the coin to our coin list
-                            self.Coins.append(Coin(pygame.image.load('Assets/coin1.png'), (j * 15 + 15 / 2, i * 15 + 15 / 2)))
+                            self.Coins.append(Coin(pygame.image.load('Assets/coin1.png'), (j * 15 + 15 / 2, i * 15 + 15 / 2), self.rng))
         if len(self.Coins) <= 20:  # If there are less than 21 coins, we call the function again
             self.GenerateCoins()
 
@@ -171,10 +172,10 @@ class Board:
     # Generate ladders randomly, 1 for each floor such that they are not too close to each other
     def makeLadders(self):
         for i in range(2, (self.__height / (15 * 5) - 1)):
-            ladderPos = math.floor(random.random() * (self.__width / 15 - 20))
+            ladderPos = math.floor(self.rng.rand() * (self.__width / 15 - 20))
             ladderPos = int(10 + ladderPos)
             while self.checkMapForMatch(ladderPos, i - 1, 2, 0) == 1:
-                ladderPos = math.floor(random.random() * (self.__width / 15 - 20))
+                ladderPos = math.floor(self.rng.rand() * (self.__width / 15 - 20))
                 ladderPos = int(10 + ladderPos)
             for k in range(0, 5):
                 self.map[i * 5 + k][ladderPos] = self.map[i * 5 + k][ladderPos + 1] = 2
@@ -183,15 +184,15 @@ class Board:
     def makeBrokenLadders(self):
         for i in range(2, (self.__height / (15 * 5) - 1)):
             if i % 2 == 1:
-                brokenLadderPos = math.floor(random.random() * (self.__width / 15 - 20))
+                brokenLadderPos = math.floor(self.rng.rand() * (self.__width / 15 - 20))
                 brokenLadderPos = int(10 + brokenLadderPos)
                 # Make sure aren't too close to other ladders or broken ladders
                 while self.checkMapForMatch(brokenLadderPos, i - 1, 2, 0) == 1 or self.checkMapForMatch(brokenLadderPos,i, 2,0) == 1 or self.checkMapForMatch(brokenLadderPos, i + 1, 2, 0) == 1:
-                    brokenLadderPos = math.floor(random.random() * (self.__width / 15 - 20))
+                    brokenLadderPos = math.floor(self.rng.rand() * (self.__width / 15 - 20))
                     brokenLadderPos = int(10 + brokenLadderPos)
                 # Randomly make the broken edges of the ladder
-                brokenRand = int(math.floor(random.random() * 100)) % 2
-                brokenRand2 = int(math.floor(random.random() * 100)) % 2
+                brokenRand = int(math.floor(self.rng.rand() * 100)) % 2
+                brokenRand2 = int(math.floor(self.rng.rand() * 100)) % 2
                 for k in range(0, 1):
                     self.map[i * 5 + k][brokenLadderPos] = self.map[i * 5 + k][brokenLadderPos + 1] = 2
                 for k in range(3 + brokenRand, 5):
@@ -218,10 +219,10 @@ class Board:
             for y in range(len(self.map[x])):
                 if self.map[x][y] == 1:
                     # Add a wall at that position
-                    self.Walls.append(OnBoard(pygame.image.load('Assets/wood_block.png'), (y * 15 + 15 / 2, x * 15 + 15 / 2)))
+                    self.Walls.append(OnBoard(pygame.image.load('Assets/wood_block.png'), (y * 15 + 15 / 2, x * 15 + 15 / 2), self.rng))
                 elif self.map[x][y] == 2:
                     # Add a ladder at that position
-                    self.Ladders.append(OnBoard(pygame.image.load('Assets/ladder.png'), (y * 15 + 15 / 2, x * 15 + 15 / 2)))
+                    self.Ladders.append(OnBoard(pygame.image.load('Assets/ladder.png'), (y * 15 + 15 / 2, x * 15 + 15 / 2), self.rng))
 
     # Check if the player is on a ladder or not
     def ladderCheck(self, laddersCollidedBelow, wallsCollidedBelow, wallsCollidedAbove):
@@ -243,21 +244,18 @@ class Board:
         for fireball in self.fireballGroup:
             fireball.continuousUpdate(self.wallGroup, self.ladderGroup)
             if fireball.checkCollision(self.playerGroup, "V"):
-                if len(self.Hearts) >= 2:  # Reduce the player's life by 1
-                    self.Fireballs.remove(fireball)
-                    self.Hearts.pop(len(self.Hearts) - 1)
-                    self.Players[0].setPosition((50, 440))
-                    print "YOU DIED"
-                    self.score -= 25
-                    if self.score < 0:
-                        self.score = 0
-                    self.createGroups()
+                self.Fireballs.remove(fireball)
+                self.Hearts.pop(len(self.Hearts) - 1)
+                self.Players[0].setPosition((50, 440))
+                print "YOU DIED"
+                self.score += self.rewards["negative"]
+                self.createGroups()
             self.checkFireballDestroy(fireball)
 
     # Check for coins collided and add the appropriate score
     def coinCheck(self, coinsCollected):
         for coin in coinsCollected:
-            self.score += coin.collectCoin()
+            self.score += self.rewards["positive"]
             # We also remove the coin entry from our map
             self.map[(coin.getPosition()[1] - 15 / 2) / 15][(coin.getPosition()[0] - 15 / 2) / 15] = 0
             # Remove the coin entry from our list
@@ -271,8 +269,7 @@ class Board:
         if self.Players[0].checkCollision(self.allyGroup) or self.Players[0].getPosition()[1] < 5 * 15:
 
             print "VICTORY"
-            clock.tick(100)  # A delay of 0.1 second before the next level starts
-            self.score += 50
+            self.score += self.rewards["win"]
 
             # This is just the next level so we only clear the fireballs and regenerate the coins
             self.Fireballs = []
@@ -282,9 +279,9 @@ class Board:
 
             # Add Donkey Kongs
             if len(self.Enemies) == 1:
-                self.Enemies.append(DonkeyKong(pygame.image.load('Assets/kong0.png'), (700, 117)))
+                self.Enemies.append(Donkey(pygame.image.load('Assets/kong0.png'), (700, 117), self.rng))
             elif len(self.Enemies) == 2:
-                self.Enemies.append(DonkeyKong(pygame.image.load('Assets/kong0.png'), (400, 117)))
+                self.Enemies.append(Donkey(pygame.image.load('Assets/kong0.png'), (400, 117), self.rng))
             # Create the groups again so the enemies are effected
             self.createGroups()
 
