@@ -1,5 +1,6 @@
 __author__ = 'Erilyth'
 import pygame
+import os
 from Person import Person
 
 '''
@@ -9,7 +10,7 @@ Each donkey kong can only move on the top floor and cannot move vertically.
 
 
 class DonkeyKongPerson(Person):
-    def __init__(self, raw_image, position, rng):
+    def __init__(self, raw_image, position, rng, dir):
         super(DonkeyKongPerson, self).__init__(raw_image, position)
         self.__speed = 2
         self.rng = rng
@@ -17,18 +18,18 @@ class DonkeyKongPerson(Person):
         self.__cycles = 0
         self.__stopDuration = 0
         self.IMAGES = {
-            "kong0": pygame.image.load('Assets/kong0.png'),
-            "kong1": pygame.image.load('Assets/kong1.png'),
-            "kong2": pygame.image.load('Assets/kong2.png'),
-            "kong3": pygame.image.load('Assets/kong3.png'),
-            "kong01": pygame.image.load('Assets/kong01.png'),
-            "kong11": pygame.image.load('Assets/kong11.png'),
-            "kong21": pygame.image.load('Assets/kong21.png'),
-            "kong31": pygame.image.load('Assets/kong31.png'),
-            "kongstill0": pygame.image.load('Assets/kongstill0.png'),
-            "kongstill10": pygame.image.load('Assets/kongstill10.png'),
-            "kongstill1": pygame.image.load('Assets/kongstill1.png'),
-            "kongstill11": pygame.image.load('Assets/kongstill11.png')
+            "kong0": pygame.image.load(os.path.join(dir, 'Assets/kong0.png')).convert_alpha(),
+            "kong1": pygame.image.load(os.path.join(dir, 'Assets/kong1.png')).convert_alpha(),
+            "kong2": pygame.image.load(os.path.join(dir, 'Assets/kong2.png')).convert_alpha(),
+            "kong3": pygame.image.load(os.path.join(dir, 'Assets/kong3.png')).convert_alpha(),
+            "kong01": pygame.image.load(os.path.join(dir, 'Assets/kong01.png')).convert_alpha(),
+            "kong11": pygame.image.load(os.path.join(dir, 'Assets/kong11.png')).convert_alpha(),
+            "kong21": pygame.image.load(os.path.join(dir, 'Assets/kong21.png')).convert_alpha(),
+            "kong31": pygame.image.load(os.path.join(dir, 'Assets/kong31.png')).convert_alpha(),
+            "kongstill0": pygame.image.load(os.path.join(dir, 'Assets/kongstill0.png')).convert_alpha(),
+            "kongstill10": pygame.image.load(os.path.join(dir, 'Assets/kongstill10.png')).convert_alpha(),
+            "kongstill1": pygame.image.load(os.path.join(dir, 'Assets/kongstill1.png')).convert_alpha(),
+            "kongstill11": pygame.image.load(os.path.join(dir, 'Assets/kongstill11.png')).convert_alpha()
         }
 
     # Getters and Setters

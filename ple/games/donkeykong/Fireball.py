@@ -1,6 +1,7 @@
 __author__ = 'Erilyth'
 import pygame
 import math
+import os
 from OnBoard import OnBoard
 
 '''
@@ -10,7 +11,7 @@ Each fireball can check for collisions in order to decide when to turn and when 
 '''
 
 class Fireball(OnBoard):
-    def __init__(self, raw_image, position, index, speed, rng):
+    def __init__(self, raw_image, position, index, speed, rng, dir):
         super(Fireball,self).__init__(raw_image, position)
         #Set the fireball direction randomly
         self.rng = rng
@@ -20,8 +21,8 @@ class Fireball(OnBoard):
         self.laddersBelow = []
 
         self.IMAGES = {
-            "fireballright": pygame.transform.scale(pygame.image.load('Assets/fireballright.png'), (15, 15)), 
-            "fireballleft": pygame.transform.scale(pygame.image.load('Assets/fireballleft.png'), (15, 15))
+            "fireballright": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/fireballright.png')), (15, 15)).convert_alpha(), 
+            "fireballleft": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/fireballleft.png')), (15, 15)).convert_alpha()
         }
         #The newly spawned fireball is not falling
         self.__fall = 0

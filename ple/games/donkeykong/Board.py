@@ -2,6 +2,7 @@ __author__ = 'Batchu Vishal'
 import pygame
 import math
 import sys
+import os
 
 from Person import Person
 from OnBoard import OnBoard
@@ -18,7 +19,7 @@ The generation of the level also happens in this class.
 
 
 class Board:
-    def __init__(self, width, height, rewards, rng):
+    def __init__(self, width, height, rewards, rng, dir):
         self.__width = width
         self.__actHeight = height
         self.__height = self.__actHeight + 10
@@ -27,18 +28,19 @@ class Board:
         self.rewards = rewards
         self.cycles = 0  # For the characters animation
         self.direction = 0
+        self._dir = dir
 
         self.IMAGES = {
-        	"background": pygame.image.load('Assets/background.png'),
-        	"still": pygame.image.load('Assets/still.png'),
-        	"kong0": pygame.image.load('Assets/kong0.png'),
-        	"princess": pygame.image.load('Assets/princess.png'),
-        	"heart": pygame.image.load('Assets/heart.png'),
-        	"board": pygame.image.load('Assets/board.png'),
-        	"fireballright": pygame.image.load('Assets/fireballright.png'),
-        	"coin1": pygame.image.load('Assets/coin1.png'),
-        	"wood_block": pygame.image.load('Assets/wood_block.png'),
-        	"ladder": pygame.image.load('Assets/ladder.png')
+        	"background": pygame.image.load(os.path.join(dir, 'Assets/background.png')).convert_alpha(),
+        	"still": pygame.image.load(os.path.join(dir, 'Assets/still.png')).convert_alpha(),
+        	"kong0": pygame.image.load(os.path.join(dir, 'Assets/kong0.png')).convert_alpha(),
+        	"princess": pygame.image.load(os.path.join(dir, 'Assets/princess.png')).convert_alpha(),
+        	"heart": pygame.image.load(os.path.join(dir, 'Assets/heart.png')).convert_alpha(),
+        	"board": pygame.image.load(os.path.join(dir, 'Assets/board.png')).convert_alpha(),
+        	"fireballright": pygame.image.load(os.path.join(dir, 'Assets/fireballright.png')).convert_alpha(),
+        	"coin1": pygame.image.load(os.path.join(dir, 'Assets/coin1.png')).convert_alpha(),
+        	"wood_block": pygame.image.load(os.path.join(dir, 'Assets/wood_block.png')).convert_alpha(),
+        	"ladder": pygame.image.load(os.path.join(dir, 'Assets/ladder.png')).convert_alpha()
         }
 
         self.white = (255, 255, 255)
@@ -84,7 +86,7 @@ class Board:
         self.score = 0
         self.map = []  # We will create the map again when we reset the game
         self.Players = [Player(self.IMAGES["still"], (50, 440))]
-        self.Enemies = [DonkeyKongPerson(self.IMAGES["kong0"], (100, 117), self.rng)]
+        self.Enemies = [DonkeyKongPerson(self.IMAGES["kong0"], (100, 117), self.rng, self._dir)]
         self.Allies = [Person(self.IMAGES["princess"], (50, 55))]
         self.Allies[0].updateWH(self.Allies[0].image, "H", 0, 25, 25)
         self.Coins = []
@@ -115,7 +117,7 @@ class Board:
         if len(self.Fireballs) < len(self.Enemies) * 6+6:
             self.Fireballs.append(
                 Fireball(self.IMAGES["fireballright"], (location[0], location[1] + 15), len(self.Fireballs),
-                         2 + len(self.Enemies)/2, self.rng))
+                         2 + len(self.Enemies)/2, self.rng, self._dir))
             # Starts DonkeyKong's animation
             self.Enemies[kongIndex].setStopDuration(15)
             self.Enemies[kongIndex].setPosition(
@@ -148,7 +150,7 @@ class Board:
                             self.map[i][j] = 0
                         if self.map[i][j] == 3:
                             # Add the coin to our coin list
-                            self.Coins.append(Coin(self.IMAGES["coin1"], (j * 15 + 15 / 2, i * 15 + 15 / 2)))
+                            self.Coins.append(Coin(self.IMAGES["coin1"], (j * 15 + 15 / 2, i * 15 + 15 / 2), self._dir))
         if len(self.Coins) <= 20:  # If there are less than 21 coins, we call the function again
             self.GenerateCoins()
 
@@ -280,7 +282,7 @@ class Board:
             self.createGroups()
 
     # Check if the player wins
-    def checkVictory(self, clock):
+    def checkVictory(self):
         # If you touch the princess or reach the floor with the princess you win!
         if self.Players[0].checkCollision(self.allyGroup) or self.Players[0].getPosition()[1] < 5 * 15:
 
@@ -294,9 +296,9 @@ class Board:
 
             # Add Donkey Kongs
             if len(self.Enemies) == 1:
-                self.Enemies.append(DonkeyKongPerson(self.IMAGES["kong0"], (700, 117), self.rng))
+                self.Enemies.append(DonkeyKongPerson(self.IMAGES["kong0"], (700, 117), self.rng, self._dir))
             elif len(self.Enemies) == 2:
-                self.Enemies.append(DonkeyKongPerson(self.IMAGES["kong0"], (400, 117), self.rng))
+                self.Enemies.append(DonkeyKongPerson(self.IMAGES["kong0"], (400, 117), self.rng, self._dir))
             # Create the groups again so the enemies are effected
             self.createGroups()
 

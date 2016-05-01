@@ -5,6 +5,7 @@ from pygame.locals import K_a, K_d, K_SPACE, K_w, K_s, QUIT, KEYDOWN
 from Board import Board
 from .. import base
 import numpy as np
+import os
 
 '''
 This class defines the logic of the game and how player input is taken etc
@@ -38,12 +39,14 @@ class DonkeyKong(base.Game):
 
         self.allowed_fps = 30
 
+        self._dir = os.path.dirname(os.path.abspath(__file__))
+
         self.IMAGES = {
-        	"right": pygame.image.load('Assets/right.png'),
-        	"right2": pygame.image.load('Assets/right2.png'),
-        	"left": pygame.image.load('Assets/left.png'),
-        	"left2": pygame.image.load('Assets/left2.png'),
-        	"still": pygame.image.load('Assets/still.png')
+        	"right": pygame.image.load(os.path.join(self._dir, 'Assets/right.png')),
+        	"right2": pygame.image.load(os.path.join(self._dir, 'Assets/right2.png')),
+        	"left": pygame.image.load(os.path.join(self._dir, 'Assets/left.png')),
+        	"left2": pygame.image.load(os.path.join(self._dir, 'Assets/left2.png')),
+        	"still": pygame.image.load(os.path.join(self._dir, 'Assets/still.png'))
         }
 
         # Font is set to comic sans MS
@@ -51,7 +54,7 @@ class DonkeyKong(base.Game):
 
     def init(self):
         # Create a new instance of the Board class
-        self.newGame = Board(self.width, self.height, self.rewards, self.rng)
+        self.newGame = Board(self.width, self.height, self.rewards, self.rng, self._dir)
 
         # Initialize the fireball timer
         self.fireballTimer = 0
@@ -193,7 +196,7 @@ class DonkeyKong(base.Game):
         self.newGame.coinCheck(coinsCollected)
 
         # Check if you have reached the princess
-        self.newGame.checkVictory(pygame.time.Clock())
+        self.newGame.checkVictory()
 
         # Update all the Donkey Kongs
         for enemy in self.newGame.Enemies:
