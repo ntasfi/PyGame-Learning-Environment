@@ -11,7 +11,7 @@ Each fireball can check for collisions in order to decide when to turn and when 
 
 class Fireball(OnBoard):
     def __init__(self, raw_image, position, index, speed, rng):
-        super(Fireball,self).__init__(raw_image, position, rng)
+        super(Fireball,self).__init__(raw_image, position)
         #Set the fireball direction randomly
         self.rng = rng
         self.__direction = int(math.floor(self.rng.rand() * 100)) % 2
@@ -35,10 +35,13 @@ class Fireball(OnBoard):
     #Getters and Setters for some private variables
     def getSpeed(self):
         return self.__speed
+
     def setSpeed(self,speed):
         self.__speed = speed
+
     def getFall(self):
         return self.__fall
+        
     def getDirection(self):
         return self.__direction
 

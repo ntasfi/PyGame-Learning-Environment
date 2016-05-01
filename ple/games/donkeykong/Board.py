@@ -8,7 +8,7 @@ from OnBoard import OnBoard
 from Coin import Coin
 from Player import Player
 from Fireball import Fireball
-from Donkey import Donkey
+from DonkeyKongPerson import DonkeyKongPerson
 
 '''
 This class defines our gameboard.
@@ -25,9 +25,21 @@ class Board:
         self.score = 0
         self.rng = rng
         self.rewards = rewards
-        self.gameState = 1
         self.cycles = 0  # For the characters animation
         self.direction = 0
+
+        self.IMAGES = {
+        	"background": pygame.image.load('Assets/background.png'),
+        	"still": pygame.image.load('Assets/still.png'),
+        	"kong0": pygame.image.load('Assets/kong0.png'),
+        	"princess": pygame.image.load('Assets/princess.png'),
+        	"heart": pygame.image.load('Assets/heart.png'),
+        	"board": pygame.image.load('Assets/board.png'),
+        	"fireballright": pygame.image.load('Assets/fireballright.png'),
+        	"coin1": pygame.image.load('Assets/coin1.png'),
+        	"wood_block": pygame.image.load('Assets/wood_block.png'),
+        	"ladder": pygame.image.load('Assets/ladder.png')
+        }
 
         self.white = (255, 255, 255)
 
@@ -37,14 +49,23 @@ class Board:
         '''
         self.map = []
         # These are the arrays in which we store our instances of different classes
-        self.Players = self.Enemies = self.Allies = self.Coins = self.Walls = self.Ladders = self.Fireballs = self.Hearts = self.Boards = self.FireballEndpoints = []
+        self.Players = []
+        self.Enemies = []
+        self.Allies = []
+        self.Coins = []
+        self.Walls = []
+        self.Ladders = []
+        self.Fireballs = []
+        self.Hearts = []
+        self.Boards = []
+        self.FireballEndpoints = []
 
         # Resets the above groups and initializes the game for us
         self.resetGroups()
 
         self.myfont = pygame.font.SysFont("comicsansms", 50)
 
-        self.background = pygame.image.load('Assets/background.png')
+        self.background = self.IMAGES["background"]
         self.background = pygame.transform.scale(self.background, (width, height))
 
         # Initialize the instance groups which we use to display our instances on the screen
@@ -62,25 +83,25 @@ class Board:
     def resetGroups(self):
         self.score = 0
         self.map = []  # We will create the map again when we reset the game
-        self.Players = [Player(pygame.image.load('Assets/still.png'), (50, 440), self.rng)]
-        self.Enemies = [Donkey(pygame.image.load('Assets/kong0.png'), (100, 117), self.rng)]
-        self.Allies = [Person(pygame.image.load('Assets/princess.png'), (50, 55), self.rng)]
+        self.Players = [Player(self.IMAGES["still"], (50, 440))]
+        self.Enemies = [DonkeyKongPerson(self.IMAGES["kong0"], (100, 117), self.rng)]
+        self.Allies = [Person(self.IMAGES["princess"], (50, 55))]
         self.Allies[0].updateWH(self.Allies[0].image, "H", 0, 25, 25)
         self.Coins = []
         self.Walls = []
         self.Ladders = []
         self.Fireballs = []
-        self.Hearts = [OnBoard(pygame.image.load('Assets/heart.png'), (730, 490), self.rng),
-                       OnBoard(pygame.image.load('Assets/heart.png'), (750, 490), self.rng),
-                       OnBoard(pygame.image.load('Assets/heart.png'), (770, 490), self.rng)]
-        self.Hearts[0].modifySize(pygame.image.load('Assets/heart.png'), 20, 20)
-        self.Hearts[1].modifySize(pygame.image.load('Assets/heart.png'), 20, 20)
-        self.Hearts[2].modifySize(pygame.image.load('Assets/heart.png'), 20, 20)
-        self.Boards = [OnBoard(pygame.image.load('Assets/board.png'), (200, 480), self.rng),
-                       OnBoard(pygame.image.load('Assets/board.png'), (685, 480), self.rng)]
+        self.Hearts = [OnBoard(self.IMAGES["heart"], (730, 490)),
+                       OnBoard(self.IMAGES["heart"], (750, 490)),
+                       OnBoard(self.IMAGES["heart"], (770, 490))]
+        self.Hearts[0].modifySize(self.IMAGES["heart"], 20, 20)
+        self.Hearts[1].modifySize(self.IMAGES["heart"], 20, 20)
+        self.Hearts[2].modifySize(self.IMAGES["heart"], 20, 20)
+        self.Boards = [OnBoard(self.IMAGES["board"], (200, 480)),
+                       OnBoard(self.IMAGES["board"], (685, 480))]
         self.Boards[0].modifySize(self.Boards[0].image, 40, 150)  # Do this on purpose to get a pixelated image
         self.Boards[1].modifySize(self.Boards[1].image, 40, 150)
-        self.FireballEndpoints = [OnBoard(pygame.image.load('Assets/still.png'), (50, 440), self.rng)]
+        self.FireballEndpoints = [OnBoard(self.IMAGES["still"], (50, 440))]
         self.initializeGame()  # This initializes the game and generates our map
         self.createGroups()  # This creates the instance groups
 
@@ -93,15 +114,13 @@ class Board:
     def CreateFireball(self, location, kongIndex):
         if len(self.Fireballs) < len(self.Enemies) * 6+6:
             self.Fireballs.append(
-                Fireball(pygame.image.load('Assets/fireballright.png'), (location[0], location[1] + 15), len(self.Fireballs),
+                Fireball(self.IMAGES["fireballright"], (location[0], location[1] + 15), len(self.Fireballs),
                          2 + len(self.Enemies)/2, self.rng))
             # Starts DonkeyKong's animation
             self.Enemies[kongIndex].setStopDuration(15)
             self.Enemies[kongIndex].setPosition(
                 (self.Enemies[kongIndex].getPosition()[0], self.Enemies[kongIndex].getPosition()[1] - 12))
             self.Enemies[kongIndex].setCenter(self.Enemies[kongIndex].getPosition())
-            # if 5 > self.Fireballs[len(self.Fireballs)-1].speed:
-            #    self.Fireballs[len(self.Fireballs)-1].speed=self.Fireballs[len(self.Fireballs)-1].speed+1
             self.createGroups()  # We recreate the groups so the fireball is added
 
     # Destroy a fireball if it has collided with a player or reached its endpoint
@@ -129,7 +148,7 @@ class Board:
                             self.map[i][j] = 0
                         if self.map[i][j] == 3:
                             # Add the coin to our coin list
-                            self.Coins.append(Coin(pygame.image.load('Assets/coin1.png'), (j * 15 + 15 / 2, i * 15 + 15 / 2), self.rng))
+                            self.Coins.append(Coin(self.IMAGES["coin1"], (j * 15 + 15 / 2, i * 15 + 15 / 2)))
         if len(self.Coins) <= 20:  # If there are less than 21 coins, we call the function again
             self.GenerateCoins()
 
@@ -219,10 +238,10 @@ class Board:
             for y in range(len(self.map[x])):
                 if self.map[x][y] == 1:
                     # Add a wall at that position
-                    self.Walls.append(OnBoard(pygame.image.load('Assets/wood_block.png'), (y * 15 + 15 / 2, x * 15 + 15 / 2), self.rng))
+                    self.Walls.append(OnBoard(self.IMAGES["wood_block"], (y * 15 + 15 / 2, x * 15 + 15 / 2)))
                 elif self.map[x][y] == 2:
                     # Add a ladder at that position
-                    self.Ladders.append(OnBoard(pygame.image.load('Assets/ladder.png'), (y * 15 + 15 / 2, x * 15 + 15 / 2), self.rng))
+                    self.Ladders.append(OnBoard(self.IMAGES["ladder"], (y * 15 + 15 / 2, x * 15 + 15 / 2)))
 
     # Check if the player is on a ladder or not
     def ladderCheck(self, laddersCollidedBelow, wallsCollidedBelow, wallsCollidedAbove):
@@ -233,9 +252,7 @@ class Board:
                     self.Players[0].isJumping = 0
                     # Move the player down if he collides a wall above
                     if wallsCollidedAbove:
-                        #print "HIT HEAD"
                         self.Players[0].updateY(3)
-                    #print "ON LADDER!"
         else:
             self.Players[0].onLadder = 0
 
@@ -247,7 +264,6 @@ class Board:
                 self.Fireballs.remove(fireball)
                 self.Hearts.pop(len(self.Hearts) - 1)
                 self.Players[0].setPosition((50, 440))
-                print "YOU DIED"
                 self.score += self.rewards["negative"]
                 self.createGroups()
             self.checkFireballDestroy(fireball)
@@ -268,7 +284,6 @@ class Board:
         # If you touch the princess or reach the floor with the princess you win!
         if self.Players[0].checkCollision(self.allyGroup) or self.Players[0].getPosition()[1] < 5 * 15:
 
-            print "VICTORY"
             self.score += self.rewards["win"]
 
             # This is just the next level so we only clear the fireballs and regenerate the coins
@@ -279,30 +294,28 @@ class Board:
 
             # Add Donkey Kongs
             if len(self.Enemies) == 1:
-                self.Enemies.append(Donkey(pygame.image.load('Assets/kong0.png'), (700, 117), self.rng))
+                self.Enemies.append(DonkeyKongPerson(self.IMAGES["kong0"], (700, 117), self.rng))
             elif len(self.Enemies) == 2:
-                self.Enemies.append(Donkey(pygame.image.load('Assets/kong0.png'), (400, 117), self.rng))
+                self.Enemies.append(DonkeyKongPerson(self.IMAGES["kong0"], (400, 117), self.rng))
             # Create the groups again so the enemies are effected
             self.createGroups()
 
     # Redraws the entire game screen for us
     def redrawScreen(self, screen, scoreLabel, width, height):
         screen.fill((0, 0, 0))  # Fill it with black
-        # We are in the game state
-        if self.gameState == 1:
-            # Draw the background first
-            screen.blit(self.background, self.background.get_rect())
-            # Draw all our groups on the background
-            self.ladderGroup.draw(screen)
-            self.playerGroup.draw(screen)
-            self.coinGroup.draw(screen)
-            self.wallGroup.draw(screen)
-            self.fireballGroup.draw(screen)
-            self.enemyGroup.draw(screen)
-            self.allyGroup.draw(screen)
-            self.boardGroup.draw(screen)
-            screen.blit(scoreLabel, (265-scoreLabel.get_width()/2, 470)) #Center the text on the board
-            self.heartGroup.draw(screen)
+        # Draw the background first
+        screen.blit(self.background, self.background.get_rect())
+        # Draw all our groups on the background
+        self.ladderGroup.draw(screen)
+        self.playerGroup.draw(screen)
+        self.coinGroup.draw(screen)
+        self.wallGroup.draw(screen)
+        self.fireballGroup.draw(screen)
+        self.enemyGroup.draw(screen)
+        self.allyGroup.draw(screen)
+        self.boardGroup.draw(screen)
+        screen.blit(scoreLabel, (265-scoreLabel.get_width()/2, 470)) #Center the text on the board
+        self.heartGroup.draw(screen)
 
     # Update all the groups from their corresponding lists
     def createGroups(self):

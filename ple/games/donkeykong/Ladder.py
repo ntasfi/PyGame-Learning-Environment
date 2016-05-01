@@ -10,9 +10,8 @@ Currently not much is done here, but we can add features such as ladder climb so
 
 
 class Ladder(OnBoard):
-    def __init__(self, raw_image, position, rng):
+    def __init__(self, raw_image, position):
         super(Ladder, self).__init__(raw_image, position)
-        self.rng = rng
 
     # Update the ladder image
     def updateImage(self, raw_image):

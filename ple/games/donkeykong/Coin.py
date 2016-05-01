@@ -11,22 +11,20 @@ A coin inherits from the OnBoard class since we will use it as an inanimate obje
 
 
 class Coin(OnBoard):
-    def __init__(self, raw_image, position, rng):
-        super(Coin, self).__init__(raw_image, position, rng)
-        self.rng = rng
+    def __init__(self, raw_image, position):
+        super(Coin, self).__init__(raw_image, position)
         self.__coinAnimState = 0  # Initialize animation state to 0
         self.IMAGES = {
-            "coin1": pygame.image.load('Assets/coin1.png'),
-            "coin2": pygame.image.load('Assets/coin2.png'),
-            "coin3": pygame.image.load('Assets/coin3.png'),
-            "coin4": pygame.image.load('Assets/coin4.png'),
-            "coin5": pygame.image.load('Assets/coin5.png')
+            "coin1": pygame.transform.scale(pygame.image.load('Assets/coin1.png'), (15, 15)),
+            "coin2": pygame.transform.scale(pygame.image.load('Assets/coin2.png'), (15, 15)),
+            "coin3": pygame.transform.scale(pygame.image.load('Assets/coin3.png'), (15, 15)),
+            "coin4": pygame.transform.scale(pygame.image.load('Assets/coin4.png'), (15, 15)),
+            "coin5": pygame.transform.scale(pygame.image.load('Assets/coin5.png'), (15, 15))
         }
 
     # Update the image of the coin
     def updateImage(self, raw_image):
         self.image = raw_image
-        self.image = pygame.transform.scale(self.image, (15, 15))
 
     # Animate the coin
     def animateCoin(self):
@@ -41,6 +39,3 @@ class Coin(OnBoard):
             self.updateImage(self.IMAGES["coin4"])
         if self.__coinAnimState / 5 == 4:
             self.updateImage(self.IMAGES["coin5"])
-
-    def collectCoin(self):
-        print "You have picked up a coin!"

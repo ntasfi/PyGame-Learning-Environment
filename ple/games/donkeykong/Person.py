@@ -8,9 +8,8 @@ Each of these objects can move in any direction specified.
 
 
 class Person(pygame.sprite.Sprite):
-    def __init__(self, raw_image, position, rng):
+    def __init__(self, raw_image, position):
         super(Person, self).__init__()
-        self.rng = rng
         self.__position = position
         self.image = raw_image
         self.image = pygame.transform.scale(self.image, (15, 15))
