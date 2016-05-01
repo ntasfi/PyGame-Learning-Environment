@@ -12,7 +12,7 @@ class Person(pygame.sprite.Sprite):
         super(Person, self).__init__()
         self.__position = position
         self.image = raw_image
-        self.image = pygame.transform.scale(self.image, (15, 15)).convert()
+        self.image = pygame.transform.scale(self.image, (15, 15)).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = self.__position
 

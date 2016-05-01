@@ -1,7 +1,7 @@
 __author__ = 'Batchu Vishal'
 
 import pygame
-from OnBoard import OnBoard
+from onBoard import OnBoard
 
 '''
 This class defines all our ladders in the game.

@@ -2,7 +2,7 @@ __author__ = 'Batchu Vishal'
 import pygame
 import sys
 from pygame.locals import K_a, K_d, K_SPACE, K_w, K_s, QUIT, KEYDOWN
-from Board import Board
+from board import Board
 from .. import base
 import numpy as np
 import os
@@ -42,11 +42,11 @@ class DonkeyKong(base.Game):
         self._dir = os.path.dirname(os.path.abspath(__file__))
 
         self.IMAGES = {
-        	"right": pygame.image.load(os.path.join(self._dir, 'Assets/right.png')),
-        	"right2": pygame.image.load(os.path.join(self._dir, 'Assets/right2.png')),
-        	"left": pygame.image.load(os.path.join(self._dir, 'Assets/left.png')),
-        	"left2": pygame.image.load(os.path.join(self._dir, 'Assets/left2.png')),
-        	"still": pygame.image.load(os.path.join(self._dir, 'Assets/still.png'))
+        	"right": pygame.image.load(os.path.join(self._dir, 'assets/right.png')),
+        	"right2": pygame.image.load(os.path.join(self._dir, 'assets/right2.png')),
+        	"left": pygame.image.load(os.path.join(self._dir, 'assets/left.png')),
+        	"left2": pygame.image.load(os.path.join(self._dir, 'assets/left2.png')),
+        	"still": pygame.image.load(os.path.join(self._dir, 'assets/still.png'))
         }
 
         # Font is set to comic sans MS
@@ -213,9 +213,6 @@ if __name__ == "__main__":
     createdGame.init()
  
     while True:
-        if createdGame.game_over():
-            pygame.quit()
-            sys.exit()
         dt = pygame.time.Clock().tick_busy_loop(30)
         createdGame.step(dt);
         pygame.display.update()

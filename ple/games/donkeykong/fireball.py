@@ -2,7 +2,7 @@ __author__ = 'Erilyth'
 import pygame
 import math
 import os
-from OnBoard import OnBoard
+from onBoard import OnBoard
 
 '''
 This class defines all our fireballs.
@@ -21,8 +21,8 @@ class Fireball(OnBoard):
         self.laddersBelow = []
 
         self.IMAGES = {
-            "fireballright": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/fireballright.png')), (15, 15)).convert_alpha(), 
-            "fireballleft": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/fireballleft.png')), (15, 15)).convert_alpha()
+            "fireballright": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'assets/fireballright.png')), (15, 15)).convert_alpha(), 
+            "fireballleft": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'assets/fireballleft.png')), (15, 15)).convert_alpha()
         }
         #The newly spawned fireball is not falling
         self.__fall = 0

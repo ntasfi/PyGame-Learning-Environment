@@ -4,12 +4,12 @@ import math
 import sys
 import os
 
-from Person import Person
-from OnBoard import OnBoard
-from Coin import Coin
-from Player import Player
-from Fireball import Fireball
-from DonkeyKongPerson import DonkeyKongPerson
+from person import Person
+from onBoard import OnBoard
+from coin import Coin
+from player import Player
+from fireball import Fireball
+from donkeyKongPerson import DonkeyKongPerson
 
 '''
 This class defines our gameboard.
@@ -31,16 +31,16 @@ class Board:
         self._dir = dir
 
         self.IMAGES = {
-        	"background": pygame.image.load(os.path.join(dir, 'Assets/background.png')).convert_alpha(),
-        	"still": pygame.image.load(os.path.join(dir, 'Assets/still.png')).convert_alpha(),
-        	"kong0": pygame.image.load(os.path.join(dir, 'Assets/kong0.png')).convert_alpha(),
-        	"princess": pygame.image.load(os.path.join(dir, 'Assets/princess.png')).convert_alpha(),
-        	"heart": pygame.image.load(os.path.join(dir, 'Assets/heart.png')).convert_alpha(),
-        	"board": pygame.image.load(os.path.join(dir, 'Assets/board.png')).convert_alpha(),
-        	"fireballright": pygame.image.load(os.path.join(dir, 'Assets/fireballright.png')).convert_alpha(),
-        	"coin1": pygame.image.load(os.path.join(dir, 'Assets/coin1.png')).convert_alpha(),
-        	"wood_block": pygame.image.load(os.path.join(dir, 'Assets/wood_block.png')).convert_alpha(),
-        	"ladder": pygame.image.load(os.path.join(dir, 'Assets/ladder.png')).convert_alpha()
+        	"background": pygame.image.load(os.path.join(dir, 'assets/background.png')).convert(),
+        	"still": pygame.image.load(os.path.join(dir, 'assets/still.png')).convert_alpha(),
+        	"kong0": pygame.image.load(os.path.join(dir, 'assets/kong0.png')).convert_alpha(),
+        	"princess": pygame.image.load(os.path.join(dir, 'assets/princess.png')).convert_alpha(),
+        	"heart": pygame.image.load(os.path.join(dir, 'assets/heart.png')).convert_alpha(),
+        	"board": pygame.image.load(os.path.join(dir, 'assets/board.png')).convert_alpha(),
+        	"fireballright": pygame.image.load(os.path.join(dir, 'assets/fireballright.png')).convert_alpha(),
+        	"coin1": pygame.image.load(os.path.join(dir, 'assets/coin1.png')).convert_alpha(),
+        	"wood_block": pygame.image.load(os.path.join(dir, 'assets/wood_block.png')).convert_alpha(),
+        	"ladder": pygame.image.load(os.path.join(dir, 'assets/ladder.png')).convert_alpha()
         }
 
         self.white = (255, 255, 255)

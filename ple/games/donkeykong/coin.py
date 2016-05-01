@@ -1,7 +1,7 @@
 __author__ = 'Batchu Vishal'
 import pygame
 import os
-from OnBoard import OnBoard
+from onBoard import OnBoard
 
 '''
 This class defines all our coins.
@@ -16,11 +16,11 @@ class Coin(OnBoard):
         super(Coin, self).__init__(raw_image, position)
         self.__coinAnimState = 0  # Initialize animation state to 0
         self.IMAGES = {
-            "coin1": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/coin1.png')), (15, 15)).convert_alpha(),
-            "coin2": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/coin2.png')), (15, 15)).convert_alpha(),
-            "coin3": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/coin3.png')), (15, 15)).convert_alpha(),
-            "coin4": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/coin4.png')), (15, 15)).convert_alpha(),
-            "coin5": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'Assets/coin5.png')), (15, 15)).convert_alpha()
+            "coin1": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'assets/coin1.png')), (15, 15)).convert_alpha(),
+            "coin2": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'assets/coin2.png')), (15, 15)).convert_alpha(),
+            "coin3": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'assets/coin3.png')), (15, 15)).convert_alpha(),
+            "coin4": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'assets/coin4.png')), (15, 15)).convert_alpha(),
+            "coin5": pygame.transform.scale(pygame.image.load(os.path.join(dir, 'assets/coin5.png')), (15, 15)).convert_alpha()
         }
 
     # Update the image of the coin

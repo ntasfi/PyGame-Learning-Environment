@@ -1,7 +1,7 @@
 __author__ = 'Erilyth'
 import pygame
 import os
-from Person import Person
+from person import Person
 
 '''
 This class defines all the Donkey Kongs present in our game.
@@ -18,18 +18,18 @@ class DonkeyKongPerson(Person):
         self.__cycles = 0
         self.__stopDuration = 0
         self.IMAGES = {
-            "kong0": pygame.image.load(os.path.join(dir, 'Assets/kong0.png')).convert_alpha(),
-            "kong1": pygame.image.load(os.path.join(dir, 'Assets/kong1.png')).convert_alpha(),
-            "kong2": pygame.image.load(os.path.join(dir, 'Assets/kong2.png')).convert_alpha(),
-            "kong3": pygame.image.load(os.path.join(dir, 'Assets/kong3.png')).convert_alpha(),
-            "kong01": pygame.image.load(os.path.join(dir, 'Assets/kong01.png')).convert_alpha(),
-            "kong11": pygame.image.load(os.path.join(dir, 'Assets/kong11.png')).convert_alpha(),
-            "kong21": pygame.image.load(os.path.join(dir, 'Assets/kong21.png')).convert_alpha(),
-            "kong31": pygame.image.load(os.path.join(dir, 'Assets/kong31.png')).convert_alpha(),
-            "kongstill0": pygame.image.load(os.path.join(dir, 'Assets/kongstill0.png')).convert_alpha(),
-            "kongstill10": pygame.image.load(os.path.join(dir, 'Assets/kongstill10.png')).convert_alpha(),
-            "kongstill1": pygame.image.load(os.path.join(dir, 'Assets/kongstill1.png')).convert_alpha(),
-            "kongstill11": pygame.image.load(os.path.join(dir, 'Assets/kongstill11.png')).convert_alpha()
+            "kong0": pygame.image.load(os.path.join(dir, 'assets/kong0.png')).convert_alpha(),
+            "kong1": pygame.image.load(os.path.join(dir, 'assets/kong1.png')).convert_alpha(),
+            "kong2": pygame.image.load(os.path.join(dir, 'assets/kong2.png')).convert_alpha(),
+            "kong3": pygame.image.load(os.path.join(dir, 'assets/kong3.png')).convert_alpha(),
+            "kong01": pygame.image.load(os.path.join(dir, 'assets/kong01.png')).convert_alpha(),
+            "kong11": pygame.image.load(os.path.join(dir, 'assets/kong11.png')).convert_alpha(),
+            "kong21": pygame.image.load(os.path.join(dir, 'assets/kong21.png')).convert_alpha(),
+            "kong31": pygame.image.load(os.path.join(dir, 'assets/kong31.png')).convert_alpha(),
+            "kongstill0": pygame.image.load(os.path.join(dir, 'assets/kongstill0.png')).convert_alpha(),
+            "kongstill10": pygame.image.load(os.path.join(dir, 'assets/kongstill10.png')).convert_alpha(),
+            "kongstill1": pygame.image.load(os.path.join(dir, 'assets/kongstill1.png')).convert_alpha(),
+            "kongstill11": pygame.image.load(os.path.join(dir, 'assets/kongstill11.png')).convert_alpha()
         }
 
     # Getters and Setters
