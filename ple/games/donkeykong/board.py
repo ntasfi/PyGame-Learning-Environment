@@ -31,16 +31,14 @@ class Board:
         self._dir = dir
 
         self.IMAGES = {
-        	"background": pygame.image.load(os.path.join(dir, 'assets/background.png')).convert(),
-        	"still": pygame.image.load(os.path.join(dir, 'assets/still.png')).convert_alpha(),
-        	"kong0": pygame.image.load(os.path.join(dir, 'assets/kong0.png')).convert_alpha(),
-        	"princess": pygame.image.load(os.path.join(dir, 'assets/princess.png')).convert_alpha(),
-        	"heart": pygame.image.load(os.path.join(dir, 'assets/heart.png')).convert_alpha(),
-        	"board": pygame.image.load(os.path.join(dir, 'assets/board.png')).convert_alpha(),
-        	"fireballright": pygame.image.load(os.path.join(dir, 'assets/fireballright.png')).convert_alpha(),
-        	"coin1": pygame.image.load(os.path.join(dir, 'assets/coin1.png')).convert_alpha(),
-        	"wood_block": pygame.image.load(os.path.join(dir, 'assets/wood_block.png')).convert_alpha(),
-        	"ladder": pygame.image.load(os.path.join(dir, 'assets/ladder.png')).convert_alpha()
+            "background": pygame.image.load(os.path.join(dir, 'assets/background.png')).convert(),
+            "still": pygame.image.load(os.path.join(dir, 'assets/still.png')).convert_alpha(),
+            "kong0": pygame.image.load(os.path.join(dir, 'assets/kong0.png')).convert_alpha(),
+            "princess": pygame.image.load(os.path.join(dir, 'assets/princess.png')).convert_alpha(),
+            "fireballright": pygame.image.load(os.path.join(dir, 'assets/fireballright.png')).convert_alpha(),
+            "coin1": pygame.image.load(os.path.join(dir, 'assets/coin1.png')).convert_alpha(),
+            "wood_block": pygame.image.load(os.path.join(dir, 'assets/wood_block.png')).convert_alpha(),
+            "ladder": pygame.image.load(os.path.join(dir, 'assets/ladder.png')).convert_alpha()
         }
 
         self.white = (255, 255, 255)
@@ -58,14 +56,11 @@ class Board:
         self.Walls = []
         self.Ladders = []
         self.Fireballs = []
-        self.Hearts = []
         self.Boards = []
         self.FireballEndpoints = []
 
         # Resets the above groups and initializes the game for us
         self.resetGroups()
-
-        self.myfont = pygame.font.SysFont("comicsansms", 50)
 
         self.background = self.IMAGES["background"]
         self.background = pygame.transform.scale(self.background, (width, height))
@@ -79,11 +74,10 @@ class Board:
         self.coinGroup = pygame.sprite.RenderPlain(self.Coins)
         self.allyGroup = pygame.sprite.RenderPlain(self.Allies)
         self.fireballEndpointsGroup = pygame.sprite.RenderPlain(self.FireballEndpoints)
-        self.boardGroup = pygame.sprite.RenderPlain(self.Boards)
-        self.heartGroup = pygame.sprite.RenderPlain(self.Hearts)
 
     def resetGroups(self):
         self.score = 0
+        self.lives = 3
         self.map = []  # We will create the map again when we reset the game
         self.Players = [Player(self.IMAGES["still"], (50, 440))]
         self.Enemies = [DonkeyKongPerson(self.IMAGES["kong0"], (100, 117), self.rng, self._dir)]
@@ -93,16 +87,6 @@ class Board:
         self.Walls = []
         self.Ladders = []
         self.Fireballs = []
-        self.Hearts = [OnBoard(self.IMAGES["heart"], (730, 490)),
-                       OnBoard(self.IMAGES["heart"], (750, 490)),
-                       OnBoard(self.IMAGES["heart"], (770, 490))]
-        self.Hearts[0].modifySize(self.IMAGES["heart"], 20, 20)
-        self.Hearts[1].modifySize(self.IMAGES["heart"], 20, 20)
-        self.Hearts[2].modifySize(self.IMAGES["heart"], 20, 20)
-        self.Boards = [OnBoard(self.IMAGES["board"], (200, 480)),
-                       OnBoard(self.IMAGES["board"], (685, 480))]
-        self.Boards[0].modifySize(self.Boards[0].image, 40, 150)  # Do this on purpose to get a pixelated image
-        self.Boards[1].modifySize(self.Boards[1].image, 40, 150)
         self.FireballEndpoints = [OnBoard(self.IMAGES["still"], (50, 440))]
         self.initializeGame()  # This initializes the game and generates our map
         self.createGroups()  # This creates the instance groups
@@ -264,9 +248,9 @@ class Board:
             fireball.continuousUpdate(self.wallGroup, self.ladderGroup)
             if fireball.checkCollision(self.playerGroup, "V"):
                 self.Fireballs.remove(fireball)
-                self.Hearts.pop(len(self.Hearts) - 1)
                 self.Players[0].setPosition((50, 440))
                 self.score += self.rewards["negative"]
+                self.lives += -1
                 self.createGroups()
             self.checkFireballDestroy(fireball)
 
@@ -303,7 +287,7 @@ class Board:
             self.createGroups()
 
     # Redraws the entire game screen for us
-    def redrawScreen(self, screen, scoreLabel, width, height):
+    def redrawScreen(self, screen, width, height):
         screen.fill((0, 0, 0))  # Fill it with black
         # Draw the background first
         screen.blit(self.background, self.background.get_rect())
@@ -315,9 +299,6 @@ class Board:
         self.fireballGroup.draw(screen)
         self.enemyGroup.draw(screen)
         self.allyGroup.draw(screen)
-        self.boardGroup.draw(screen)
-        screen.blit(scoreLabel, (265-scoreLabel.get_width()/2, 470)) #Center the text on the board
-        self.heartGroup.draw(screen)
 
     # Update all the groups from their corresponding lists
     def createGroups(self):
@@ -329,8 +310,6 @@ class Board:
         self.coinGroup = pygame.sprite.RenderPlain(self.Coins)
         self.allyGroup = pygame.sprite.RenderPlain(self.Allies)
         self.fireballEndpointsGroup = pygame.sprite.RenderPlain(self.FireballEndpoints)
-        self.boardGroup = pygame.sprite.RenderPlain(self.Boards)
-        self.heartGroup = pygame.sprite.RenderPlain(self.Hearts)
 
     '''
     Initialize the game by making the map, generating walls, generating princess chamber, generating ladders randomly,

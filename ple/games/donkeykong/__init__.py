@@ -42,15 +42,12 @@ class DonkeyKong(base.Game):
         self._dir = os.path.dirname(os.path.abspath(__file__))
 
         self.IMAGES = {
-        	"right": pygame.image.load(os.path.join(self._dir, 'assets/right.png')),
-        	"right2": pygame.image.load(os.path.join(self._dir, 'assets/right2.png')),
-        	"left": pygame.image.load(os.path.join(self._dir, 'assets/left.png')),
-        	"left2": pygame.image.load(os.path.join(self._dir, 'assets/left2.png')),
-        	"still": pygame.image.load(os.path.join(self._dir, 'assets/still.png'))
+            "right": pygame.image.load(os.path.join(self._dir, 'assets/right.png')),
+            "right2": pygame.image.load(os.path.join(self._dir, 'assets/right2.png')),
+            "left": pygame.image.load(os.path.join(self._dir, 'assets/left.png')),
+            "left2": pygame.image.load(os.path.join(self._dir, 'assets/left2.png')),
+            "still": pygame.image.load(os.path.join(self._dir, 'assets/still.png'))
         }
-
-        # Font is set to comic sans MS
-        self.myFont = pygame.font.SysFont("comicsansms", 30)
 
     def init(self):
         # Create a new instance of the Board class
@@ -68,11 +65,9 @@ class DonkeyKong(base.Game):
         return self.newGame.score
 
     def game_over(self):
-        return len(self.newGame.Hearts) <= 0
+        return self.newGame.lives <= 0
 
     def step(self, dt):
-        self.scoreLabel = self.myFont.render(str(self.getScore()), 1,
-                                            (0, 0, 0))  # Display the score on the screen
         self.newGame.score += self.rewards["tick"]
         # This is where the actual game is run
         # Get the appropriate groups
@@ -125,6 +120,58 @@ class DonkeyKong(base.Game):
                         self.newGame.Players[0].isJumping = 1
                         self.newGame.Players[0].currentJumpSpeed = 7
 
+                if event.key == self.actions["right"]:
+                    if self.newGame.direction != 4:
+                        self.newGame.direction = 4
+                        self.newGame.cycles = -1  # Reset cycles
+                    self.newGame.cycles = (self.newGame.cycles + 1) % 10
+                    if self.newGame.cycles < 5:
+                        # Display the first image for half the cycles
+                        self.newGame.Players[0].updateWH(self.IMAGES["right"], "H",
+                                                        self.newGame.Players[0].getSpeed(), 15, 15)
+                    else:
+                        # Display the second image for half the cycles
+                        self.newGame.Players[0].updateWH(self.IMAGES["right2"], "H",
+                                                        self.newGame.Players[0].getSpeed(), 15, 15)
+                    wallsCollidedExact = self.newGame.Players[0].checkCollision(self.wallGroup)
+                    if wallsCollidedExact:
+                        # If we have collided a wall, move the player back to where he was in the last state
+                        self.newGame.Players[0].updateWH(self.IMAGES["right"], "H",
+                                                        -self.newGame.Players[0].getSpeed(), 15, 15)
+
+                if event.key == self.actions["left"]:
+                    if self.newGame.direction != 3:
+                        self.newGame.direction = 3
+                        self.newGame.cycles = -1  # Reset cycles
+                    self.newGame.cycles = (self.newGame.cycles + 1) % 10
+                    if self.newGame.cycles < 5:
+                        # Display the first image for half the cycles
+                        self.newGame.Players[0].updateWH(self.IMAGES["left"], "H",
+                                                        -self.newGame.Players[0].getSpeed(), 15, 15)
+                    else:
+                        # Display the second image for half the cycles
+                        self.newGame.Players[0].updateWH(self.IMAGES["left2"], "H",
+                                                        -self.newGame.Players[0].getSpeed(), 15, 15)
+                    wallsCollidedExact = self.newGame.Players[0].checkCollision(self.wallGroup)
+                    if wallsCollidedExact:
+                        # If we have collided a wall, move the player back to where he was in the last state
+                        self.newGame.Players[0].updateWH(self.IMAGES["left"], "H",
+                                                        self.newGame.Players[0].getSpeed(), 15, 15)
+
+                # If we are on a ladder, then we can move up
+                if event.key == self.actions["up"] and self.newGame.Players[0].onLadder:
+                    self.newGame.Players[0].updateWH(self.IMAGES["still"], "V",
+                                                    -self.newGame.Players[0].getSpeed() / 2, 15, 15)
+                    if len(self.newGame.Players[0].checkCollision(self.ladderGroup)) == 0 or len(
+                            self.newGame.Players[0].checkCollision(self.wallGroup)) != 0:
+                        self.newGame.Players[0].updateWH(self.IMAGES["still"], "V",
+                                                        self.newGame.Players[0].getSpeed() / 2, 15, 15)
+
+                # If we are on a ladder, then we can move down
+                if event.key == self.actions["down"] and self.newGame.Players[0].onLadder:
+                    self.newGame.Players[0].updateWH(self.IMAGES["still"], "V",
+                                                    self.newGame.Players[0].getSpeed() / 2, 15, 15)
+
         # Update the player's position and process his jump if he is jumping
         self.newGame.Players[0].continuousUpdate(self.wallGroup, self.ladderGroup)
 
@@ -132,61 +179,9 @@ class DonkeyKong(base.Game):
         We use cycles to animate the character, when we change direction we also reset the cycles
         We also change the direction according to the key pressed
         '''
-        keyState = pygame.key.get_pressed()
-        if keyState[self.actions["right"]]:
-            if self.newGame.direction != 4:
-                self.newGame.direction = 4
-                self.newGame.cycles = -1  # Reset cycles
-            self.newGame.cycles = (self.newGame.cycles + 1) % 10
-            if self.newGame.cycles < 5:
-                # Display the first image for half the cycles
-                self.newGame.Players[0].updateWH(self.IMAGES["right"], "H",
-                                                self.newGame.Players[0].getSpeed(), 15, 15)
-            else:
-                # Display the second image for half the cycles
-                self.newGame.Players[0].updateWH(self.IMAGES["right2"], "H",
-                                                self.newGame.Players[0].getSpeed(), 15, 15)
-            wallsCollidedExact = self.newGame.Players[0].checkCollision(self.wallGroup)
-            if wallsCollidedExact:
-                # If we have collided a wall, move the player back to where he was in the last state
-                self.newGame.Players[0].updateWH(self.IMAGES["right"], "H",
-                                                -self.newGame.Players[0].getSpeed(), 15, 15)
-
-        if keyState[self.actions["left"]]:
-            if self.newGame.direction != 3:
-                self.newGame.direction = 3
-                self.newGame.cycles = -1  # Reset cycles
-            self.newGame.cycles = (self.newGame.cycles + 1) % 10
-            if self.newGame.cycles < 5:
-                # Display the first image for half the cycles
-                self.newGame.Players[0].updateWH(self.IMAGES["left"], "H",
-                                                -self.newGame.Players[0].getSpeed(), 15, 15)
-            else:
-                # Display the second image for half the cycles
-                self.newGame.Players[0].updateWH(self.IMAGES["left2"], "H",
-                                                -self.newGame.Players[0].getSpeed(), 15, 15)
-            wallsCollidedExact = self.newGame.Players[0].checkCollision(self.wallGroup)
-            if wallsCollidedExact:
-                # If we have collided a wall, move the player back to where he was in the last state
-                self.newGame.Players[0].updateWH(self.IMAGES["left"], "H",
-                                                self.newGame.Players[0].getSpeed(), 15, 15)
-
-        # If we are on a ladder, then we can move up
-        if keyState[self.actions["up"]] and self.newGame.Players[0].onLadder:
-            self.newGame.Players[0].updateWH(self.IMAGES["still"], "V",
-                                            -self.newGame.Players[0].getSpeed() / 2, 15, 15)
-            if len(self.newGame.Players[0].checkCollision(self.ladderGroup)) == 0 or len(
-                    self.newGame.Players[0].checkCollision(self.wallGroup)) != 0:
-                self.newGame.Players[0].updateWH(self.IMAGES["still"], "V",
-                                                self.newGame.Players[0].getSpeed() / 2, 15, 15)
-
-        # If we are on a ladder, then we can move down
-        if keyState[self.actions["down"]] and self.newGame.Players[0].onLadder:
-            self.newGame.Players[0].updateWH(self.IMAGES["still"], "V",
-                                            self.newGame.Players[0].getSpeed() / 2, 15, 15)
 
         # Redraws all our instances onto the screen
-        self.newGame.redrawScreen(self.screen, self.scoreLabel, self.width, self.height)
+        self.newGame.redrawScreen(self.screen, self.width, self.height)
 
         # Update the fireball and check for collisions with player (ie Kill the player)
         self.newGame.fireballCheck()
