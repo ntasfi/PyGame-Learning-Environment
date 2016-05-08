@@ -53,7 +53,7 @@ class Tile():
         if self.toggles != None:
             color = " with color code %s" % self.toggles
 
-        return "%s%s at [%s, %s]%s." % (status, self.name, self.x-px, self.y-py, color)
+        return "%s%s at [%s, %s]%s.\n" % (status, self.name, self.x-px, self.y-py, color)
 
 
     def _create_block(self, image):
@@ -88,6 +88,20 @@ class Tile():
     def toggle(self):
         pass
 
+class Corner(Tile):
+
+    def __init__(self, *args, **kwargs):
+        Tile.__init__(self, *args, **kwargs)
+        self.name = "Corner"
+        self.enabled = None 
+        self.toggles = None
+
+    def _create_block(self, image):
+        self.image = image
+
+    def draw(self, screen):
+        return None #or pass?
+
 class Goal(Tile):
     
     def __init__(self, *args, **kwargs):
@@ -103,8 +117,8 @@ class Goal(Tile):
             0
         )
 
-        flag_color = (255, 224, 0)
-        self._draw_flag(image, flag_color)
+        color = (255, 224, 0)
+        self._draw_cross(image, color)
         
         image = image.convert()
         self.image = image
@@ -121,31 +135,38 @@ class Goal(Tile):
             0
         )
 
-        flag_color = (205, 170, 0)
-        self._draw_flag(image, flag_color)
+        color = (205, 170, 0)
+        self._draw_cross(image, color)
         self.image_off = image.convert()
 
-    def _draw_flag(self, image, color):
-        flag_width = self.height/6
-        flag_height = self.height/2
+    def _draw_cross(self, image, color):
+        _width = self.height/6
         
-        triangle_verticies = [
-            (self.width/2 - flag_width, flag_width),
-            (self.width/2 - flag_width, flag_width+flag_height),
-            (flag_height*1.5, flag_width+flag_height/2)
-        ]
+        pygame.draw.rect(
+            image,
+            color,
+            (0, 0, self.width, _width),
+            0
+        )
 
         pygame.draw.rect(
             image,
             color,
-            (self.width/2 - flag_width, self.height/2, flag_width, flag_height-flag_width/2),
+            (0, self.height-_width+1, self.width, _width),
+            0
+        )
+        
+        pygame.draw.rect(
+            image,
+            color,
+            (0, 0, _width, self.height),
             0
         )
 
-        pygame.draw.polygon(
+        pygame.draw.rect(
             image,
             color,
-            triangle_verticies,
+            (self.width-_width+1, 0, _width, self.height),
             0
         )
 
@@ -207,6 +228,7 @@ class Water(Tile):
     def __init__(self, *args, **kwargs):
         Tile.__init__(self, *args, **kwargs)
         self.name = "Water"
+        self.reward = -0.2
 
     def _small_wave_verts(self, offset_x, offset_y):
         wave = [

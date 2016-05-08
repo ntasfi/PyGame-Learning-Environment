@@ -1,11 +1,12 @@
 import ipdb
 
 import sys
-import copy
+import math
+import pygame
+import importlib
+
 from io import StringIO
 import numpy as np
-
-import pygame
 from pygame.constants import K_a, K_w, K_s, K_d, K_e
 
 import tiles
@@ -76,7 +77,7 @@ class Player():
 
 class TileMap():
 
-    def __init__(self, tile_str, SCREEN_WIDTH, SCREEN_HEIGHT):
+    def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, map_str=None, scenario=None):
         self.tile_objs = {
                 "WA": tiles.Water,
                 "BU": tiles.BlockUnmoveable,
@@ -89,34 +90,48 @@ class TileMap():
         }
        
         self.tile_list = []
-        self.empty_tile = "X"
-        self.tile_str = tile_str
+        self.EMPTY_TILE = "X"
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
+        self.scenario = scenario
+
+        if self.scenario is not None:
+            self.raw_str = scenario.toString()
+        elif map_str is not None:
+            self.raw_str = map_str
+        else:
+            raise ValueError("Scenario object or map_str must be given.")
 
     def init(self):
-        tile_str = StringIO( unicode(self.tile_str) )
+        tile_str = StringIO( unicode(self.raw_str) )
         self.map_str = np.genfromtxt(tile_str, dtype="str", delimiter=",")
         self.map_obj = self.map_str.astype(object)
 
         #the rows are the height!
         map_height, map_width = self.map_str.shape
-        self.tile_width = self.SCREEN_WIDTH/ float(map_width)
-        self.tile_height = self.SCREEN_HEIGHT/ float(map_height)
+        self.tile_width = math.ceil( self.SCREEN_WIDTH/ float(map_width) )
+        self.tile_height = math.ceil( self.SCREEN_HEIGHT/ float(map_height) ) #ceil so it fills the screen
 
         self._parse_map()
 
+    @profile
     def reset(self):
+        if self.scenario is not None:
+            self.scenario.generate()
+            self.raw_str = self.scenario.toString()
+
         self.init()
 
     def _parse_map(self):
         #not sure if its kosher to use numpy like this. makes life easy though
-        self.map_obj[ np.where( np.char.find( self.map_str, self.empty_tile) > -1 ) ] = None
+        self.map_obj[ np.where( np.char.find( self.map_str, self.EMPTY_TILE) > -1 ) ] = None
 
         tile_kwargs = {
             "width": self.tile_width,
             "height": self.tile_height,
         }
+
+        reward = 0.0
 
         if len(self.tile_list) > 0:
             self.tile_list = []
@@ -127,11 +142,6 @@ class TileMap():
             n = len(locs[0])
             
             arr = []
-
-            if block_str == "WA":
-                reward = -0.2
-            else:
-                reward = 0.0
 
             for i in range(n): #locs returns back a tuple
                 if block_str in ["MSW_", "SSW_", "DO_", "GOT_"]:
@@ -167,18 +177,38 @@ class TileMap():
         self.agent_init = self.agent_init[::-1] #reverse it
         self.map_obj[ agent_loc ] = None
 
-        self.goals = self.map_obj[ np.where( np.char.find( self.map_str, "GO" ) > -1 ) ].tolist()
+        #always add corners as they are used in all tasks.
+        height, width = self.map_str.shape
+        height, width = height - 1, width - 1
+        corners = [[0,0], [width, 0], [0, height], [width, height]]
+        for c in corners:
+            self.tile_list.append( tiles.Corner(0.0, x=c[0], y=c[1]) )
+
+        self.map_goal_obj = self.map_obj[ np.where( np.char.find( self.map_str, "GO" ) > -1 ) ].tolist()
+        
+        if len(self.map_goal_obj) == 0:
+            raise Warning("No goal objects were created. The map will never end")
+
+    def info(self):
+        if len(self.map_goal_obj) == 0:
+            return "Info: No goals given.\n"
+        
+        if self.scenario is None:
+            return "Info: Visit all the goals.\n"
+        else:
+            return self.scenario.info()
 
     def complete(self):
-        #have all the goals been visited?
-        if len(self.goals) == 0:
-            return False
+        if self.scenario is None and len(self.map_goal_obj) > 0:
+            return len([ None for g in self.map_goal_obj if not g.visited ]) == 0 
+        elif self.scenario is not None: #scenario obj was passed
+            return self.scenario.is_complete(self.map_goal_obj) 
         else:
-            return len([ None for g in self.goals if not g.visited ]) == 0 
+            raise Warning("No goal objects were created. The map will never end.")
 
 class TileBase(base.Game):
 
-    def __init__(self, width=128, height=128, map_str=None):
+    def __init__(self, map_str=None, scenario=None, width=128, height=128):
         actions = {
             "up": K_w,
             "left": K_a,
@@ -189,18 +219,42 @@ class TileBase(base.Game):
 
         base.Game.__init__(self, width, height, actions=actions)
 
-        self.tile_map = TileMap(
-                map_str,
-                width,
-                height
-        )
-        
+        self.map_str = map_str
+        self.scenario = scenario
+        self.tile_map = None
+
         self.dx, self.dy = 0, 0
-        self.action = False
+        self.toggle_action = False
+
+    def init_tilemap(self):
+        if self.scenario is not None and isinstance(self.scenario, str):
+            try:
+                scenario = getattr(
+                        importlib.import_module(
+                            "scenarios.%s" % self.scenario.lower()
+                            ), self.scenario
+                        )
+
+            except ImportError:
+                raise ValueError("scenario %s not found." % scenario)
+            scenario = scenario(self.rng)
+            self.tile_map = TileMap(
+                    self.width,
+                    self.height,
+                    scenario=scenario
+            )
+        elif map_str is not None: 
+            self.tile_map = TileMap(
+                    self.width,
+                    self.height,
+                    map_str=map_str
+            )
+        else:
+            raise ValueError("Need map_str or a scenario name specified.")
 
     def _handle_player_events(self):
         self.dx, self.dy = 0, 0
-        self.action = False
+        self.toggle_action = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -223,14 +277,17 @@ class TileBase(base.Game):
                     self.dy = 1
 
                 if key == self.actions["toggle_tile"]:
-                    self.action = True
+                    self.toggle_action = True
 
-    def new_map(self, map_str):
-        self.tile_map.tile_str = map_str
+    def new_map(self, scenario=None, map_str=None, map_obj=None):
+        self._init(scenario=scenario, map_str=map_str, map_obj=map_obj)
 
     def init(self):
         self.lives = 1
         self.score = 0.0
+
+        if self.tile_map is None:
+            self.init_tilemap()
 
         self.tile_map.reset()
 
@@ -241,8 +298,19 @@ class TileBase(base.Game):
             (235, 20, 20)
         )
 
-    def gameState(self):
-        return None
+    def getGameState(self):
+        return_str = ""
+        for tile in self.tile_map.tile_list:
+            if self.dx != 0 or self.dy != 0 or self.toggle_action != False:
+                return_str += tile.toString(self.player.pos[0], self.player.pos[1])
+
+        if self.tile_map.map_obj is None:
+            return_str += "Info: Visit all the Goals.\n" #default assumption
+
+        if len(return_str) > 0:
+            return return_str
+        else:
+            return None
 
     def game_over(self):
         return self.tile_map.complete()
@@ -253,21 +321,20 @@ class TileBase(base.Game):
 
         self.score += self.rewards["tick"]
         
-        self.player.update(self.dx, self.dy, self.action, self.tile_map)
+        self.player.update(self.dx, self.dy, self.toggle_action, self.tile_map)
        
 
         #could be done in pygame group
         #but it does some strange offsetting.
         for tile in self.tile_map.tile_list:
-            if self.dx != 0 or self.dy != 0 or self.action != False:
-                print tile.toString(self.player.pos[0], self.player.pos[1])
             tile.draw(self.screen)
 
         self.player.draw(self.screen)
 
 if __name__ == "__main__":
     maps = []
-    
+    objs = []
+
     maps.append(u"""
         X,X,X,X,X,X,X,X,X,X
         X,X,AG,X,X,X,X,X,X,X
@@ -278,18 +345,20 @@ if __name__ == "__main__":
         X,X,X,X,X,X,X,X,X,X
         X,X,X,X,X,X,X,X,X,X
     """)
+    objs.append([])
 
     maps.append(u"""
-        BU,BU,BU,X,GOA,X,BU,BU,BU
+        BU,BU,BU,X,GOT_1,X,BU,BU,BU
         BU,BU,BU,X,X,X,BU,BU,BU
         BU,BU,BU,BU,DO_1,BU,BU,BU,BU
         X,X,BU,X,X,X,BU,X,X
-        GOA,X,DO_2,X,MSW_A,AG,DO_4,X,GOA
+        GOT_2,X,DO_2,X,MSW_A,AG,DO_4,X,GOT_4
         X,X,BU,X,X,X,BU,X,X
         BU,BU,BU,BU,DO_3,BU,BU,BU,BU
         BU,BU,BU,X,X,X,BU,BU,BU
-        BU,BU,BU,X,GOA,X,BU,BU,BU
+        BU,BU,BU,X,GOT_3,X,BU,BU,BU
     """)
+    objs.append(["GOT_4", "GOT_2", "GOT_3", "GOT_1"])
 
     maps.append(u"""
         X,X,X,X,BU,X,X,X,X,X
@@ -299,6 +368,7 @@ if __name__ == "__main__":
         X,X,WA,X,BU,X,X,X,X,WA
         X,BU,X,X,DO_3,X,X,X,X,WA
     """)
+    objs.append([])
 
     maps.append(u"""
         X,X,X,WA,X,X,X,X,X,X,X
@@ -330,22 +400,25 @@ if __name__ == "__main__":
         X,X,DO_1,GOT_3,BU,SSW_2,BU
     """)
 
-    i = 1 
-    game = TileBase(width=256, height=224, map_str=maps[i])
-    game.rng = np.random.RandomState(24)
+    game = TileBase(width=256, height=224, scenario="LightKey")
     game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
     game.clock = pygame.time.Clock()
+    game.rng = np.random.RandomState(24)
     game.init() 
     tick = 0
 
     while True:
         dt = game.clock.tick_busy_loop(30)
         if game.game_over():
-            i += 1
-            game.new_map( maps[i])
             game.reset()
 
         game.step(dt)
-        
-        pygame.display.update()
+        state = game.getGameState() 
+        if state is not None:
+            print state
+
+        if tick%30 == 0:
+            game.reset()
+
         tick += 1
+        pygame.display.update()
