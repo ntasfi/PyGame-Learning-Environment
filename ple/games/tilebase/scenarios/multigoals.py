@@ -1,57 +1,49 @@
-import ipdb
 import numpy as np
+import ipdb
+from cStringIO import StringIO
 import base
 
-class LightKey(base.Scenario):
+class MultiGoals(base.Scenario):
 
     def __init__(self, rng):
-        block_strings = ["GOA", "SSW_1", "AG", "WA", "BU"] #blocks we use
-        base.Scenario.__init__(self, rng, block_strings)
+        block_strings = ["AG", "WA", "BU"] #blocks we use
+        base.Scenario.__init__(self, rng, block_strings)    
 
     def generate(self):
+        self.goals = None
+        self.goals_order = []
+        self.next_goal = 0
+        
         w, h = self.rng.uniform(self._min, self._max + 1, size=(2)).astype(int)
         self.map_str = np.zeros([h, w], dtype=object)
-        locs = np.where( self.map_str == 0 )
-        self.map_str[ locs ] = self.EMPTY_TILE
+        locs = np.where(self.map_str == 0)
+        self.map_str[locs] = self.EMPTY_TILE
         
-        #select a column as the wall
-        col = self.rng.choice(np.arange(w/2 - 1, w/2 + 1))
-        self.map_str[:, col] = "BU"
-
-        #pick a location for the door
-        door = self.rng.randint(0, high=h-1)
-        self.map_str[door, col] = "DO_1"
-
-        ranges = [(0, col), (col+1, w-1)]
-        side = self.rng.choice([0, 1])
-        side = ranges[side]
-
-        pos_h, pos_w = 0, col
-        while self.map_str[ pos_h, pos_w ] != self.EMPTY_TILE:
+        pos_h, pos_w = self.rng.randint(0, high=np.min([w,h])-1, size=(2))
+        while self.map_str[pos_h, pos_w] != self.EMPTY_TILE:
             pos_w = self.rng.randint(side[0], high=side[1])
             pos_h = self.rng.randint(0, high=h-1)
 
         #random side for agent
         self.map_str[pos_h, pos_w] = "AG"
-
-        while self.map_str[ pos_h, pos_w ] != self.EMPTY_TILE:
-            pos_w = self.rng.randint(side[0], high=side[1])
-            pos_h = self.rng.randint(0, high=h-1)
-
-        #put switch here too
-        self.map_str[pos_h, pos_w] = "SSW_1"
-
-        #random side for goal
-        side = self.rng.choice([0, 1])
-        side = ranges[side]
-        while self.map_str[ pos_h, pos_w ] != self.EMPTY_TILE:
-            pos_w = self.rng.randint(side[0], high=side[1])
-            pos_h = self.rng.randint(0, high=h-1)
         
-        self.map_str[pos_h, pos_w] = "GOA"
+        #select a column as the wall
+        num_goals = self.rng.randint(2, high=6)
+        num_active = self.rng.randint(1, high=num_goals)
+        num_placed = 0
+        while num_placed < num_goals:
+            pos_h, pos_w = self.rng.randint(0, high=np.min([w,h])-1, size=(2))
+            while self.map_str[pos_h, pos_w] != self.EMPTY_TILE or self.map_str[pos_h, pos_w] != "AG":
+                pos_w = self.rng.randint(0, high=w-1)
+                pos_h = self.rng.randint(0, high=h-1)
+            
+            self.map_str[pos_h, pos_w] = "GOT_%s" % num_placed
+            self.block_strings.extend(["GOT_%s" % num_placed])
+            num_placed += 1
 
-        ipdb.set_trace()
-
+        selected_goals = self.rng.choice(np.arange(num_goals), num_active, replace=False)
+        self.goals_order = [ i for i in selected_goals ]
+        
         #make 20% of remaining blocks randomly water or unmoveable blocks
         empty_blocks = len(np.where( self.map_str == self.EMPTY_TILE )[0])
         num_blocks = empty_blocks*self.percent
@@ -75,7 +67,6 @@ class LightKey(base.Scenario):
             self.map_str[ pos_h, pos_w ] = block
             num_placed += 1
 
-
     def _blocking(self, pos_w, pos_h):
         #if a block were placed in pos_w, pos_h would it stop the level from being completed?
         pos = np.array([pos_h, pos_w])
@@ -85,9 +76,6 @@ class LightKey(base.Scenario):
         w = np.clip(pos[:, 1], 0, self.map_str.shape[1]-1)
         area = self.map_str[(h, w)].tolist()
        
-        if "DO_1" in area:
-            return True #its blocking a door
-
         if "BU" in area: #we dont want too many blocks near e/o
             return True
 
@@ -95,17 +83,21 @@ class LightKey(base.Scenario):
         return False
 
     def info(self):
-        return "Info: Visit the Goal.\n"
-
-    def is_complete(self):
-        if self.goal_obj.visited: #there is only one goal
-            return True
+        info_str = "Info: Visit the goals in the following order "
+        if len(self.goals_order) > 1:
+            goals = ", ".join(self.goals_order[:-1])
+            goals = " and " + self.goals_order[-1]
         else:
-            return False
+            goals = ", ".join(self.goals_order)
+            return_str = info_str + goals
+
+        return return_str + ".\n"
 
     def setup(self, tiles):
-        self.goal_objs = None 
         for t in tiles:
-            if isinstance(t, Goal):
-                self.goal_obj = t
-                break
+            if isinstance(t, tiles.GoalToggle) and t.toggles in self.goals_order:
+                t.toggle()
+                self.goals[t.toggles] = t
+
+    def is_complete(self):
+        return False

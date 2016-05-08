@@ -8,7 +8,17 @@ class Tile():
     def __init__(self, reward, x=0, y=0, width=16, height=16, toggles=None):
         #switch colors
         self.colors = {}
-        colors = [(253,0,253), (0, 253, 0), (0, 253, 253), (0, 0, 253), (215, 95, 0)] 
+        self.color_names = {
+            "0": "Magneta",
+            "1": "Green",
+            "2": "Cyan",
+            "3": "Blue",
+            "4": "Orange",
+            "5": "Purple",
+            "6": "Black"
+        }
+        colors = [(253,0,253), (0, 253, 0), (0, 253, 253), 
+                (0, 0, 253), (215, 95, 0), (173, 0, 215), (0, 0, 0)]
         for i in range(len(colors)):
             c = list(colors[i])
             off_color = tuple( max(0, c[j]-100) for j in range(len(c)) ) 
@@ -42,18 +52,12 @@ class Tile():
     def toString(self, px, py):
         # Inactive Goal at [x, y] with color code 1.
         # Active Door at [x, y]
-        if self.enabled == True:
-            status = "Active "
-        elif self.enabled == False:
-            status = "Inactive "
-        else:
-            status = ""
-        
         color = ""
+        num = ""
         if self.toggles != None:
-            color = " with color code %s" % self.toggles
+            color = " with %s color" % self.color_names[str(self.toggles)]
 
-        return "%s%s at [%s, %s]%s.\n" % (status, self.name, self.x-px, self.y-py, color)
+        return "%s at [%s, %s]%s.\n" % (self.name, self.x-px, self.y-py, color)
 
 
     def _create_block(self, image):
@@ -139,6 +143,17 @@ class Goal(Tile):
         self._draw_cross(image, color)
         self.image_off = image.convert()
 
+    def toString(self, px, py):
+        # Inactive Goal at [x, y] with color code 1.
+        # Active Door at [x, y]
+        color = ""
+        num = ""
+        if self.toggles != None:
+            color = " with %s color" % self.color_names[str(self.toggles)]
+            num = " #%s" % self.toggles
+
+        return "%s%s at [%s, %s]%s.\n" % (self.name, num, self.x-px, self.y-py, color)
+    
     def _draw_cross(self, image, color):
         _width = self.height/6
         
@@ -181,7 +196,7 @@ class Goal(Tile):
 class GoalToggle(Goal):
     def __init__(self, *args, **kwargs):
         Tile.__init__(self, *args, **kwargs)
-        self.name = "Toggle Goal"
+        self.name = "Goal"
         self.enabled = False
 
     def _create_block(self, image):
