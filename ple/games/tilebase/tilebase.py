@@ -23,13 +23,13 @@ class Player():
         image.fill((0,0,0))
         image.set_colorkey((0,0,0))
 
-        radius = min(width, height)/2
+        radius = int( min(width, height)/2 * 0.8 )
 
         pygame.draw.circle(
             image,
             color,
-            (radius, radius),
-            int(radius*0.8),
+            (width/2, height/2),
+            radius,
             0
         )
 
@@ -113,8 +113,11 @@ class TileMap():
         self.tile_height = math.ceil( self.SCREEN_HEIGHT/ float(map_height) ) #ceil so it fills the screen
 
         self._parse_map()
+       
+        #let the scenario do any setup if needed
+        if self.scenario is not None:
+            self.scenario.setup(self.tile_list)
 
-    @profile
     def reset(self):
         if self.scenario is not None:
             self.scenario.generate()
@@ -186,9 +189,6 @@ class TileMap():
 
         self.map_goal_obj = self.map_obj[ np.where( np.char.find( self.map_str, "GO" ) > -1 ) ].tolist()
         
-        if len(self.map_goal_obj) == 0:
-            raise Warning("No goal objects were created. The map will never end")
-
     def info(self):
         if len(self.map_goal_obj) == 0:
             return "Info: No goals given.\n"
@@ -202,9 +202,9 @@ class TileMap():
         if self.scenario is None and len(self.map_goal_obj) > 0:
             return len([ None for g in self.map_goal_obj if not g.visited ]) == 0 
         elif self.scenario is not None: #scenario obj was passed
-            return self.scenario.is_complete(self.map_goal_obj) 
+            return self.scenario.is_complete() 
         else:
-            raise Warning("No goal objects were created. The map will never end.")
+            print "No goal objects were created. The map will never end."
 
 class TileBase(base.Game):
 
@@ -229,14 +229,15 @@ class TileBase(base.Game):
     def init_tilemap(self):
         if self.scenario is not None and isinstance(self.scenario, str):
             try:
+                #do not like the absolute path has to be specified
+                #TODO: make relative
                 scenario = getattr(
                         importlib.import_module(
-                            "scenarios.%s" % self.scenario.lower()
+                            "ple.games.tilebase.scenarios.%s" % self.scenario.lower()
                             ), self.scenario
                         )
-
             except ImportError:
-                raise ValueError("scenario %s not found." % scenario)
+                raise ValueError("scenario %s not found." % self.scenario)
             scenario = scenario(self.rng)
             self.tile_map = TileMap(
                     self.width,
@@ -330,95 +331,3 @@ class TileBase(base.Game):
             tile.draw(self.screen)
 
         self.player.draw(self.screen)
-
-if __name__ == "__main__":
-    maps = []
-    objs = []
-
-    maps.append(u"""
-        X,X,X,X,X,X,X,X,X,X
-        X,X,AG,X,X,X,X,X,X,X
-        X,X,X,X,X,X,X,X,X,X
-        X,X,X,X,MSW_X,X,X,X,X,X
-        X,X,X,X,X,X,X,X,X,X
-        X,X,X,X,MSW_X,X,X,X,X,X
-        X,X,X,X,X,X,X,X,X,X
-        X,X,X,X,X,X,X,X,X,X
-    """)
-    objs.append([])
-
-    maps.append(u"""
-        BU,BU,BU,X,GOT_1,X,BU,BU,BU
-        BU,BU,BU,X,X,X,BU,BU,BU
-        BU,BU,BU,BU,DO_1,BU,BU,BU,BU
-        X,X,BU,X,X,X,BU,X,X
-        GOT_2,X,DO_2,X,MSW_A,AG,DO_4,X,GOT_4
-        X,X,BU,X,X,X,BU,X,X
-        BU,BU,BU,BU,DO_3,BU,BU,BU,BU
-        BU,BU,BU,X,X,X,BU,BU,BU
-        BU,BU,BU,X,GOT_3,X,BU,BU,BU
-    """)
-    objs.append(["GOT_4", "GOT_2", "GOT_3", "GOT_1"])
-
-    maps.append(u"""
-        X,X,X,X,BU,X,X,X,X,X
-        SSW_3,X,WA,WA,BU,X,WA,X,X,X
-        X,X,WA,AG,BU,GOA,X,X,X,X
-        BU,X,X,X,BU,WA,X,X,X,X
-        X,X,WA,X,BU,X,X,X,X,WA
-        X,BU,X,X,DO_3,X,X,X,X,WA
-    """)
-    objs.append([])
-
-    maps.append(u"""
-        X,X,X,WA,X,X,X,X,X,X,X
-        X,X,X,X,SSW_1,X,WA,X,X,X,X
-        X,X,X,X,X,X,X,X,X,AG,X
-        DO_1,BU,BU,BU,BU,BU,BU,BU,BU,BU,BU
-        X,X,X,WA,X,X,X,X,X,X,X
-        X,WA,X,X,GOA,X,X,X,X,X,X
-        X,X,X,X,X,X,X,X,X,X,X
-    """)
-
-    maps.append(u"""
-        BU,X,AG,BU,GOA,WA,X,X,X,BU
-        X,X,BU,X,WA,X,X,X,WA,X
-        X,X,BU,BU,WA,X,X,X,X,GOA
-        X,X,X,X,X,X,BU,WA,X,GOA
-        X,X,X,X,X,BU,X,X,GOA,X
-        X,X,X,WA,X,BU,WA,BU,X,BU
-        X,X,WA,X,BU,GOA,X,WA,WA,X
-    """)
-
-    maps.append(u"""
-        AG,X,X,X,BU,GOA,BU
-        X,X,X,X,X,BM,DO_2
-        X,X,X,X,BU,X,DO_2
-        X,X,X,X,BU,X,BU
-        SSW_1,X,X,X,DO_3,X,BU
-        SSW_3,X,DO_1,DO_1,BU,X,BU
-        X,X,DO_1,GOT_3,BU,SSW_2,BU
-    """)
-
-    game = TileBase(width=256, height=224, scenario="LightKey")
-    game.screen = pygame.display.set_mode( game.getScreenDims(), 0, 32)
-    game.clock = pygame.time.Clock()
-    game.rng = np.random.RandomState(24)
-    game.init() 
-    tick = 0
-
-    while True:
-        dt = game.clock.tick_busy_loop(30)
-        if game.game_over():
-            game.reset()
-
-        game.step(dt)
-        state = game.getGameState() 
-        if state is not None:
-            print state
-
-        if tick%30 == 0:
-            game.reset()
-
-        tick += 1
-        pygame.display.update()

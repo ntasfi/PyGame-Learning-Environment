@@ -4,17 +4,15 @@ from cStringIO import StringIO
 from . import base
 from .. import tiles
 
-class MultiGoals(base.Scenario):
+class Switches(base.Scenario):
 
     def __init__(self, rng):
         block_strings = ["AG", "WA", "BU"] #blocks we use
         base.Scenario.__init__(self, rng, block_strings)    
 
     def generate(self):
-        self.goals = None
-        self.goals_order = []
-        self.next_goal = 0
-        
+        self.switches = []
+
         w, h = self.rng.uniform(self._min, self._max + 1, size=(2)).astype(int)
         self.map_str = np.zeros([h, w], dtype=object)
         locs = np.where(self.map_str == 0)
@@ -29,30 +27,26 @@ class MultiGoals(base.Scenario):
         self.map_str[pos_h, pos_w] = "AG"
         
         #select a column as the wall
-        num_goals = self.rng.randint(2, high=6)
-        num_active = self.rng.randint(1, high=num_goals)
+        num_switches = self.rng.randint(2, high=5)
         num_placed = 0
-        while num_placed < num_goals:
+        while num_placed < num_switches:
             pos_h, pos_w = self.rng.randint(0, high=np.min([w,h])-1, size=(2))
             while self.map_str[pos_h, pos_w] != self.EMPTY_TILE or self.map_str[pos_h, pos_w] == "AG" or self._blocking(pos_w, pos_h):
 
                 pos_w = self.rng.randint(0, high=w-1)
                 pos_h = self.rng.randint(0, high=h-1)
             
-            self.map_str[pos_h, pos_w] = "GOT_%s" % num_placed
-            self.block_strings.extend(["GOT_%s" % num_placed])
+            self.map_str[pos_h, pos_w] = "MSW_%s" % num_placed
             num_placed += 1
 
-        selected_goals = self.rng.choice(np.arange(num_goals), num_active, replace=False)
-        self.goals_order = [ i for i in selected_goals ]
-        
         #make 20% of remaining blocks randomly water or unmoveable blocks
         empty_blocks = len(np.where( self.map_str == self.EMPTY_TILE )[0])
         num_blocks = empty_blocks*self.percent
         num_placed = 0
         while num_placed < num_blocks:
             tries = 0
-            while self._occupied(pos_w, pos_h) or self._blocking(pos_w, pos_h):
+            pos_h, pos_w = self.rng.randint(0, high=np.min([w,h])-1, size=(2))
+            while self._occupied(pos_w, pos_h) or self._blocking(pos_w, pos_h) or "MSW" in self.map_str[pos_h, pos_w]:
                 pos_w = self.rng.randint(0, high=w-1)
                 pos_h = self.rng.randint(0, high=h-1)
                 tries += 1
@@ -75,33 +69,28 @@ class MultiGoals(base.Scenario):
         h = np.clip(pos[:, 0], 0, self.map_str.shape[0]-1) #the heights
         w = np.clip(pos[:, 1], 0, self.map_str.shape[1]-1)
         area = self.map_str[(h, w)].tolist()
-       
+      
         if "BU" in area: #we dont want too many blocks near e/o
             return True
-
-        for sq in area:
-            if "GOT_" in sq:
-                return True
 
         #checks if this would block the player or door.
         return False
 
     def info(self):
-        info_str = "Info: Visit the goals in the following order "
-        if len(self.goals_order) > 1:
-            goals = ", ".join(self.goals_order[:-1])
-            goals = " and " + self.goals_order[-1]
-        else:
-            goals = ", ".join(self.goals_order)
-
-        return_str = info_str + goals
-        return return_str + ".\n"
+        return "Info: Change all the switches to the same color.\n"
 
     def setup(self, tile_objs):
         for t in tile_objs:
-            if isinstance(t, tiles.GoalToggle) and t.toggles in self.goals_order:
-                t.toggle()
-                self.goals[t.toggles] = t
+            if isinstance(t, tiles.MultiSwitch):
+                for i in range(self.rng.randint(0, high=6)):
+                    t.toggle()
+
+                self.switches.append(t)
 
     def is_complete(self):
-        return False
+        code = self.switches[0].color_idx
+        for i in range(len(self.switches)):
+            if code != self.switches[i].color_idx:
+                return False
+
+        return True

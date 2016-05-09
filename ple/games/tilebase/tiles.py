@@ -122,7 +122,7 @@ class Goal(Tile):
         )
 
         color = (255, 224, 0)
-        self._draw_cross(image, color)
+        self._draw_box(image, color)
         
         image = image.convert()
         self.image = image
@@ -140,7 +140,7 @@ class Goal(Tile):
         )
 
         color = (205, 170, 0)
-        self._draw_cross(image, color)
+        self._draw_box(image, color)
         self.image_off = image.convert()
 
     def toString(self, px, py):
@@ -154,7 +154,7 @@ class Goal(Tile):
 
         return "%s%s at [%s, %s]%s.\n" % (self.name, num, self.x-px, self.y-py, color)
     
-    def _draw_cross(self, image, color):
+    def _draw_box(self, image, color):
         _width = self.height/6
         
         pygame.draw.rect(
@@ -207,7 +207,7 @@ class GoalToggle(Goal):
             0
         )
 
-        self._draw_flag(image, self.colors[self.toggles]["on"])
+        self._draw_box(image, self.colors[self.toggles]["on"])
        
         image = image.convert()
         self.image_on = image
@@ -224,7 +224,7 @@ class GoalToggle(Goal):
             0
         )
         
-        self._draw_flag(image, self.colors[self.toggles]["off"])
+        self._draw_box(image, self.colors[self.toggles]["off"])
         self.image_off = image.convert()
    
     def on_enter(self, dx, dy, tile_map):
@@ -414,17 +414,20 @@ class MultiSwitch(Tile):
         toggle_list = tile_map.map_obj[sel]
         _ = [ tile.toggle() for tile in toggle_list ]
 
+    def toggle(self):
+        self.color_idx += 1
+        if self.color_idx == len(self.color_images):
+            self.color_idx = 0
+
+        self.image = self.color_images[ self.color_idx ][1]
+        self.toggles = self.color_images[ self.color_idx ][0]
+
     def on_top(self, action, tile_map):
         if action == True:
-            self.color_idx += 1
-            if self.color_idx == len(self.color_images):
-                self.color_idx = 0
-
             if self.enabled:
                 self._toggle_all(tile_map)
-
-            self.image = self.color_images[ self.color_idx ][1]
-            self.toggles = self.color_images[ self.color_idx ][0]
+            
+            self.toggle()
             
             if self.enabled:
                 self._toggle_all(tile_map)
