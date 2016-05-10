@@ -94,7 +94,7 @@ class Fruit(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect.center)
 
-class Catcher(base.Game):
+class Catcher(base.PyGameWrapper):
     """
     Based on `Eder Santana`_'s game idea.
 
@@ -119,7 +119,7 @@ class Catcher(base.Game):
                 "right": K_d
         }
 
-        base.Game.__init__(self, width, height, actions=actions)
+        base.PyGameWrapper.__init__(self, width, height, actions=actions)
 
         self.fruit_size = percent_round_int(height, 0.06)
         self.fruit_fall_speed = 0.00095*height

@@ -137,7 +137,7 @@ class Player(pygame.sprite.Sprite):
                 self.pos.y += dy*dt
                 self.rect.center = (self.pos.x, self.pos.y)
 
-class Pong(base.Game):
+class Pong(base.PyGameWrapper):
         """
         Loosely based on code from marti1125's `pong game`_.
         
@@ -162,7 +162,7 @@ class Pong(base.Game):
 			"down": K_s
 		}
 
-                base.Game.__init__(self, width, height, actions=actions)
+                base.PyGameWrapper.__init__(self, width, height, actions=actions)
 
                 #the %'s come from original values, wanted to keep same ratio when you 
                 #increase the resolution.

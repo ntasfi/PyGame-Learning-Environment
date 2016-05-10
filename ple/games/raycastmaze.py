@@ -4,7 +4,7 @@ import numpy as np
 from raycast import RayCastPlayer
 from pygame.constants import K_w, K_a, K_d, K_s
 
-class RaycastMaze(base.Game, RayCastPlayer):
+class RaycastMaze(base.PyGameWrapper, RayCastPlayer):
     """
     Parameters
     ----------
@@ -63,7 +63,7 @@ class RaycastMaze(base.Game, RayCastPlayer):
             "backward": K_s
         }
 
-        base.Game.__init__(self, width, height, actions=actions)
+        base.PyGameWrapper.__init__(self, width, height, actions=actions)
 
         RayCastPlayer.__init__(self, None,
                 init_pos, init_dir, width, height, resolution, 

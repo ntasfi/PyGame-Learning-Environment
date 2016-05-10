@@ -7,7 +7,7 @@ from .. import base
 import numpy as np
 import os
 
-class MonsterKong(base.Game):
+class MonsterKong(base.PyGameWrapper):
 
     def __init__(self):
         """
@@ -29,7 +29,7 @@ class MonsterKong(base.Game):
                 "down": K_s
         }
 
-        base.Game.__init__(self, self.width, self.height, actions=actions)
+        base.PyGameWrapper.__init__(self, self.width, self.height, actions=actions)
         
         self.rewards = {
             "positive": 5,

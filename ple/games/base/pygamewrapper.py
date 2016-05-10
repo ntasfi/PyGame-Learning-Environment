@@ -1,9 +1,13 @@
-class Game(object):
-    """Game base class
+import pygame
+import numpy as np
+from pygame.constants import KEYDOWN, KEYUP, K_F15
 
-    ple.games.base.Game(width, height, actions={})
+class PyGameWrapper(object):
+    """PyGameWrapper  class
+
+    ple.games.base.PyGameWrapper(width, height, actions={})
     
-    This :class:`Game` class sets methods all games require. It should be subclassed when creating new games.
+    This :class:`PyGameWrapper` class sets methods all games require. It should be subclassed when creating new games.
 
     Parameters
     ----------
@@ -37,6 +41,7 @@ class Game(object):
         self.width = width
         self.screen_dim = (width, height) #width and height
         self.allowed_fps = None #fps that the game is allowed to run at.
+        self.NOOP = K_F15 #the noop key
         self.rng = None
         
         self.rewards = {
@@ -46,6 +51,59 @@ class Game(object):
             "loss": -5.0,
             "win": 5.0
         }
+    
+    def _init(self):
+        """
+        Setups up the pygame env, the display and game clock.
+        """
+        pygame.init()
+        self.screen = pygame.display.set_mode( self.getScreenDims(), 0, 32 )
+        self.clock = pygame.time.Clock()
+
+    def _setAction(self, action, last_action):
+        """
+        Pushes the action to the pygame event queue.
+        """
+        if action is None:
+            action = self.NOOP
+
+        if last_action is None:
+            last_action = self.NOOP
+
+        kd = pygame.event.Event(KEYDOWN, {"key": action})
+        ku = pygame.event.Event(KEYUP, {"key": last_action})
+
+        pygame.event.post(kd)
+        pygame.event.post(ku)
+
+    def _draw_frame(self, draw_screen):
+        """
+        Decides if the screen will be drawn too
+        """
+
+        if draw_screen == True:
+            pygame.display.update()
+
+    def getScreenRGB(self):
+        """
+        Returns the current game screen in RGB format.
+
+        Returns
+        --------
+        numpy uint8 array
+            Returns a numpy array with the shape (width, height, 3).
+
+        """
+
+        return pygame.surfarray.array3d(pygame.display.get_surface()).astype(np.uint8)
+
+
+    def tick(self, fps):
+        """
+        This sleeps the game to ensure it runs at the desired fps.
+        """
+        return self.clock.tick_busy_loop(fps)
+
 
     def adjustRewards(self, rewards):
         """

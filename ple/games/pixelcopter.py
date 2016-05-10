@@ -118,7 +118,7 @@ class Terrain(pygame.sprite.Sprite):
         self.pos.x -= self.speed*dt
         self.rect.center = (self.pos.x, self.pos.y)
 
-class Pixelcopter(base.Game):
+class Pixelcopter(base.PyGameWrapper):
     """
     Parameters
     ----------
@@ -134,7 +134,7 @@ class Pixelcopter(base.Game):
                 "up": K_w
         }
 
-        base.Game.__init__(self, width, height, actions=actions)
+        base.PyGameWrapper.__init__(self, width, height, actions=actions)
 
         self.is_climbing = False
         self.speed = 0.0004*width

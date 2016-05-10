@@ -197,7 +197,7 @@ class SnakePlayer():
         for b in self.body[::-1]:
             b.draw(screen)
 
-class Snake(base.Game):
+class Snake(base.PyGameWrapper):
     """
     Parameters
     ----------
@@ -223,7 +223,7 @@ class Snake(base.Game):
             "down": K_s
         }
 
-        base.Game.__init__(self, width, height, actions=actions)
+        base.PyGameWrapper.__init__(self, width, height, actions=actions)
 
         self.speed = percent_round_int(width, 0.45) 
 

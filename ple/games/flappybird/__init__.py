@@ -159,7 +159,7 @@ class Backdrop():
     def draw_background(self, screen):
         screen.blit(self.background_image, (0,0))
 
-class FlappyBird(base.Game):
+class FlappyBird(base.PyGameWrapper):
     """
     Used physics values from sourabhv's `clone`_.
 
@@ -186,9 +186,9 @@ class FlappyBird(base.Game):
         }
        
         fps = 30
-
-        base.Game.__init__(self, width, height, actions=actions)
         
+        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+
         self.scale = 30.0/fps
     
         self.allowed_fps = 30 #restrict the fps

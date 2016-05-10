@@ -1,8 +1,8 @@
-import pygame
 import numpy as np
 from PIL import Image #pillow
 
-from pygame.constants import KEYDOWN, KEYUP, K_F15 #this is our NOOP?
+import pygame
+from games import base
 
 class PLE(object):
         """
@@ -12,7 +12,7 @@ class PLE(object):
 
         Parameters
         ----------
-        game: ple.game.base
+        game: Class from ple.games.base
             The game the PLE environment manipulates and maintains.
 
         fps: int (default: 30)
@@ -57,9 +57,6 @@ class PLE(object):
         add_noop_action: bool (default: True)
             This inserts the NOOP action specified as a valid move the agent can make.
 
-        NOOP: pygame.constants (default: K_F15)
-            The key we want our agent to send that represents a NOOP. This is currently set to F15.
-
         state_preprocessor: python function (default: None)
             Python function which takes a dict representing game state and returns a numpy array.
 
@@ -68,14 +65,14 @@ class PLE(object):
 
         """
 	def __init__(self, 
-                game, fps=30, frame_skip=1, num_steps=1, reward_values={}, force_fps=True, 
-                display_screen=False, add_noop_action=True, 
-                NOOP=K_F15, state_preprocessor=None, rng=24):
+                game, fps=30, frame_skip=1, num_steps=1, 
+                reward_values={}, force_fps=True, display_screen=False, 
+                add_noop_action=True, state_preprocessor=None, rng=24):
 
 		self.game = game
 		self.fps = fps
 		self.frame_skip = frame_skip
-		self.NOOP = NOOP
+		self.NOOP = None
 		self.num_steps = num_steps
 		self.force_fps = force_fps
 		self.display_screen = display_screen
@@ -97,8 +94,10 @@ class PLE(object):
 
                 self.game.setRNG(self.rng)
 
-                #some games need a screen setup for convert images
-                pygame.display.set_mode((1,1), pygame.NOFRAME)
+                #some pygame games preload the images
+                #to speed resetting and inits up.
+                if isinstance(self.game, base.PyGameWrapper):
+                    pygame.display.set_mode((1,1), pygame.NOFRAME)
 
 		self.game.init()
 
@@ -123,17 +122,16 @@ class PLE(object):
 		if self.force_fps:
 			return 1000.0/self.fps
 		else:
-			return self.game.clock.tick_busy_loop(self.fps)
+                        return self.game.tick(self.fps)
 
 	def init(self):
                 """
-                Initializes the pygame environement, setup the display, and game clock.
+                Initializes the game. This depends on the game and could include doing
+                things such as setting up the display, clock etc.
 
                 This method should be explicitly called.
                 """
-		pygame.init()
-		self.game.screen = pygame.display.set_mode( self.getScreenDims(), 0, 32)
-		self.game.clock = pygame.time.Clock()
+                self.game._init()
 
 	def getActionSet(self):
                 """
@@ -228,7 +226,7 @@ class PLE(object):
 
                 """
 
-		return pygame.surfarray.array3d(pygame.display.get_surface()).astype(np.uint8)
+                return self.game.getScreenRGB()
 
 	def getScreenGrayscale(self):
                 """
@@ -329,8 +327,7 @@ class PLE(object):
                 Decides if the screen will be drawn too
                 """
 
-		if self.display_screen == True:
-			pygame.display.update()
+                self.game._draw_frame(self.display_screen)
 
 	def _oneStepAct(self, action):
                 """
@@ -354,17 +351,13 @@ class PLE(object):
 
 	def _setAction(self, action):
 		"""
-			Pushes the action to pygame event queue.
-		"""
+		    Instructs the game to perform an action if its not a NOOP
+                """
 
-		kd = pygame.event.Event(KEYDOWN, {"key": action})
-		ku = pygame.event.Event(KEYUP, {"key": self.last_action})
+                if action is not None:
+                    self.game._setAction(action, self.last_action)
 
-		self.last_action = action
-		
-		#send it to the event stack
-		pygame.event.post(kd) 
-		pygame.event.post(ku)
+                self.last_action = action
 
 	def _getReward(self):
                 """

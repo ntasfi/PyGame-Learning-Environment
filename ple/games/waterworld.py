@@ -9,7 +9,7 @@ from utils import percent_round_int
 from pygame.constants import K_w, K_a, K_s, K_d
 from primitives import Player, Creep
 
-class WaterWorld(base.Game):
+class WaterWorld(base.PyGameWrapper):
     """
     Based Karpthy's WaterWorld in `REINFORCEjs`_.
     
@@ -38,7 +38,7 @@ class WaterWorld(base.Game):
             "down": K_s
         }
 
-        base.Game.__init__(self, width, height, actions=actions)
+        base.PyGameWrapper.__init__(self, width, height, actions=actions)
         self.BG_COLOR = (255, 255, 255)
         self.N_CREEPS = num_creeps
         self.CREEP_TYPES = [ "GOOD", "BAD" ]

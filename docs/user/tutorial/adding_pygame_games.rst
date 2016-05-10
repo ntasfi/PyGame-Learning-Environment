@@ -1,5 +1,5 @@
-Wrapping and Adding Games
-=========================
+Wrapping and Adding PyGame Games
+=================================
 
 Adding or wrapping games to work with PLE is relatively easy. You must implement a few methods, explained below, to have a game be useable with PLE. We will walk through an implementation of the Catcher game inspired by Eder Santana to examine the required methods for games. As we want to focus on the important aspects related to the game interface we will ignore game specific code. 
 
@@ -7,14 +7,14 @@ Note: The full code is not included in each method. The full implementation, whi
 
 Catcher is a simple game where the agent must catch 'fruit' dropped at random from the top of the screen with the 'paddle' controlled by the agent.
 
-The main component of the game is enclosed in one class that inherits from :class:`base.Game <ple.games.base.Game>`:
+The main component of the game is enclosed in one class that inherits from :class:`base.PyGameWrapper <ple.games.base.PyGameWrapper>`:
 
 .. code:: python
 
         from ple.games import base
         from pygame.constants import K_a, K_d
 
-        class Catcher(base.Game):
+        class Catcher(base.PyGameWrapper):
 
                 def __init__(self, width=48, height=48):
                 
@@ -29,7 +29,7 @@ The main component of the game is enclosed in one class that inherits from :clas
                         self.lives = 0
 
 
-The game must inherit from :class:`base.Game <ple.games.base.Game>` as it sets attributes and methods used by PLE to control game flow, scoring and other functions.
+The game must inherit from :class:`base.PyGameWrapper <ple.games.base.PyGameWrapper>` as it sets attributes and methods used by PLE to control game flow, scoring and other functions.
 
 The crucial porition in the ``__init__`` method is to call the parent class ``__init__`` and pass the width, height and valid actions the game responds too.
 
@@ -39,7 +39,7 @@ The code below is within our ``Catcher`` class and has the class definition repe
 
 .. code:: python
 
-        class Catcher(base.Game):
+        class Catcher(base.PyGameWrapper):
 
                 def init(self):
                         self.score = 0        
