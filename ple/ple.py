@@ -60,7 +60,7 @@ class PLE(object):
         state_preprocessor: python function (default: None)
             Python function which takes a dict representing game state and returns a numpy array.
 
-        rng: numpy.random.RandomState, int, array_like or None. (default: 24)
+        rng: int. (default: 24)
             Number generator which is used by PLE and the games.
 
         """
@@ -87,19 +87,22 @@ class PLE(object):
                 if reward_values:
                     self.game.adjustRewards(reward_values)
 
-                if isinstance(rng, np.random.RandomState):
-                    self.rng = rng
-                else:
-                    self.rng = np.random.RandomState(rng)
-
-                self.game.setRNG(self.rng)
-
                 #some pygame games preload the images
                 #to speed resetting and inits up.
                 if isinstance(self.game, base.PyGameWrapper):
+
+                    if isinstance(rng, np.random.RandomState):
+                        self.rng = rng
+                    else:
+                        self.rng = np.random.RandomState(rng)
+                    
                     pygame.display.set_mode((1,1), pygame.NOFRAME)
 
-		self.game.init()
+                else:
+                    self.rng = rng
+
+                self.game.setRNG(self.rng)
+		self.init()
 
                 self.state_preprocessor = state_preprocessor
                 self.state_dim = None
@@ -132,6 +135,7 @@ class PLE(object):
                 This method should be explicitly called.
                 """
                 self.game._init()
+                self.game.init()
 
 	def getActionSet(self):
                 """
@@ -144,7 +148,7 @@ class PLE(object):
                     The agent can simply select the index of the action to perform.
 
                 """
-		actions = self.game.actions.values()
+		actions = self.game.getActions()
 
                 if self.add_noop_action:
                     actions.append(self.NOOP)
