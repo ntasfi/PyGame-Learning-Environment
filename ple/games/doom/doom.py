@@ -14,6 +14,6 @@ class Doom(DoomWrapper):
         package_directory = os.path.dirname(os.path.abspath(__file__))
         cfg_file = os.path.join( package_directory, cfg_file )
         scenario_file = os.path.join( package_directory, scenario_file )
-
+        
         DoomWrapper.__init__(self, doom_game, width, height, 
                 cfg_file, scenario_file)

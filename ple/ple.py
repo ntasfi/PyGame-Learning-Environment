@@ -134,7 +134,7 @@ class PLE(object):
 
                 This method should be explicitly called.
                 """
-                self.game._init()
+                self.game._setup()
                 self.game.init()
 
 	def getActionSet(self):

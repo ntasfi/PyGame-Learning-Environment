@@ -1,10 +1,9 @@
-import ipdb
-
 import os
 import sys
 import itertools
 import time
 import numpy as np
+import pygame
 
 sys.path.append("/home/ntasfi/ViZDoom/bin/python/")
 
@@ -16,24 +15,23 @@ except ImportError:
 class DoomWrapper(object):
 
 
-    def __init__(self, doom_game, width, height, 
-            cfg_file, scenario_file):
+    def __init__(self, doom_game, width, height, cfg_file, scenario_file):
 
         self.doom_game = doom_game
-        
+       
+        #make most sense to keep cfg and wads together.
+        #which is why we ship them all together
         self.cfg_file = cfg_file 
         self.scenario_file = scenario_file 
        
         _root = os.environ["VIZDOOM_ROOT"]
         self.freedom_file = os.path.join( _root, "scenarios/freedoom2.wad" )
         self.vizdoom_file = os.path.join( _root, "bin/vizdoom" )
-        print self.vizdoom_file
 
         self.state = None
-        self.actions = []
         self.num_actions = 0
         self.action = None
-        self.last_action = None
+        self.NOOP = [0]*40
 
         self.height = height
         self.width = width
@@ -41,34 +39,36 @@ class DoomWrapper(object):
         self.allowed_fps = None
         self.rng = None
 
-    def _init(self):
+        self._window = DoomWindow(width, height)
+
+    def _setup(self):
+        self.doom_game.set_screen_format(vizdoom.ScreenFormat.BGR24)
+        
         #load the cfg
         self.doom_game.load_config(self.cfg_file)
         
         self.doom_game.set_vizdoom_path(self.vizdoom_file)
         self.doom_game.set_doom_game_path(self.freedom_file)
         self.doom_game.set_doom_scenario_path(self.scenario_file)
-
-        #overwrite with sane defaults. we expect RGB values
-        self.doom_game.set_screen_format(vizdoom.ScreenFormat.RGB24)
+        self.doom_game.set_window_visible(False) #we use our own window...
 
         self.doom_game.init()
         
-        ipdb.set_trace()
-
         self.num_actions = self.doom_game.get_available_buttons_size()
-        for perm in itertools.product([True, False], repeat=self.num_actions):
-            self.actions.append(list(perm))
 
+        self.actions = []
+        for i in range(self.num_actions):
+            action = [0]*self.num_actions
+            action[i] = 1
+            self.actions.append(action)
 
     def _setAction(self, action, last_action):
         #make the game perform the action
-        self.last_action = self.action
         self.action = action
 
     def _draw_frame(self, draw_screen):
-        #devices if the screen will be drawn
-        pass
+        if draw_screen:
+            self._window.show_frame(self.getScreenRGB())
 
     def setRNG(self, rng):
         if isinstance(rng, int):
@@ -78,7 +78,6 @@ class DoomWrapper(object):
             raise ValueError("ViZDoom needs an int passed as rng")
 
     def getScreenRGB(self):
-        #return a RGB of the screen
         return self.state.image_buffer.copy()
 
     def tick(self, fps):
@@ -102,7 +101,7 @@ class DoomWrapper(object):
         return self.actions
 
     def init(self):
-        #used to init the game.
+        self.action = None
         self.doom_game.new_episode()
         self.state = self.doom_game.get_state()
 
@@ -115,11 +114,34 @@ class DoomWrapper(object):
     def game_over(self):
         return self.doom_game.is_episode_finished()
 
+    def _handle_window_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.doom_game.close() #doom quit
+                pygame.quit() #close window
+                sys.exit() #close game
+
     def step(self, dt):
+        self._handle_window_events()
+
         self.state = self.doom_game.get_state()
         
-        action = self.action
-        if action is None:
-            action = [False]*self.num_actions
+        if self.action is None:
+            _ = self.doom_game.make_action(self.NOOP)
+        else:
+            _ = self.doom_game.make_action(self.action)
 
-        _ = self.doom_game.make_action(action)
+class DoomWindow(object):
+
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+        pygame.init()
+        self.window = pygame.display.set_mode( (self.width, self.height), pygame.DOUBLEBUF, 24 )
+        pygame.display.set_caption("PLE ViZDoom")
+
+    def show_frame(self, frame):
+        frame = np.rollaxis(frame, 0, 2) #its HEIGHT, WIDTH, 3
+        pygame.surfarray.blit_array(self.window, frame)
+        pygame.display.update()
