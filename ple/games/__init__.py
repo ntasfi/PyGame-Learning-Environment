@@ -1,3 +1,4 @@
+from .doom import Doom
 from .catcher import Catcher
 from .flappybird import FlappyBird
 from .monsterkong import MonsterKong

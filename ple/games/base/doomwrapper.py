@@ -1,32 +1,30 @@
-import os
 import sys
-import itertools
 import time
 import numpy as np
 import pygame
 
-sys.path.append("/home/ntasfi/ViZDoom/bin/python/")
-
 try:
-    import vizdoom
+    #ty @ gdb & ppaquette
+    import doom_py
+    import doom_py.vizdoom as vizdoom
 except ImportError:
-    raise ImportError("Please install ViZDoom.")
+    raise ImportError("Please install doom_py.")
 
 class DoomWrapper(object):
 
 
-    def __init__(self, doom_game, width, height, cfg_file, scenario_file):
+    def __init__(self, width, height, cfg_file, scenario_file):
 
-        self.doom_game = doom_game
-       
+        self.doom_game = doom_py.DoomGame() 
+        self._loader = doom_py.Loader()
+
         #make most sense to keep cfg and wads together.
         #which is why we ship them all together
         self.cfg_file = cfg_file 
         self.scenario_file = scenario_file 
        
-        _root = os.environ["VIZDOOM_ROOT"]
-        self.freedom_file = os.path.join( _root, "scenarios/freedoom2.wad" )
-        self.vizdoom_file = os.path.join( _root, "bin/vizdoom" )
+        self.freedom_file = self._loader.get_freedoom_path()
+        self.vizdoom_file = self._loader.get_vizdoom_path()
 
         self.state = None
         self.num_actions = 0
