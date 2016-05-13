@@ -21,7 +21,3 @@ Rewards
 The player gains +5 for collecting a coin while losing a life and receiving a reward of -25 for hitting a fireball. The player gains +50 points for rescusing a princess.
 
 Note: Images were sourced from various authors. You can find the respective artist listed in the assets directory folder of the game.
-
-.. currentmodule:: ple.games.monsterkong
-.. autoclass:: MonsterKong
-   :members: __init__

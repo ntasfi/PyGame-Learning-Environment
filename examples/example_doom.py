@@ -13,7 +13,7 @@ class NaiveAgent():
 		return self.actions[np.random.randint(0, len(self.actions))]
 
 ###################################
-game = Doom(scenario="deathmatch")
+game = Doom(scenario="take_cover")
 
 env = PLE(game)
 agent = NaiveAgent(env.getActionSet())
@@ -25,8 +25,7 @@ for f in range(15000):
         if env.game_over():
             env.reset_game()
             
-        obs = env.getScreenRGB()
-        action = agent.pickAction(reward, obs)
+        action = agent.pickAction(reward, env.getScreenRGB())
         reward = env.act(action)
 
         if f > 2000:

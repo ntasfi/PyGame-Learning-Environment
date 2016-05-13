@@ -1,16 +1,16 @@
 import sys
 import os
 from mock import Mock
-sys.modules['pygame'] = Mock()
-sys.modules['pygame.constants'] = Mock()
 
 #so we can import ple
 sys.path.append(os.path.join(os.path.dirname(__name__), ".."))
 
+sys.modules['pygame.constants'] = Mock()
+sys.modules['pygame.sprite.Sprite'] = Mock()
+
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'numpydoc'
 ]
