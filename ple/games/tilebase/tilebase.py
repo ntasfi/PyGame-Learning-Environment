@@ -10,7 +10,8 @@ import numpy as np
 from pygame.constants import K_a, K_w, K_s, K_d, K_e
 
 import tiles
-from ple.games import base
+
+from ..base import PyGameWrapper
 
 class Player():
 
@@ -206,7 +207,7 @@ class TileMap():
         else:
             print "No goal objects were created. The map will never end."
 
-class TileBase(base.Game):
+class TileBase(PyGameWrapper):
 
     def __init__(self, map_str=None, scenario=None, width=128, height=128):
         actions = {
@@ -217,7 +218,7 @@ class TileBase(base.Game):
             "toggle_tile": K_e
         }
 
-        base.Game.__init__(self, width, height, actions=actions)
+        super(TileBase, self).__init__(width, height, actions=actions)
 
         self.map_str = map_str
         self.scenario = scenario
