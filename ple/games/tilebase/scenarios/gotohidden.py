@@ -4,16 +4,13 @@ from cStringIO import StringIO
 from . import base
 from .. import tiles
 
-class MultiGoals(base.Scenario):
+class GotoHidden(base.Scenario):
 
     def __init__(self, rng):
         block_strings = ["AG", "WA", "BU"] #blocks we use
         base.Scenario.__init__(self, rng, block_strings)    
 
     def generate(self):
-        self.goals = {}
-        self.goals_order = []
-        self.next_goal = 0
         
         w, h = self.rng.uniform(self._min, self._max + 1, size=(2)).astype(int)
         self.map_str = np.zeros([h, w], dtype=object)
@@ -29,22 +26,18 @@ class MultiGoals(base.Scenario):
         self.map_str[pos_h, pos_w] = "AG"
         
         #select a column as the wall
-        num_goals = self.rng.randint(2, high=6)
-        num_active = self.rng.randint(1, high=num_goals)
-        num_placed = 0
-        while num_placed < num_goals:
+        num_goals = self.rng.randint(0, high=6)
+        for i in range(num_goals):
             pos_h, pos_w = self.rng.randint(0, high=np.min([w,h])-1, size=(2))
             while self.map_str[pos_h, pos_w] != self.EMPTY_TILE or self.map_str[pos_h, pos_w] == "AG" or self._blocking(pos_w, pos_h):
 
                 pos_w = self.rng.randint(0, high=w-1)
                 pos_h = self.rng.randint(0, high=h-1)
             
-            self.map_str[pos_h, pos_w] = "GOT_%s" % num_placed
-            self.block_strings.extend(["GOT_%s" % num_placed])
-            num_placed += 1
+            self.map_str[pos_h, pos_w] = "GOT_%s" % i 
+            self.block_strings.extend(["GOT_%s" % i])
 
-        selected_goals = self.rng.choice(np.arange(num_goals), num_active, replace=False)
-        self.goals_order = [ str(i) for i in selected_goals ]
+        self.target_goal = self.rng.choice(np.arange(num_goals)).astype(str)
         
         #make 20% of remaining blocks randomly water or unmoveable blocks
         empty_blocks = len(np.where( self.map_str == self.EMPTY_TILE )[0])
@@ -87,39 +80,20 @@ class MultiGoals(base.Scenario):
         return False
 
     def info(self):
-        info_str = "Info: Visit the goals in the following order "
-        goals_str = [ "Goal #%s" % i for i in self.goals_order ]
-        if len(goals_str) > 1:
-            goals = ", ".join(goals_str[:-1])
-            goals += " and " + goals_str[-1]
-        else:
-            goals = ", ".join(goals_str)
-
-        return_str = info_str + goals
-        return return_str + ".\n"
+        info_str = "Info: Visit Goal #%s" % self.target_goal.toggles
+        return info_str + ".\n"
 
     def setup(self, tile_objs):
         for t in tile_objs:
-            if isinstance(t, tiles.GoalToggle) and t.toggles in self.goals_order:
+            if isinstance(t, tiles.GoalToggle): 
+                t.abs_pos = True
                 t.toggle()
-                self.goals[t.toggles] = t
+                
+                if t.toggles == self.target_goal:
+                    self.target_goal = t
 
     def is_complete(self):
-        num_completed = 0
-        for i in range(len(self.goals_order)):
-            current_goal = self.goals[self.goals_order[i]].visited
-            if i == self.next_goal and current_goal:
-                self.next_goal += 1
-                num_completed += 1
-                #has the next goal been completed?
-            elif i < self.next_goal and current_goal:
-                num_completed += 1
-            else: #clear all others
-                if current_goal: #only if its been visited before.
-                    self.goals[self.goals_order[i]].visited = False
-                    self.goals[self.goals_order[i]].toggle()
-                
-        if num_completed == len(self.goals_order):
+        if self.target_goal.visited:
             return True
-    
+
         return False

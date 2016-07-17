@@ -87,7 +87,8 @@ class TileMap():
                 "SSW_": tiles.SingleSwitch,
                 "MSW_": tiles.MultiSwitch,
                 "GOA": tiles.Goal, #Goal Active?
-                "GOT_": tiles.GoalToggle
+                "GOT_": tiles.GoalToggle,
+                "GTA": tiles.GotoTarget
         }
        
         self.tile_list = []
@@ -191,9 +192,6 @@ class TileMap():
         self.map_goal_obj = self.map_obj[ np.where( np.char.find( self.map_str, "GO" ) > -1 ) ].tolist()
         
     def info(self):
-        if len(self.map_goal_obj) == 0:
-            return "Info: No goals given.\n"
-        
         if self.scenario is None:
             return "Info: Visit all the goals.\n"
         else:
@@ -302,12 +300,15 @@ class TileBase(PyGameWrapper):
 
     def getGameState(self):
         return_str = ""
-        for tile in self.tile_map.tile_list:
-            if self.dx != 0 or self.dy != 0 or self.toggle_action != False:
-                return_str += tile.toString(self.player.pos[0], self.player.pos[1])
+        if self.dx != 0 or self.dy != 0 or self.toggle_action != False:
+            if self.tile_map.map_obj is None:
+                return_str += "Info: Visit all the Goals.\n" #default assumption
+            else:
+                return_str += self.tile_map.info()
+            
+            for tile in self.tile_map.tile_list:
+                    return_str += tile.toString(self.player.pos[0], self.player.pos[1])
 
-        if self.tile_map.map_obj is None:
-            return_str += "Info: Visit all the Goals.\n" #default assumption
 
         if len(return_str) > 0:
             return return_str

@@ -29,6 +29,7 @@ class Tile():
             }
 
         self.reward = 0.0
+        self.abs_pos = False
         self.x = x
         self.y = y
         self.width = width
@@ -57,7 +58,10 @@ class Tile():
         if self.toggles != None:
             color = " with %s color" % self.color_names[str(self.toggles)]
 
-        return "%s at [%s, %s]%s.\n" % (self.name, self.x-px, self.y-py, color)
+        if self.abs_pos:
+            return "%s at [%s, %s]%s.\n" % (self.name, self.x, self.y, color)
+        else:    
+            return "%s at [%s, %s]%s.\n" % (self.name, self.x-px, self.y-py, color)
 
 
     def _create_block(self, image):
@@ -91,6 +95,28 @@ class Tile():
 
     def toggle(self):
         pass
+
+class GotoTarget(Tile):
+
+    def __init__(self, *args, **kwargs):
+        Tile.__init__(self, *args, **kwargs)
+        self.name = "Goto"
+        self.enabled = None 
+        self.toggles = None
+
+    def toString(self, px, py):
+        return "" 
+
+    def _create_block(self, image):
+        self.image = image
+    
+    def on_enter(self, dx, dy, tile_map):
+        self.visited = True
+        
+        return True, self.reward
+
+    def draw(self, screen):
+        return None #or pass?
 
 class Corner(Tile):
 
@@ -152,7 +178,10 @@ class Goal(Tile):
             color = " with %s color" % self.color_names[str(self.toggles)]
             num = " #%s" % self.toggles
 
-        return "%s%s at [%s, %s]%s.\n" % (self.name, num, self.x-px, self.y-py, color)
+        if self.abs_pos:
+            return "%s%s at [%s, %s]%s.\n" % (self.name, num, self.x, self.y, color)
+        else:
+            return "%s%s at [%s, %s]%s.\n" % (self.name, num, self.x-px, self.y-py, color)
     
     def _draw_box(self, image, color):
         _width = self.height/6
