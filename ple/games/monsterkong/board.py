@@ -12,7 +12,6 @@ from fireball import Fireball
 from monsterPerson import MonsterPerson
 
 
-
 class Board(object):
     '''
     This class defines our gameboard.
@@ -48,7 +47,8 @@ class Board(object):
         1 represents a wall, 2 for a ladder and 3 for a coin.
         '''
         self.map = []
-        # These are the arrays in which we store our instances of different classes
+        # These are the arrays in which we store our instances of different
+        # classes
         self.Players = []
         self.Enemies = []
         self.Allies = []
@@ -62,8 +62,8 @@ class Board(object):
         # Resets the above groups and initializes the game for us
         self.resetGroups()
 
-
-        # Initialize the instance groups which we use to display our instances on the screen
+        # Initialize the instance groups which we use to display our instances
+        # on the screen
         self.fireballGroup = pygame.sprite.RenderPlain(self.Fireballs)
         self.playerGroup = pygame.sprite.RenderPlain(self.Players)
         self.enemyGroup = pygame.sprite.RenderPlain(self.Enemies)
@@ -71,14 +71,27 @@ class Board(object):
         self.ladderGroup = pygame.sprite.RenderPlain(self.Ladders)
         self.coinGroup = pygame.sprite.RenderPlain(self.Coins)
         self.allyGroup = pygame.sprite.RenderPlain(self.Allies)
-        self.fireballEndpointsGroup = pygame.sprite.RenderPlain(self.FireballEndpoints)
+        self.fireballEndpointsGroup = pygame.sprite.RenderPlain(
+            self.FireballEndpoints)
 
     def resetGroups(self):
         self.score = 0
         self.lives = 3
         self.map = []  # We will create the map again when we reset the game
-        self.Players = [Player(self.IMAGES["still"], (self.__width/2, 435), 15, 15)]
-        self.Enemies = [MonsterPerson(self.IMAGES["monster0"], (100, 117), self.rng, self._dir)]
+        self.Players = [
+            Player(
+                self.IMAGES["still"],
+                (self.__width / 2,
+                 435),
+                15,
+                15)]
+        self.Enemies = [
+            MonsterPerson(
+                self.IMAGES["monster0"],
+                (100,
+                 117),
+                self.rng,
+                self._dir)]
         self.Allies = [Person(self.IMAGES["princess"], (50, 48), 18, 25)]
         self.Allies[0].updateWH(self.Allies[0].image, "H", 0, 25, 25)
         self.Coins = []
@@ -91,23 +104,27 @@ class Board(object):
 
     # Checks to destroy a fireball when it reaches its terminal point
     def checkFireballDestroy(self, fireball):
-        if pygame.sprite.spritecollide(fireball, self.fireballEndpointsGroup, False):
-            self.DestroyFireball(fireball.index)  # We use indices on fireballs to uniquely identify each fireball
+        if pygame.sprite.spritecollide(
+                fireball, self.fireballEndpointsGroup, False):
+            # We use indices on fireballs to uniquely identify each fireball
+            self.DestroyFireball(fireball.index)
 
     # Creates a new fireball and adds it to our fireball group
     def CreateFireball(self, location, monsterIndex):
         if len(self.Fireballs) < len(self.Enemies) * 5:
             self.Fireballs.append(
                 Fireball(self.IMAGES["fireballright"], (location[0], location[1] + 15), len(self.Fireballs),
-                         2 + len(self.Enemies)/2, self.rng, self._dir))
+                         2 + len(self.Enemies) / 2, self.rng, self._dir))
             # Starts monster's animation
             self.Enemies[monsterIndex].setStopDuration(15)
             self.Enemies[monsterIndex].setPosition(
                 (self.Enemies[monsterIndex].getPosition()[0], self.Enemies[monsterIndex].getPosition()[1] - 12))
-            self.Enemies[monsterIndex].setCenter(self.Enemies[monsterIndex].getPosition())
+            self.Enemies[monsterIndex].setCenter(
+                self.Enemies[monsterIndex].getPosition())
             self.createGroups()  # We recreate the groups so the fireball is added
 
-    # Destroy a fireball if it has collided with a player or reached its endpoint
+    # Destroy a fireball if it has collided with a player or reached its
+    # endpoint
     def DestroyFireball(self, index):
         for fireBall in range(len(self.Fireballs)):
             if self.Fireballs[fireBall].index == index:
@@ -119,28 +136,38 @@ class Board(object):
                 self.createGroups()  # Recreate the groups so the fireball is removed
                 break
 
-    # Randomly Generate coins in the level where there is a wall below the coin so the player can reach it
+    # Randomly Generate coins in the level where there is a wall below the
+    # coin so the player can reach it
     def GenerateCoins(self):
         for i in range(6, len(self.map)):
             for j in range(len(self.map[i])):
                 if self.map[i][j] == 0 and ((i + 1 < len(self.map) and self.map[i + 1][j] == 1) or (
-                            i + 2 < len(self.map) and self.map[i + 2][j] == 1)):
+                        i + 2 < len(self.map) and self.map[i + 2][j] == 1)):
                     randNumber = math.floor(self.rng.rand() * 1000)
-                    if randNumber % 35 == 0 and len(self.Coins) <= 25:  # At max there will be 26 coins in the map
+                    if randNumber % 35 == 0 and len(
+                            self.Coins) <= 25:  # At max there will be 26 coins in the map
                         self.map[i][j] = 3
                         if j - 1 >= 0 and self.map[i][j - 1] == 3:
                             self.map[i][j] = 0
                         if self.map[i][j] == 3:
                             # Add the coin to our coin list
-                            self.Coins.append(Coin(self.IMAGES["coin1"], (j * 15 + 15 / 2, i * 15 + 15 / 2), self._dir))
-        if len(self.Coins) <= 15:  # If there are less than 21 coins, we call the function again
+                            self.Coins.append(
+                                Coin(
+                                    self.IMAGES["coin1"],
+                                    (j * 15 + 15 / 2,
+                                     i * 15 + 15 / 2),
+                                    self._dir))
+        if len(
+                self.Coins) <= 15:  # If there are less than 21 coins, we call the function again
             self.GenerateCoins()
 
-    # Given a position and checkNo ( 1 for wall, 2 for ladder, 3 for coin) the function tells us if its a valid position to place or not
+    # Given a position and checkNo ( 1 for wall, 2 for ladder, 3 for coin) the
+    # function tells us if its a valid position to place or not
     def checkMapForMatch(self, placePosition, floor, checkNo, offset):
         if floor < 1:
             return 0
-        for i in range(0, 5):  # We will get things placed atleast 5-1 blocks away from each other
+        for i in range(
+                0, 5):  # We will get things placed atleast 5-1 blocks away from each other
             if self.map[floor * 5 - offset][placePosition + i] == checkNo:
                 return 1
             if self.map[floor * 5 - offset][placePosition - i] == checkNo:
@@ -174,21 +201,25 @@ class Board(object):
         for j in range(0, 6):
             self.map[1 * 4 + j][7] = self.map[1 * 4 + j][8] = 2
 
-    # Generate ladders randomly, 1 for each floor such that they are not too close to each other
+    # Generate ladders randomly, 1 for each floor such that they are not too
+    # close to each other
     def makeLadders(self):
         for i in range(2, (self.__height / (15 * 4) - 1)):
             ladderPos = math.floor(self.rng.rand() * (self.__width / 15 - 20))
             ladderPos = int(7 + ladderPos)
             while self.checkMapForMatch(ladderPos, i - 1, 2, 0) == 1:
-                ladderPos = math.floor(self.rng.rand() * (self.__width / 15 - 20))
+                ladderPos = math.floor(
+                    self.rng.rand() * (self.__width / 15 - 20))
                 ladderPos = int(7 + ladderPos)
             for k in range(0, 5):
-                self.map[i * 5 + k][ladderPos] = self.map[i * 5 + k][ladderPos + 1] = 2
+                self.map[i * 5 + k][ladderPos] = self.map[i *
+                                                          5 + k][ladderPos + 1] = 2
 
     # Create the holes on each floor (extreme right and extreme left)
     def makeHoles(self):
         for i in range(3, (self.__height / (15 * 4) - 1)):
-            for k in range(1, 6):  # Ladders wont interfere since they leave 10 blocks on either side
+            for k in range(
+                    1, 6):  # Ladders wont interfere since they leave 10 blocks on either side
                 if i % 2 == 0:
                     self.map[i * 5][k] = 0
                 else:
@@ -204,13 +235,22 @@ class Board(object):
             for y in range(len(self.map[x])):
                 if self.map[x][y] == 1:
                     # Add a wall at that position
-                    self.Walls.append(OnBoard(self.IMAGES["wood_block"], (y * 15 + 15 / 2, x * 15 + 15 / 2)))
+                    self.Walls.append(
+                        OnBoard(
+                            self.IMAGES["wood_block"],
+                            (y * 15 + 15 / 2,
+                             x * 15 + 15 / 2)))
                 elif self.map[x][y] == 2:
                     # Add a ladder at that position
-                    self.Ladders.append(OnBoard(self.IMAGES["ladder"], (y * 15 + 15 / 2, x * 15 + 15 / 2)))
+                    self.Ladders.append(
+                        OnBoard(
+                            self.IMAGES["ladder"],
+                            (y * 15 + 15 / 2,
+                             x * 15 + 15 / 2)))
 
     # Check if the player is on a ladder or not
-    def ladderCheck(self, laddersCollidedBelow, wallsCollidedBelow, wallsCollidedAbove):
+    def ladderCheck(self, laddersCollidedBelow,
+                    wallsCollidedBelow, wallsCollidedAbove):
         if laddersCollidedBelow and len(wallsCollidedBelow) == 0:
             for ladder in laddersCollidedBelow:
                 if ladder.getPosition()[1] >= self.Players[0].getPosition()[1]:
@@ -239,7 +279,8 @@ class Board(object):
         for coin in coinsCollected:
             self.score += self.rewards["positive"]
             # We also remove the coin entry from our map
-            self.map[(coin.getPosition()[1] - 15 / 2) / 15][(coin.getPosition()[0] - 15 / 2) / 15] = 0
+            self.map[(coin.getPosition()[1] - 15 / 2) /
+                     15][(coin.getPosition()[0] - 15 / 2) / 15] = 0
             # Remove the coin entry from our list
             self.Coins.remove(coin)
             # Update the coin group since we modified the coin list
@@ -247,12 +288,15 @@ class Board(object):
 
     # Check if the player wins
     def checkVictory(self):
-        # If you touch the princess or reach the floor with the princess you win!
-        if self.Players[0].checkCollision(self.allyGroup) or self.Players[0].getPosition()[1] < 4 * 15:
+        # If you touch the princess or reach the floor with the princess you
+        # win!
+        if self.Players[0].checkCollision(self.allyGroup) or self.Players[
+                0].getPosition()[1] < 4 * 15:
 
             self.score += self.rewards["win"]
 
-            # This is just the next level so we only clear the fireballs and regenerate the coins
+            # This is just the next level so we only clear the fireballs and
+            # regenerate the coins
             self.Fireballs = []
             self.Players[0].setPosition((50, 440))
             self.Coins = []
@@ -260,9 +304,13 @@ class Board(object):
 
             # Add monsters
             if len(self.Enemies) == 1:
-                self.Enemies.append(MonsterPerson(self.IMAGES["monster0"], (700, 117), self.rng, self._dir))
+                self.Enemies.append(
+                    MonsterPerson(
+                        self.IMAGES["monster0"], (700, 117), self.rng, self._dir))
             elif len(self.Enemies) == 2:
-                self.Enemies.append(MonsterPerson(self.IMAGES["monster0"], (400, 117), self.rng, self._dir))
+                self.Enemies.append(
+                    MonsterPerson(
+                        self.IMAGES["monster0"], (400, 117), self.rng, self._dir))
             # Create the groups again so the enemies are effected
             self.createGroups()
 
@@ -287,7 +335,8 @@ class Board(object):
         self.ladderGroup = pygame.sprite.RenderPlain(self.Ladders)
         self.coinGroup = pygame.sprite.RenderPlain(self.Coins)
         self.allyGroup = pygame.sprite.RenderPlain(self.Allies)
-        self.fireballEndpointsGroup = pygame.sprite.RenderPlain(self.FireballEndpoints)
+        self.fireballEndpointsGroup = pygame.sprite.RenderPlain(
+            self.FireballEndpoints)
 
     '''
     Initialize the game by making the map, generating walls, generating princess chamber, generating ladders randomly,

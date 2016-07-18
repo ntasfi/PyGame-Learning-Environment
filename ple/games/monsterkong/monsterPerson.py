@@ -10,6 +10,7 @@ Each Monster can only move on the top floor and cannot move vertically.
 
 
 class MonsterPerson(Person):
+
     def __init__(self, raw_image, position, rng, dir, width=15, height=15):
         super(MonsterPerson, self).__init__(raw_image, position, width, height)
         self.__speed = 2
@@ -45,36 +46,46 @@ class MonsterPerson(Person):
     def setStopDuration(self, stopDuration):
         self.__stopDuration = stopDuration
 
-    # Checks for collisions with walls in order to change direction when hit by a wall
+    # Checks for collisions with walls in order to change direction when hit
+    # by a wall
     def checkWall(self, colliderGroup):
         if self.__direction == 0:
-            self.updateWH(self.image, "H", 20, 40, 40)  # Right collision with wall
+            # Right collision with wall
+            self.updateWH(self.image, "H", 20, 40, 40)
         if self.__direction == 1:
-            self.updateWH(self.image, "H", -20, 40, 40)  # Left collision with wall
+            # Left collision with wall
+            self.updateWH(self.image, "H", -20, 40, 40)
         Colliders = pygame.sprite.spritecollide(self, colliderGroup, False)
         if self.__direction == 0:
-            self.updateWH(self.image, "H", -20, 40, 40)  # Right collision with wall
+            # Right collision with wall
+            self.updateWH(self.image, "H", -20, 40, 40)
         if self.__direction == 1:
-            self.updateWH(self.image, "H", 20, 40, 40)  # Left collision with wall
+            # Left collision with wall
+            self.updateWH(self.image, "H", 20, 40, 40)
         return Colliders
 
     # This is used to animate the monster
     def continuousUpdate(self, GroupList, GroupList2):
 
-        # If the stop duration is 0 then monster is currently moving either left or right
+        # If the stop duration is 0 then monster is currently moving either
+        # left or right
         if self.__stopDuration == 0:
 
             # Currently moving right
             if self.__direction == 0:
                 self.__cycles += 1
                 if self.__cycles % 24 < 6:
-                    self.updateWH(self.IMAGES["monster0"], "H", self.__speed, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monster0"], "H", self.__speed, 45, 45)
                 elif self.__cycles % 24 < 12:
-                    self.updateWH(self.IMAGES["monster1"], "H", self.__speed, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monster1"], "H", self.__speed, 45, 45)
                 elif self.__cycles % 24 < 18:
-                    self.updateWH(self.IMAGES["monster2"], "H", self.__speed, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monster2"], "H", self.__speed, 45, 45)
                 else:
-                    self.updateWH(self.IMAGES["monster3"], "H", self.__speed, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monster3"], "H", self.__speed, 45, 45)
                 if self.checkWall(GroupList):
                     self.__direction = 1
                     self.__cycles = 0
@@ -84,19 +95,24 @@ class MonsterPerson(Person):
             else:
                 self.__cycles += 1
                 if self.__cycles % 24 < 6:
-                    self.updateWH(self.IMAGES["monster01"], "H", -self.__speed, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monster01"], "H", -self.__speed, 45, 45)
                 elif self.__cycles % 24 < 12:
-                    self.updateWH(self.IMAGES["monster11"], "H", -self.__speed, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monster11"], "H", -self.__speed, 45, 45)
                 elif self.__cycles % 24 < 18:
-                    self.updateWH(self.IMAGES["monster21"], "H", -self.__speed, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monster21"], "H", -self.__speed, 45, 45)
                 else:
-                    self.updateWH(self.IMAGES["monster31"], "H", -self.__speed, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monster31"], "H", -self.__speed, 45, 45)
                 if self.checkWall(GroupList):
                     self.__direction = 0
                     self.__cycles = 0
                     self.updateWH(self.image, "H", self.__speed, 45, 45)
 
-        # Donkey Kong is currently not moving, which means he is launching a fireball
+        # Donkey Kong is currently not moving, which means he is launching a
+        # fireball
         else:
             self.__stopDuration -= 1
             if self.__stopDuration == 0:  # Once he finishes launching a fireball, we go back to our normal movement animation
@@ -105,14 +121,17 @@ class MonsterPerson(Person):
                 if self.__direction == 0:
                     self.updateWH(self.IMAGES["monsterstill0"], "H", 0, 45, 45)
                 else:
-                    self.updateWH(self.IMAGES["monsterstill10"], "H", 0, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monsterstill10"], "H", 0, 45, 45)
             elif self.__stopDuration >= 5:
                 if self.__direction == 0:
                     self.updateWH(self.IMAGES["monsterstill1"], "H", 0, 45, 45)
                 else:
-                    self.updateWH(self.IMAGES["monsterstill11"], "H", 0, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monsterstill11"], "H", 0, 45, 45)
             else:
                 if self.__direction == 0:
                     self.updateWH(self.IMAGES["monsterstill0"], "H", 0, 45, 45)
                 else:
-                    self.updateWH(self.IMAGES["monsterstill10"], "H", 0, 45, 45)
+                    self.updateWH(
+                        self.IMAGES["monsterstill10"], "H", 0, 45, 45)

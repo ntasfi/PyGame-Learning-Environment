@@ -8,13 +8,15 @@ Each of these objects can move in any direction specified.
 
 
 class Person(pygame.sprite.Sprite):
+
     def __init__(self, raw_image, position, width, height):
         super(Person, self).__init__()
         self.width = width
         self.height = height
         self.__position = position
         self.image = raw_image
-        self.image = pygame.transform.scale(self.image, (width, height)).convert_alpha()
+        self.image = pygame.transform.scale(
+            self.image, (width, height)).convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = self.__position
 
@@ -55,12 +57,15 @@ class Person(pygame.sprite.Sprite):
         self.__position = (self.__position[0], self.__position[1] + value)
         self.rect.center = self.__position
 
-    # Given a collider list, just check if the person instance collides with any of them
+    # Given a collider list, just check if the person instance collides with
+    # any of them
     def checkCollision(self, colliderGroup):
         Colliders = pygame.sprite.spritecollide(self, colliderGroup, False)
         return Colliders
 
-    # This is another abstract function, and it must be implemented in child classes inheriting from this class
-    def continuousUpdate(self, GroupList,GroupList2):
-    # continuousUpdate that gets called frequently for collision checks, movement etc
+    # This is another abstract function, and it must be implemented in child
+    # classes inheriting from this class
+    def continuousUpdate(self, GroupList, GroupList2):
+        # continuousUpdate that gets called frequently for collision checks,
+        # movement etc
         raise NotImplementedError("Subclass must implement this")

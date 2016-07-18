@@ -9,6 +9,7 @@ Currently not much is done here, but we can add traps to certain walls such as s
 
 
 class Wall(OnBoard):
+
     def __init__(self, raw_image, position):
         super(Wall, self).__init__(raw_image, position)
 

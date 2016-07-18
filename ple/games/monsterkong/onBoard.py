@@ -1,13 +1,14 @@
 __author__ = 'Batchu Vishal'
 import pygame
 
+
 class OnBoard(pygame.sprite.Sprite):
     '''
     This class defines all inanimate objects that we need to display on our board.
     Any object that is on the board and not a person, comes under this class (ex. Coins,Ladders,Walls etc)
     Sets up the image and its position for all its child classes.
     '''
-    
+
     def __init__(self, raw_image, position):
         pygame.sprite.Sprite.__init__(self)
         self.__position = position
@@ -27,7 +28,8 @@ class OnBoard(pygame.sprite.Sprite):
     def setPosition(self, position):
         self.__position = position
 
-    # Update Image, this is an abstract method, needs to be implemented in the subclass with whatever size required
+    # Update Image, this is an abstract method, needs to be implemented in the
+    # subclass with whatever size required
     def updateImage(self, raw_image):  # Abstract Method
         raise NotImplementedError("Subclass must implement this")
 

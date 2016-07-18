@@ -2,11 +2,12 @@ import pygame
 import numpy as np
 from pygame.constants import KEYDOWN, KEYUP, K_F15
 
+
 class PyGameWrapper(object):
     """PyGameWrapper  class
 
     ple.games.base.PyGameWrapper(width, height, actions={})
-    
+
     This :class:`PyGameWrapper` class sets methods all games require. It should be subclassed when creating new games.
 
     Parameters
@@ -18,8 +19,8 @@ class PyGameWrapper(object):
         The height of the game screen.
 
     actions: dict
-        Contains possible actions that the game responds too. The dict keys are used by the game, while the values are `pygame.constants` referring the keys. 
-        
+        Contains possible actions that the game responds too. The dict keys are used by the game, while the values are `pygame.constants` referring the keys.
+
         Possible actions dict:
 
         >>> from pygame.constants import K_w, K_s
@@ -28,22 +29,23 @@ class PyGameWrapper(object):
         >>>     "down": K_s
         >>> }
     """
+
     def __init__(self, width, height, actions={}):
 
-        #Required fields
-        self.actions = actions #holds actions
+        # Required fields
+        self.actions = actions  # holds actions
 
-        self.score = 0.0 #required.
-        self.lives = 0 #required. Can be 0 or -1 if not required.
-        self.screen = None #must be set to None
-        self.clock = None #must be set to None
+        self.score = 0.0  # required.
+        self.lives = 0  # required. Can be 0 or -1 if not required.
+        self.screen = None  # must be set to None
+        self.clock = None  # must be set to None
         self.height = height
         self.width = width
-        self.screen_dim = (width, height) #width and height
-        self.allowed_fps = None #fps that the game is allowed to run at.
-        self.NOOP = K_F15 #the noop key
+        self.screen_dim = (width, height)  # width and height
+        self.allowed_fps = None  # fps that the game is allowed to run at.
+        self.NOOP = K_F15  # the noop key
         self.rng = None
-        
+
         self.rewards = {
             "positive": 1.0,
             "negative": -1.0,
@@ -51,13 +53,13 @@ class PyGameWrapper(object):
             "loss": -5.0,
             "win": 5.0
         }
-    
+
     def _init(self):
         """
         Setups up the pygame env, the display and game clock.
         """
         pygame.init()
-        self.screen = pygame.display.set_mode( self.getScreenDims(), 0, 32 )
+        self.screen = pygame.display.set_mode(self.getScreenDims(), 0, 32)
         self.clock = pygame.time.Clock()
 
     def _setAction(self, action, last_action):
@@ -95,15 +97,14 @@ class PyGameWrapper(object):
 
         """
 
-        return pygame.surfarray.array3d(pygame.display.get_surface()).astype(np.uint8)
-
+        return pygame.surfarray.array3d(
+            pygame.display.get_surface()).astype(np.uint8)
 
     def tick(self, fps):
         """
         This sleeps the game to ensure it runs at the desired fps.
         """
         return self.clock.tick_busy_loop(fps)
-
 
     def adjustRewards(self, rewards):
         """
@@ -113,7 +114,7 @@ class PyGameWrapper(object):
         Parameters
         ----------
         rewards : dict
-            A dictonary of reward events to float rewards. Only updates if key matches those specificed in the init function. 
+            A dictonary of reward events to float rewards. Only updates if key matches those specificed in the init function.
 
         """
         for key in rewards.keys():
@@ -165,7 +166,7 @@ class PyGameWrapper(object):
 
     def init(self):
         """
-        This is used to initialize the game, such reseting the score, lives, and player position. 
+        This is used to initialize the game, such reseting the score, lives, and player position.
 
         This is game dependent.
 
@@ -174,7 +175,7 @@ class PyGameWrapper(object):
 
     def reset(self):
         """
-        Wraps the init() function, can be setup to reset certain poritions of the game only if needed. 
+        Wraps the init() function, can be setup to reset certain poritions of the game only if needed.
         """
         self.init()
 
@@ -185,14 +186,14 @@ class PyGameWrapper(object):
 
         Returns
         -------
-        int 
-            The current reward the agent has received since the last init() or reset() call. 
+        int
+            The current reward the agent has received since the last init() or reset() call.
         """
         raise NotImplementedError("Please override this method")
 
     def game_over(self):
         """
-        Gets the status of the game, returns True if game has hit a terminal state. False otherwise. 
+        Gets the status of the game, returns True if game has hit a terminal state. False otherwise.
 
         This is game dependent.
 
@@ -211,6 +212,6 @@ class PyGameWrapper(object):
         ----------
         dt : integer
             This is the amount of time elapsed since the last frame in milliseconds.
-        
+
         """
         raise NotImplementedError("Please override this method")
