@@ -4,7 +4,7 @@ import base
 import vgdl.core as core
 
 # Hacked together VLE wrapper for py-VGDL. Potentially extremely buggy - use with caution.
-
+# This allows you to use VGDL (see http://people.idsia.ch/~tom/publications/pyvgdl.pdf , thanks to Tom Schaul) with the PLE.
 
 # Example VGDL description text
 # The game dynamics are specified as a paragraph of text
