@@ -3,6 +3,7 @@ import pygame
 import os
 from onBoard import OnBoard
 
+
 class Coin(OnBoard):
     """
     This class defines all our coins.
