@@ -54,7 +54,7 @@ class PyGameWrapper(object):
             "win": 5.0
         }
 
-    def _init(self):
+    def _setup(self):
         """
         Setups up the pygame env, the display and game clock.
         """

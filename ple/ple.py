@@ -112,19 +112,23 @@ class PLE(object):
         if reward_values:
             self.game.adjustRewards(reward_values)
 
-        if isinstance(rng, np.random.RandomState):
-            self.rng = rng
-        else:
-            self.rng = np.random.RandomState(rng)
 
-        self.game.setRNG(self.rng)
-
-        # some pygame games preload the images
-        # to speed resetting and inits up.
         if isinstance(self.game, base.PyGameWrapper):
-            pygame.display.set_mode((1, 1), pygame.NOFRAME)
+            if isinstance(rng, np.random.RandomState):
+                self.rng = rng
+            else:
+                self.rng = np.random.RandomState(rng)
 
-        self.game.init()
+            # some pygame games preload the images
+            # to speed resetting and inits up.
+            pygame.display.set_mode((1, 1), pygame.NOFRAME)
+        
+        #vizdoom needs an int
+        if isinstance(self.game, base.DoomWrapper):
+            self.rng = rng
+        
+        self.game.setRNG(self.rng)
+        self.init()
 
         self.state_preprocessor = state_preprocessor
         self.state_dim = None
@@ -158,7 +162,8 @@ class PLE(object):
 
         This method should be explicitly called.
         """
-        self.game._init()
+        self.game._setup()
+        self.game.init() #this is the games setup/init
 
     def getActionSet(self):
         """
@@ -173,7 +178,12 @@ class PLE(object):
             to perform.
 
         """
-        actions = self.game.actions.values()
+        actions = self.game.actions
+        
+        if isinstance(actions, dict):
+            actions = actions.values()
+
+        assert isinstance(actions, list), "actions is not a list"
 
         if self.add_noop_action:
             actions.append(self.NOOP)

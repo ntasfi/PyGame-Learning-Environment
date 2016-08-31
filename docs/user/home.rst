@@ -12,6 +12,10 @@ PLE requires the following libraries to be installed:
 * numpy
 * pillow
 * pygame
+* doom-py (if using doom)
+
+PyGame
+#######
 
 PyGame can be installed using this `tutorial`_ (Ubuntu). For mac you can use these following instructions;
 
@@ -21,6 +25,32 @@ PyGame can be installed using this `tutorial`_ (Ubuntu). For mac you can use the
    conda install -c https://conda.binstar.org/quasiben pygame  # using Anaconda
 
 .. _tutorial: http://www.pygame.org/wiki/CompileUbuntu
+
+ViZDoom (optional)
+##################
+
+If you are on mac you can install the dependicies as follows:
+
+.. code-block:: bash
+
+   brew install cmake boost boost-python
+
+If you are on Ubuntu (only test on 14.04) type:
+
+.. code-block:: bash
+
+   apt-get install -y cmake zlib1g-dev libjpeg-dev libboost-all-dev gcc libsdl2-dev wget unzip
+
+Finally install OpenAI's excellent wrapper `doom-py` with the following command:
+
+.. code-block:: bash
+
+   sudo pip install doom-py
+
+Or you can clone the `repo here`_ and install with pip.
+
+PLE
+###
 
 To install PLE first clone the repo:
 
@@ -35,6 +65,8 @@ Then use the ``cd`` command to enter the ``PyGame-Learning-Environment`` directo
    sudo pip install -e .
 
 This will install PLE as an editable library with pip.
+
+.. _repo here: https://github.com/openai/doom-py
 
 Quickstart
 ---------------

@@ -2,6 +2,7 @@ Available Games
 ----------------
 
 .. toctree::
+  /user/games/doom
   /user/games/catcher
   /user/games/monsterkong
   /user/games/flappybird
