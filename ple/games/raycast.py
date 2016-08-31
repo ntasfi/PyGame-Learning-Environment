@@ -5,6 +5,7 @@ import sys
 
 import pygame
 import numpy as np
+from pygame.constants import K_w, K_a, K_d, K_s
 
 
 class RayCastPlayer():
@@ -306,6 +307,13 @@ if __name__ == "__main__":
     turn_speed = 10.5
     plane = (0.0, 0.66)
 
+    actions = {
+        "forward": K_w,
+        "left": K_a,
+        "right": K_d,
+        "backward": K_s
+    }
+
     rc = RayCastPlayer(
         map_grid,
         init_pos,
@@ -316,6 +324,7 @@ if __name__ == "__main__":
         move_speed,
         turn_speed,
         plane,
+        actions,
         block_types
     )
 
