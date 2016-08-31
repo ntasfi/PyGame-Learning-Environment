@@ -21,7 +21,7 @@ class DoomWrapper(object):
         #make most sense to keep cfg and wads together.
         #which is why we ship them all together
         self.cfg_file = cfg_file 
-        self.scenario_file = scenario_file 
+        self.scenario_file = self._loader.get_scenario_path(scenario_file) 
        
         self.freedom_file = self._loader.get_freedoom_path()
         self.vizdoom_file = self._loader.get_vizdoom_path()
