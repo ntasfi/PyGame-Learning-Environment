@@ -47,7 +47,7 @@ class BirdPlayer(pygame.sprite.Sprite):
         self.image = self.image_assets[self.color][self.current_image]
         self.rect = self.image.get_rect()
         self.thrust_time = 0.0
-        self.tick = 0
+        self.game_tick = 0
         self.pos_x = init_pos[0]
         self.pos_y = init_pos[1]
 
@@ -61,10 +61,10 @@ class BirdPlayer(pygame.sprite.Sprite):
             self.flapped = True
 
     def update(self, dt):
-        self.tick += 1
+        self.game_tick += 1
 
         # image cycle
-        if (self.tick + 1) % 15 == 0:
+        if (self.game_tick + 1) % 15 == 0:
             self.current_image += 1
 
             if self.current_image >= 3:
@@ -294,7 +294,7 @@ class FlappyBird(base.PyGameWrapper):
 
         self.score = 0.0
         self.lives = 1
-        self.tick = 0
+        self.game_tick = 0
 
     def getGameState(self):
         """
@@ -385,7 +385,7 @@ class FlappyBird(base.PyGameWrapper):
         return self.lives <= 0
 
     def step(self, dt):
-        self.tick += 1
+        self.game_tick += 1
         dt = dt / 1000.0
 
         self.score += self.rewards["tick"]
