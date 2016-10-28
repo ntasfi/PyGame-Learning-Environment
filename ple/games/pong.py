@@ -3,11 +3,11 @@ import sys
 
 import pygame
 from pygame.constants import K_w, K_s
-from utils.vec2d import vec2d
-from utils import percent_round_int
+from .utils.vec2d import vec2d
+from .utils import percent_round_int
 
-import base
-
+#import base
+from .base.pygamewrapper import PyGameWrapper
 
 class Ball(pygame.sprite.Sprite):
 
@@ -139,7 +139,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (self.pos.x, self.pos.y)
 
 
-class Pong(base.PyGameWrapper):
+class Pong(PyGameWrapper):
     """
     Loosely based on code from marti1125's `pong game`_.
 

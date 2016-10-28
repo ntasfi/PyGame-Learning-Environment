@@ -2,15 +2,16 @@ import pygame
 import sys
 import math
 
-import base
+#import .base
+from .base.pygamewrapper import PyGameWrapper
 
-from utils.vec2d import vec2d
-from utils import percent_round_int
+from .utils.vec2d import vec2d
+from .utils import percent_round_int
 from pygame.constants import K_w, K_a, K_s, K_d
-from primitives import Player, Creep
+from .primitives import Player, Creep
 
 
-class WaterWorld(base.PyGameWrapper):
+class WaterWorld(PyGameWrapper):
     """
     Based Karpthy's WaterWorld in `REINFORCEjs`_.
 

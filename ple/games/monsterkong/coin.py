@@ -1,7 +1,7 @@
 __author__ = 'Batchu Vishal'
 import pygame
 import os
-from onBoard import OnBoard
+from .onBoard import OnBoard
 
 
 class Coin(OnBoard):

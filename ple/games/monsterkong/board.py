@@ -4,12 +4,12 @@ import math
 import sys
 import os
 
-from person import Person
-from onBoard import OnBoard
-from coin import Coin
-from player import Player
-from fireball import Fireball
-from monsterPerson import MonsterPerson
+from .person import Person
+from .onBoard import OnBoard
+from .coin import Coin
+from .player import Player
+from .fireball import Fireball
+from .monsterPerson import MonsterPerson
 
 
 class Board(object):

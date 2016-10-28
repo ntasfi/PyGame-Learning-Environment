@@ -1,5 +1,5 @@
 __author__ = 'Batchu Vishal'
-from person import Person
+from .person import Person
 
 '''
 This class defines our player.

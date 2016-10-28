@@ -1,11 +1,12 @@
 import math
 import sys
 
-import base
+#import .base
+from .base.pygamewrapper import PyGameWrapper
 
 import pygame
 from pygame.constants import K_w, K_s
-from utils.vec2d import vec2d
+from .utils.vec2d import vec2d
 
 
 class Block(pygame.sprite.Sprite):
@@ -121,7 +122,7 @@ class Terrain(pygame.sprite.Sprite):
         self.rect.center = (self.pos.x, self.pos.y)
 
 
-class Pixelcopter(base.PyGameWrapper):
+class Pixelcopter(PyGameWrapper):
     """
     Parameters
     ----------

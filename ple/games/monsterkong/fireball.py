@@ -2,7 +2,7 @@ __author__ = 'Erilyth'
 import pygame
 import math
 import os
-from onBoard import OnBoard
+from .onBoard import OnBoard
 
 '''
 This class defines all our fireballs.

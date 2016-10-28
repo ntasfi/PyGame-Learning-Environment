@@ -1,2 +1,5 @@
 from .pygamewrapper import PyGameWrapper
-from .doomwrapper import DoomWrapper
+try:
+    from .doomwrapper import DoomWrapper
+except:
+    print("coulnding import doomish")

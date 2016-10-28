@@ -2,11 +2,12 @@ import pygame
 import sys
 import math
 
-import base
+#import .base
+from .base.pygamewrapper import PyGameWrapper
 
 from pygame.constants import K_w, K_a, K_s, K_d
-from utils.vec2d import vec2d
-from utils import percent_round_int
+from .utils.vec2d import vec2d
+from .utils import percent_round_int
 
 
 class Food(pygame.sprite.Sprite):
@@ -204,7 +205,7 @@ class SnakePlayer():
             b.draw(screen)
 
 
-class Snake(base.PyGameWrapper):
+class Snake(PyGameWrapper):
     """
     Parameters
     ----------
