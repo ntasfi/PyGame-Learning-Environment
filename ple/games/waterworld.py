@@ -41,7 +41,7 @@ class WaterWorld(PyGameWrapper):
             "down": K_s
         }
 
-        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+        PyGameWrapper.__init__(self, width, height, actions=actions)
         self.BG_COLOR = (255, 255, 255)
         self.N_CREEPS = num_creeps
         self.CREEP_TYPES = ["GOOD", "BAD"]

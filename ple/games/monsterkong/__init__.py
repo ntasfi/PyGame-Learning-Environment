@@ -31,7 +31,7 @@ class MonsterKong(PyGameWrapper):
             "down": K_s
         }
 
-        base.PyGameWrapper.__init__(
+        PyGameWrapper.__init__(
             self, self.width, self.height, actions=actions)
 
         self.rewards = {

@@ -82,7 +82,7 @@ class PuckWorld(PyGameWrapper):
             "down": K_s
         }
 
-        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+        PyGameWrapper.__init__(self, width, height, actions=actions)
 
         self.CREEP_BAD = {
             "radius_center": percent_round_int(width, 0.047),

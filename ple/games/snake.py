@@ -232,7 +232,7 @@ class Snake(PyGameWrapper):
             "down": K_s
         }
 
-        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+        PyGameWrapper.__init__(self, width, height, actions=actions)
 
         self.speed = percent_round_int(width, 0.45)
 

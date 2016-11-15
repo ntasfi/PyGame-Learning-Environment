@@ -139,7 +139,7 @@ class Pixelcopter(PyGameWrapper):
             "up": K_w
         }
 
-        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+        PyGameWrapper.__init__(self, width, height, actions=actions)
 
         self.is_climbing = False
         self.speed = 0.0004 * width
