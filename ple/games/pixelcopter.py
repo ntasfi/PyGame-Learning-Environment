@@ -233,7 +233,7 @@ class Pixelcopter(PyGameWrapper):
     def _add_terrain(self, start, end):
         w = int(self.width * 0.1)
         # each block takes up 10 units.
-        steps = range(start + (w / 2), end + (w / 2), w)
+        steps = range(start + int(w / 2), end + int(w / 2), w)
         y_jitter = []
 
         freq = 4.5 / self.width + self.rng.uniform(-0.01, 0.01)

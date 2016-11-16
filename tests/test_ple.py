@@ -14,6 +14,7 @@ import nose
 import numpy as np
 import unittest
 
+NUM_STEPS=150
 
 class NaiveAgent():
     def __init__(self, actions):
@@ -26,11 +27,11 @@ class MyTestCase(unittest.TestCase):
 
     def run_a_game(self,game):
         from ple import PLE
-        p =  PLE(game)
+        p =  PLE(game,display_screen=True)
         agent = NaiveAgent(p.getActionSet())
         p.init()
         reward = p.act(p.NOOP)
-        for i in range(50):
+        for i in range(NUM_STEPS):
             obs = p.getScreenRGB()
             reward = p.act(agent.pickAction(reward,obs))
 
@@ -38,12 +39,12 @@ class MyTestCase(unittest.TestCase):
         from ple.games.catcher import Catcher
         game = Catcher()
         self.run_a_game(game)
-        
+
     def test_monsterkong(self):
         from ple.games.monsterkong import MonsterKong
         game = MonsterKong()
         self.run_a_game(game)
-    
+
     def test_flappybird(self):
         from ple.games.flappybird import FlappyBird
         game = FlappyBird()

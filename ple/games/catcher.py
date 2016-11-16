@@ -101,7 +101,7 @@ class Fruit(pygame.sprite.Sprite):
         y = self.rng.choice(
             range(
                 self.size,
-                self.SCREEN_HEIGHT / 2,
+                int(self.SCREEN_HEIGHT / 2),
                 self.size))
 
         self.rect.center = (x, -1 * y)
