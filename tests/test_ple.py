@@ -75,6 +75,11 @@ class MyTestCase(unittest.TestCase):
         game = WaterWorld()
         self.run_a_game(game)
 
+    def test_pong(self):
+        from ple.games.pong import Pong
+        game = Pong()
+        self.run_a_game(game)
+
     def test_doom_not_defined(self):
         from nose.tools import assert_raises
         def invoke_doom():

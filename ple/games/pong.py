@@ -165,7 +165,7 @@ class Pong(PyGameWrapper):
             "down": K_s
         }
 
-        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+        PyGameWrapper.__init__(self, width, height, actions=actions)
 
         # the %'s come from original values, wanted to keep same ratio when you
         # increase the resolution.
