@@ -8,3 +8,4 @@ from .puckworld import PuckWorld
 from .raycastmaze import RaycastMaze
 from .snake import Snake
 from .waterworld import WaterWorld
+from .tetris import Tetris
