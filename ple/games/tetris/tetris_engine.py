@@ -300,9 +300,6 @@ class GameState:
         image_data = pygame.surfarray.array3d(pygame.display.get_surface())
         return image_data, reward, terminal
 
-    def getActionSet(self):
-        return range(6)
-
     def getBoardHeight(self):
         stack_height = 0
         for i in range(0, self.BOARDHEIGHT):
