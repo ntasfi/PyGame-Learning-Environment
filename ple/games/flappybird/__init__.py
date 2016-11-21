@@ -322,7 +322,7 @@ class FlappyBird(base.PyGameWrapper):
             if p.x > self.player.pos_x:
                 pipes.append((p, p.x - self.player.pos_x))
 
-        sorted(pipes, key=lambda p: p[1])
+        pipes.sort(key=lambda p: p[1])
 
         next_pipe = pipes[1][0]
         next_next_pipe = pipes[0][0]
