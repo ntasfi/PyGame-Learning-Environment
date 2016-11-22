@@ -328,7 +328,7 @@ if __name__ == "__main__":
         block_types
     )
 
-    print map_grid
+    print(map_grid)
 
     pygame.init()
 

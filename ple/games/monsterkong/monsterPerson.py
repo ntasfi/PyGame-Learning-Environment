@@ -1,7 +1,7 @@
 __author__ = 'Erilyth'
 import pygame
 import os
-from person import Person
+from .person import Person
 
 '''
 This class defines all the Monsters present in our game.

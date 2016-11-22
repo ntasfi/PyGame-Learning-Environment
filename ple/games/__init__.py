@@ -1,10 +1,13 @@
-from .doom import Doom
-from .catcher import Catcher
-from .flappybird import FlappyBird
-from .monsterkong import MonsterKong
-from .pixelcopter import Pixelcopter
-from .pong import Pong
-from .puckworld import PuckWorld
-from .raycastmaze import RaycastMaze
-from .snake import Snake
-from .waterworld import WaterWorld
+try:
+    from ple.games.doom import Doom
+except:
+    print("Couldn't import doom")
+from ple.games.catcher import Catcher
+from ple.games.flappybird import FlappyBird
+from ple.games.monsterkong import MonsterKong
+from ple.games.pixelcopter import Pixelcopter
+from ple.games.pong import Pong
+from ple.games.puckworld import PuckWorld
+from ple.games.raycastmaze import RaycastMaze
+from ple.games.snake import Snake
+from ple.games.waterworld import WaterWorld

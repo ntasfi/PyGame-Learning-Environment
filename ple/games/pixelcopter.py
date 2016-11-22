@@ -1,11 +1,12 @@
 import math
 import sys
 
-import base
+#import .base
+from .base.pygamewrapper import PyGameWrapper
 
 import pygame
 from pygame.constants import K_w, K_s
-from utils.vec2d import vec2d
+from .utils.vec2d import vec2d
 
 
 class Block(pygame.sprite.Sprite):
@@ -121,7 +122,7 @@ class Terrain(pygame.sprite.Sprite):
         self.rect.center = (self.pos.x, self.pos.y)
 
 
-class Pixelcopter(base.PyGameWrapper):
+class Pixelcopter(PyGameWrapper):
     """
     Parameters
     ----------
@@ -138,7 +139,7 @@ class Pixelcopter(base.PyGameWrapper):
             "up": K_w
         }
 
-        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+        PyGameWrapper.__init__(self, width, height, actions=actions)
 
         self.is_climbing = False
         self.speed = 0.0004 * width
@@ -232,7 +233,7 @@ class Pixelcopter(base.PyGameWrapper):
     def _add_terrain(self, start, end):
         w = int(self.width * 0.1)
         # each block takes up 10 units.
-        steps = range(start + (w / 2), end + (w / 2), w)
+        steps = range(start + int(w / 2), end + int(w / 2), w)
         y_jitter = []
 
         freq = 4.5 / self.width + self.rng.uniform(-0.01, 0.01)

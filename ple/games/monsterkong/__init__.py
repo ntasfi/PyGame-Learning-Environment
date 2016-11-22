@@ -2,13 +2,15 @@ __author__ = 'Batchu Vishal'
 import pygame
 import sys
 from pygame.constants import K_a, K_d, K_SPACE, K_w, K_s, QUIT, KEYDOWN
-from board import Board
-from .. import base
+from .board import Board
+#from ..base import base
+#from ple.games import base
+from ple.games.base.pygamewrapper import PyGameWrapper
 import numpy as np
 import os
 
 
-class MonsterKong(base.PyGameWrapper):
+class MonsterKong(PyGameWrapper):
 
     def __init__(self):
         """
@@ -29,7 +31,7 @@ class MonsterKong(base.PyGameWrapper):
             "down": K_s
         }
 
-        base.PyGameWrapper.__init__(
+        PyGameWrapper.__init__(
             self, self.width, self.height, actions=actions)
 
         self.rewards = {

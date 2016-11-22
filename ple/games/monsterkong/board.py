@@ -4,12 +4,12 @@ import math
 import sys
 import os
 
-from person import Person
-from onBoard import OnBoard
-from coin import Coin
-from player import Player
-from fireball import Fireball
-from monsterPerson import MonsterPerson
+from .person import Person
+from .onBoard import OnBoard
+from .coin import Coin
+from .player import Player
+from .fireball import Fireball
+from .monsterPerson import MonsterPerson
 
 
 class Board(object):
@@ -176,18 +176,18 @@ class Board(object):
 
     # Create an empty 2D map of 30x80 size
     def makeMap(self):
-        for point in range(0, self.__height / 15 + 1):
+        for point in range(0, int(self.__height / 15 + 1)):
             row = []
-            for point2 in range(0, self.__width / 15):
+            for point2 in range(0, int(self.__width / 15)):
                 row.append(0)
             self.map.append(row)
 
     # Add walls to our map boundaries and also the floors
     def makeWalls(self):
-        for i in range(0, (self.__height / 15)):
-            self.map[i][0] = self.map[i][self.__width / 15 - 1] = 1
-        for i in range(2, (self.__height / (15 * 4))):
-            for j in range(0, self.__width / 15):
+        for i in range(0, int(self.__height / 15)):
+            self.map[i][0] = self.map[i][int(self.__width / 15 - 1)] = 1
+        for i in range(2, int(self.__height / (15 * 4))):
+            for j in range(0, int(self.__width / 15)):
                 self.map[i * 5][j] = 1
 
     # Make a small chamber on the top where the princess resides
@@ -204,7 +204,7 @@ class Board(object):
     # Generate ladders randomly, 1 for each floor such that they are not too
     # close to each other
     def makeLadders(self):
-        for i in range(2, (self.__height / (15 * 4) - 1)):
+        for i in range(2, int(self.__height / (15 * 4) - 1)):
             ladderPos = math.floor(self.rng.rand() * (self.__width / 15 - 20))
             ladderPos = int(7 + ladderPos)
             while self.checkMapForMatch(ladderPos, i - 1, 2, 0) == 1:
@@ -217,13 +217,13 @@ class Board(object):
 
     # Create the holes on each floor (extreme right and extreme left)
     def makeHoles(self):
-        for i in range(3, (self.__height / (15 * 4) - 1)):
+        for i in range(3, int(self.__height / (15 * 4) - 1)):
             for k in range(
                     1, 6):  # Ladders wont interfere since they leave 10 blocks on either side
                 if i % 2 == 0:
                     self.map[i * 5][k] = 0
                 else:
-                    self.map[i * 5][self.__width / 15 - 1 - k] = 0
+                    self.map[i * 5][int(self.__width / 15 - 1 - k)] = 0
 
     '''
     This is called once you have finished making holes, ladders, walls etc
@@ -279,8 +279,8 @@ class Board(object):
         for coin in coinsCollected:
             self.score += self.rewards["positive"]
             # We also remove the coin entry from our map
-            self.map[(coin.getPosition()[1] - 15 / 2) /
-                     15][(coin.getPosition()[0] - 15 / 2) / 15] = 0
+            self.map[int((coin.getPosition()[1] - 15 / 2) /
+                     15)][int((coin.getPosition()[0] - 15 / 2) / 15)] = 0
             # Remove the coin entry from our list
             self.Coins.remove(coin)
             # Update the coin group since we modified the coin list

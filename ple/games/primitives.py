@@ -1,6 +1,6 @@
 import pygame
 import math
-from utils.vec2d import vec2d
+from .utils.vec2d import vec2d
 
 
 class Creep(pygame.sprite.Sprite):

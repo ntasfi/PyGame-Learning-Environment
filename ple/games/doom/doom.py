@@ -1,5 +1,5 @@
 import os
-from ..base import DoomWrapper
+from ..base.doomwrapper import DoomWrapper
 
 class Doom(DoomWrapper):
     

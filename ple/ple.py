@@ -2,8 +2,9 @@ import numpy as np
 from PIL import Image  # pillow
 
 import pygame
-from games import base
-
+#from ple.games import base
+#from .games.base.doomwrapper import DoomWrapper
+from .games.base.pygamewrapper import PyGameWrapper
 
 class PLE(object):
     """
@@ -113,7 +114,7 @@ class PLE(object):
             self.game.adjustRewards(reward_values)
 
 
-        if isinstance(self.game, base.PyGameWrapper):
+        if isinstance(self.game, PyGameWrapper):
             if isinstance(rng, np.random.RandomState):
                 self.rng = rng
             else:
@@ -124,8 +125,9 @@ class PLE(object):
             pygame.display.set_mode((1, 1), pygame.NOFRAME)
         
         #vizdoom needs an int
-        if isinstance(self.game, base.DoomWrapper):
-            self.rng = rng
+        #if defined?(DoomWrapper) and isinstance(self.game, DoomWrapper):
+        #if isinstance(self.game, base.DoomWrapper):
+        #    self.rng = rng
         
         self.game.setRNG(self.rng)
         self.init()
@@ -180,10 +182,11 @@ class PLE(object):
         """
         actions = self.game.actions
         
-        if isinstance(actions, dict):
+        if isinstance(actions, dict) or isinstance(actions, dict_values):
             actions = actions.values()
-
-        assert isinstance(actions, list), "actions is not a list"
+        actions = list(actions) #.values()
+        #print (actions)
+        #assert isinstance(actions, list), "actions is not a list"
 
         if self.add_noop_action:
             actions.append(self.NOOP)

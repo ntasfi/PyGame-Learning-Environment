@@ -1,11 +1,13 @@
-import base
+
+#import .base
+from .base.pygamewrapper import PyGameWrapper
 import pygame
 import numpy as np
-from raycast import RayCastPlayer
+from .raycast import RayCastPlayer
 from pygame.constants import K_w, K_a, K_d, K_s
 
 
-class RaycastMaze(base.PyGameWrapper, RayCastPlayer):
+class RaycastMaze(PyGameWrapper, RayCastPlayer):
     """
     Parameters
     ----------
@@ -64,7 +66,7 @@ class RaycastMaze(base.PyGameWrapper, RayCastPlayer):
             "backward": K_s
         }
 
-        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+        PyGameWrapper.__init__(self, width, height, actions=actions)
 
         RayCastPlayer.__init__(self, None,
                                init_pos, init_dir, width, height, resolution,
@@ -197,8 +199,8 @@ if __name__ == "__main__":
         dt = game.clock.tick_busy_loop(fps)
 
         if game.game_over():
-            print "Game over!"
-            print "Resetting!"
+            print("Game over!")
+            print("Resetting!")
             game.reset()
 
         game.step(dt)
