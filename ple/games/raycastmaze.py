@@ -83,7 +83,7 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
         """
             ty wikipedia?
         """
-        dim = np.floor(self.map_size / 2) * 2 + 1
+        dim = int(np.floor(self.map_size / 2) * 2 + 1)
         shape = (dim, dim)
 
         complexity = int(complexity * (5 * (shape[0] + shape[1])))
