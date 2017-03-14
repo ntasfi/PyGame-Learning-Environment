@@ -7,6 +7,7 @@ from keras.layers.core import Dense, Flatten
 from keras.layers.convolutional import Convolution2D
 from keras.optimizers import SGD, Adam, RMSprop
 import theano.tensor as T
+from theano.gradient import disconnected_grad
 
 
 class ExampleAgent():
@@ -52,7 +53,7 @@ class ExampleAgent():
         # assume clip_delta is 1.0
         # along with sum accumulator.
         diff = y_true - y_pred
-        _quad = T.minimum(abs(diff), 1.0)
+        _quad = disconnect_gradient(T.minimum(abs(diff), 1.0))
         _lin = abs(diff) - _quad
         loss = 0.5 * _quad ** 2 + _lin
         loss = T.sum(loss)
