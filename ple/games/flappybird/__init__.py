@@ -423,7 +423,7 @@ class FlappyBird(base.PyGameWrapper):
             self.lives -= 1
 
         # went above the screen
-        if self.player.pos_y < 0:
+        if self.player.pos_y <= 0:
             self.lives -= 1
 
         self.player.update(dt)
