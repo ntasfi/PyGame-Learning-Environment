@@ -79,6 +79,16 @@ cd PyGame-Learning-Environment/
 pip install -e .
 ``` 
 
+## Headless Usage
+
+Set the following in your code before usage:
+```python
+os.putenv('SDL_VIDEODRIVER', 'fbcon')
+os.environ["SDL_VIDEODRIVER"] = "dummy"
+```
+
+Thanks to [@wooridle](https://github.com/ntasfi/PyGame-Learning-Environment/issues/26#issuecomment-289517054).
+
 ## Updating
 
 `cd` into the `PyGame-Learning-Environment` directory and run the following:
