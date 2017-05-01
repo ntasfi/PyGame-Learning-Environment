@@ -1,9 +1,8 @@
 import numpy as np
 from PIL import Image  # pillow
+import sys
 
 import pygame
-#from ple.games import base
-#from .games.base.doomwrapper import DoomWrapper
 from .games.base.pygamewrapper import PyGameWrapper
 
 class PLE(object):
@@ -123,11 +122,11 @@ class PLE(object):
             # some pygame games preload the images
             # to speed resetting and inits up.
             pygame.display.set_mode((1, 1), pygame.NOFRAME)
-        
-        #vizdoom needs an int
-        #if defined?(DoomWrapper) and isinstance(self.game, DoomWrapper):
-        #if isinstance(self.game, base.DoomWrapper):
-        #    self.rng = rng
+        else:
+            # in order to use doom, install following https://github.com/openai/doom-py
+            from .games.base.doomwrapper import DoomWrapper
+            if isinstance(self.game, DoomWrapper):
+                self.rng = rng
         
         self.game.setRNG(self.rng)
         self.init()
@@ -181,9 +180,14 @@ class PLE(object):
 
         """
         actions = self.game.actions
-        
-        if isinstance(actions, dict) or isinstance(actions, dict_values):
-            actions = actions.values()
+
+        if (sys.version_info > (3, 0)): #python ver. 3
+            if isinstance(actions, dict) or isinstance(actions, dict_values):
+                actions = actions.values()
+        else:
+            if isinstance(actions, dict):
+                actions = actions.values()
+
         actions = list(actions) #.values()
         #print (actions)
         #assert isinstance(actions, list), "actions is not a list"
@@ -280,7 +284,7 @@ class PLE(object):
         Returns
         --------
         numpy uint8 array
-            Returns a numpy array with the shape (width, height).
+                Returns a numpy array with the shape (width, height).
 
 
         """

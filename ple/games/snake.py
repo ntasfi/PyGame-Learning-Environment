@@ -296,13 +296,15 @@ class Snake(PyGameWrapper):
             "snake_head_y": self.player.head.pos.y,
             "food_x": self.food.pos.x,
             "food_y": self.food.pos.y,
-            "snake_body": []
+            "snake_body": [],
+            "snake_body_pos": [],
         }
 
         for s in self.player.body:
             dist = math.sqrt((self.player.head.pos.x - s.pos.x)
                              ** 2 + (self.player.head.pos.y - s.pos.y)**2)
             state["snake_body"].append(dist)
+            state["snake_body_pos"].append([s.pos.x, s.pos.y])
 
         return state
 

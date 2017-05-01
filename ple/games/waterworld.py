@@ -144,6 +144,10 @@ class WaterWorld(PyGameWrapper):
             "creep_dist": {
                 "GOOD": [],
                 "BAD": []
+            },
+            "creep_pos": {
+                "GOOD": [],
+                "BAD": []
             }
         }
 
@@ -151,6 +155,7 @@ class WaterWorld(PyGameWrapper):
             dist = math.sqrt((self.player.pos.x - c.pos.x) **
                              2 + (self.player.pos.y - c.pos.y)**2)
             state["creep_dist"][c.TYPE].append(dist)
+            state["creep_pos"][c.TYPE].append([c.pos.x, c.pos.y])
 
         return state
 
