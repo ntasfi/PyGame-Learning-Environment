@@ -225,8 +225,8 @@ class Pong(PyGameWrapper):
             "cpu_y": self.cpuPlayer.pos.y,
             "ball_x": self.ball.pos.x,
             "ball_y": self.ball.pos.y,
-            "ball_velocity_x": self.ball.pos.x,
-            "ball_velocity_y": self.ball.pos.y
+            "ball_velocity_x": self.ball.vel.x,
+            "ball_velocity_y": self.ball.vel.y
         }
 
         return state
