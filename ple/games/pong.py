@@ -19,6 +19,7 @@ class Ball(pygame.sprite.Sprite):
         self.radius = radius
         self.speed = speed
         self.pos = vec2d(pos_init)
+        self.pos_before = vec2d(pos_init)
         self.vel = vec2d((speed, -1.0 * speed))
 
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
@@ -40,7 +41,37 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos_init
 
+    def line_intersection(self, p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y):
+
+        s1_x = p1_x - p0_x
+        s1_y = p1_y - p0_y
+        s2_x = p3_x - p2_x
+        s2_y = p3_y - p2_y
+
+        s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y)
+        t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y)
+
+        return (s >= 0 and s <= 1 and t >= 0 and t <= 1)
+
     def update(self, agentPlayer, cpuPlayer, dt):
+
+        self.pos.x += self.vel.x * dt
+        self.pos.y += self.vel.y * dt
+
+
+        if self.pos.x <= agentPlayer.pos.x + agentPlayer.rect_width:
+            if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y - agentPlayer.rect_height / 2, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y + agentPlayer.rect_height / 2):
+                self.pos.x = max(0, self.pos.x)
+                self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
+                self.vel.y += agentPlayer.vel.y * 0.01
+                self.pos.x += self.radius
+
+        if self.pos.x >= cpuPlayer.pos.x - cpuPlayer.rect_width:
+            if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y - cpuPlayer.rect_height / 2, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y + cpuPlayer.rect_height / 2):
+                self.pos.x = min(self.SCREEN_WIDTH, self.pos.x)
+                self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
+                self.vel.y += cpuPlayer.vel.y * 0.006
+                self.pos.x -= self.radius
 
         if self.pos.y - self.radius <= 0:
             self.vel.y *= -0.99
@@ -50,20 +81,8 @@ class Ball(pygame.sprite.Sprite):
             self.vel.y *= -0.99
             self.pos.y -= 1.0
 
-        if self.pos.x <= agentPlayer.pos.x + agentPlayer.rect_width:
-            if pygame.sprite.collide_rect(self, agentPlayer):
-                self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
-                self.vel.y += agentPlayer.vel.y * 0.01
-                self.pos.x += self.radius
-
-        if self.pos.x >= cpuPlayer.pos.x - cpuPlayer.rect_width:
-            if pygame.sprite.collide_rect(self, cpuPlayer):
-                self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
-                self.vel.y += cpuPlayer.vel.y * 0.006
-                self.pos.x -= self.radius
-
-        self.pos.x += self.vel.x * dt
-        self.pos.y += self.vel.y * dt
+        self.pos_before.x = self.pos.x
+        self.pos_before.y = self.pos.y
 
         self.rect.center = (self.pos.x, self.pos.y)
 
@@ -294,6 +313,7 @@ class Pong(PyGameWrapper):
         # doesnt make sense to have this, but include if needed.
         self.score_sum += self.rewards["tick"]
 
+        self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
         # logic
         if self.ball.pos.x <= 0:
             self.score_sum += self.rewards["negative"]
@@ -313,7 +333,6 @@ class Pong(PyGameWrapper):
         if self.score_counts['cpu'] == self.MAX_SCORE:
             self.score_sum += self.rewards["loss"]
 
-        self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
         self.agentPlayer.update(self.dy, dt)
         self.cpuPlayer.updateCpu(self.ball, dt)
 
