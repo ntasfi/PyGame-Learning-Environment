@@ -197,7 +197,7 @@ class FlappyBird(base.PyGameWrapper):
 
         self.allowed_fps = 30  # restrict the fps
 
-        self.pipe_gap = 100
+        self.pipe_gap = pipe_gap
         self.pipe_color = "red"
         self.images = {}
 
@@ -396,13 +396,15 @@ class FlappyBird(base.PyGameWrapper):
         for p in self.pipe_group:
             hit = pygame.sprite.spritecollide(
                 self.player, self.pipe_group, False)
+
+            is_in_pipe = (p.x - p.width/2 - 20) <= self.player.pos_x < (p.x + p.width/2)
             for h in hit:  # do check to see if its within the gap.
                 top_pipe_check = (
-                    (self.player.pos_y - self.player.height / 2) <= h.gap_start)
+                    (self.player.pos_y - self.player.height/2 + 12) <= h.gap_start) and is_in_pipe
                 bot_pipe_check = (
                     (self.player.pos_y +
                      self.player.height) > h.gap_start +
-                    self.pipe_gap)
+                    self.pipe_gap) and is_in_pipe
 
                 if top_pipe_check:
                     self.lives -= 1
