@@ -31,13 +31,17 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
 
     height : int (default: 48)
         Screen height, recommended to be same dimension as width.
+        
+    init_pos_distance_to_target : int (default None aka. map_size)
+        Useful for curriculum learning, slowly move target away from init position to improve learning
 
     """
 
     def __init__(self,
                  init_pos=(1, 1), resolution=1,
                  move_speed=20, turn_speed=13,
-                 map_size=10, height=48, width=48):
+                 map_size=10, height=48, width=48,
+                 init_pos_distance_to_target=None):
 
         assert map_size > 5, "map_size must be gte 5"
 
@@ -77,6 +81,10 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
         self.init_plane = np.array([init_plane], dtype=np.float32)
 
         self.obj_loc = None
+        if init_pos_distance_to_target is None:
+            init_pos_distance_to_target = map_size
+        init_pos_distance_to_target = max(2, init_pos_distance_to_target)
+        self.init_pos_distance_to_target = init_pos_distance_to_target
         self.map_size = map_size
 
     def _make_maze(self, complexity=0.75, density=0.75):
@@ -153,8 +161,22 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
         self.plane = np.copy(self.init_plane)
 
         self.map_ = self._make_maze()
+        sqr_dist = pow(self.init_pos_distance_to_target, 2)
 
-        self.obj_loc = self.rng.randint(3, high=self.map_size - 1, size=(2))
+        available_positions = []
+        for x in range(self.map_size):
+            for y in range(self.map_size):
+                # in a distance of curriculum learning
+                dist = pow(x - self.pos[0][0], 2) + pow(y - self.pos[0][1], 2)
+                if dist < sqr_dist:
+                    # in a wall
+                    if self.map_[x, y] == 1:
+                        # by the wall access to this point
+                        if self.map_[x-1, y] == 0 or self.map_[x+1, y] == 0 or self.map_[x, y-1] == 0 or self.map_[x, y-1] == 0:
+                            available_positions.append([x,y])
+
+
+        self.obj_loc = np.array(available_positions[self.rng.randint(0, high=len(available_positions))])
         self.map_[self.obj_loc[0], self.obj_loc[1]] = 2
 
     def reset(self):
