@@ -3,6 +3,7 @@
 from .base.pygamewrapper import PyGameWrapper
 import pygame
 import numpy as np
+import math
 from .raycast import RayCastPlayer
 from pygame.constants import K_w, K_a, K_d, K_s
 
@@ -86,6 +87,7 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
         init_pos_distance_to_target = max(2, init_pos_distance_to_target)
         self.init_pos_distance_to_target = init_pos_distance_to_target
         self.map_size = map_size
+        self.is_game_over = False
 
     def _make_maze(self, complexity=0.75, density=0.75):
         """
@@ -146,34 +148,29 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
         return self.score
 
     def game_over(self):
-        obj_loc = self.obj_loc + 0.5
-        dist = np.sqrt(np.sum((self.pos - obj_loc)**2.0))
-
-        if dist < 1.0:
-            self.score += self.rewards["win"]
-            return True
-        else:
-            return False
+        return self.is_game_over
 
     def init(self):
+        self.score = 0 #reset score
+        self.is_game_over = False
         self.pos = np.copy(self.init_pos)
         self.dir = np.copy(self.init_dir)
         self.plane = np.copy(self.init_plane)
 
         self.map_ = self._make_maze()
-        sqr_dist = pow(self.init_pos_distance_to_target, 2)
+        sqr_dist = self.init_pos_distance_to_target ** 2
 
         available_positions = []
-        for x in range(self.map_size):
-            for y in range(self.map_size):
+        for y in range(self.map_size):
+            for x in range(self.map_size):
                 # in a distance of curriculum learning
-                dist = pow(x - self.pos[0][0], 2) + pow(y - self.pos[0][1], 2)
+                dist = (x - self.pos[0][0]) ** 2 + (y - self.pos[0][1]) ** 2
                 if dist < sqr_dist:
                     # in a wall
-                    if self.map_[x, y] == 1:
+                    if self.map_[y, x] == 1:
                         # by the wall access to this point
-                        if self.map_[x-1, y] == 0 or self.map_[x+1, y] == 0 or self.map_[x, y-1] == 0 or self.map_[x, y-1] == 0:
-                            available_positions.append([x,y])
+                        if self.map_[y-1, x] == 0 or self.map_[y+1, x] == 0 or self.map_[y, x-1] == 0 or self.map_[y, x-1] == 0:
+                            available_positions.append([y,x])
 
 
         self.obj_loc = np.array(available_positions[self.rng.randint(0, high=len(available_positions))])
@@ -182,23 +179,42 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
     def reset(self):
         self.init()
 
+    def normalize(self, vector):
+        norm = math.sqrt(vector[0][0] ** 2 + vector[0][1] ** 2)
+        vector[0][0] /= norm
+        vector[0][1] /= norm
+        return vector
+
     def step(self, dt):
         self.screen.fill((0, 0, 0))
         pygame.draw.rect(self.screen, (92, 92, 92),
                          (0, self.height / 2, self.width, self.height))
 
-        self.score += self.rewards["tick"]
+        if not self.is_game_over:
+            self.score += self.rewards["tick"]
 
-        self._handle_player_events(dt)
+            self._handle_player_events(dt)
 
-        c, t, b, col = self.draw()
+            c, t, b, col = self.draw()
 
-        for i in range(len(c)):
-            color = (col[i][0], col[i][1], col[i][2])
-            p0 = (c[i], t[i])
-            p1 = (c[i], b[i])
+            for i in range(len(c)):
+                color = (col[i][0], col[i][1], col[i][2])
+                p0 = (c[i], t[i])
+                p1 = (c[i], b[i])
 
-            pygame.draw.line(self.screen, color, p0, p1, self.resolution)
+                pygame.draw.line(self.screen, color, p0, p1, self.resolution)
+
+            dist = np.sqrt(np.sum((self.pos - self.obj_loc)**2.0))
+
+            dir_to_loc = self.obj_loc - self.pos
+            dir_to_loc = self.normalize(dir_to_loc)
+            dir_norm = self.normalize(np.copy(self.dir))
+            angle_rad = np.arccos(np.dot(dir_to_loc[0], dir_norm[0]))
+
+            # Close to target object and in sight
+            if dist < 1.6 and angle_rad < 1.2:
+                self.score = self.rewards["win"]
+                self.is_game_over = True
 
 if __name__ == "__main__":
     import numpy as np
