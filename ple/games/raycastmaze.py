@@ -213,7 +213,7 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
 
             # Close to target object and in sight
             if dist < 1.6 and angle_rad < 1.2:
-                self.score = self.rewards["win"]
+                self.score += self.rewards["win"]
                 self.is_game_over = True
 
 if __name__ == "__main__":
