@@ -49,7 +49,7 @@ class PyGameWrapper(object):
         self.rewards = {
             "positive": 1.0,
             "negative": -1.0,
-            "tick": 0.0,
+            "tick": -1e-5, # goal of game is to reach target with minimal number of frames
             "loss": -5.0,
             "win": 5.0
         }
