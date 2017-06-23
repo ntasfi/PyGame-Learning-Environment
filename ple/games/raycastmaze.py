@@ -32,13 +32,16 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
 
     height : int (default: 48)
         Screen height, recommended to be same dimension as width.
+        
+     init_pos_distance_to_target : int (default None aka. map_size*map_size)
+        Useful for curriculum learning, slowly move target away from init position to improve learning
   
     """
 
     def __init__(self,
                  init_pos=(1, 1), resolution=1,
                  move_speed=20, turn_speed=13,
-                 map_size=10, height=48, width=48):
+                 map_size=10, height=48, width=48, init_pos_distance_to_target=None):
 
         assert map_size > 5, "map_size must be gte 5"
 
@@ -73,6 +76,9 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
                                init_pos, init_dir, width, height, resolution,
                                move_speed, turn_speed, init_plane, actions, block_types)
 
+        if init_pos_distance_to_target is None:
+            init_pos_distance_to_target = map_size * map_size
+        self.init_pos_distance_to_target = max(1, init_pos_distance_to_target)
         self.init_pos = np.array([init_pos], dtype=np.float32)
         self.init_dir = np.array([init_dir], dtype=np.float32)
         self.init_plane = np.array([init_plane], dtype=np.float32)
@@ -142,6 +148,32 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
     def game_over(self):
         return self.is_game_over
 
+    def getFiltredPositions(self, pos_input, pos_list, wall_list):
+        pos_check = pos_input['pos']
+        if self.map_[pos_check[0], pos_check[1]] == 0:
+            for y, x in [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)]:
+                if self.map_[pos_check[0] + y, pos_check[1] + x] == 0:
+                    # aile
+                    if not any(it for it in pos_list if it['pos'][0] == pos_check[0] + y and it['pos'][1] == pos_check[1] + x):
+                        pos_list.append({
+                            'pos': [pos_check[0] + y, pos_check[1] + x],
+                            'dist': pos_input['dist'] + (0 if (x == 0 and y == 0) else 1),
+                            'checked': (x == 0 and y == 0)
+                        })
+                    else:
+                        for it in pos_list:
+                            if it['pos'][0] == pos_check[0] + y and it['pos'][1] == pos_check[1] + x:
+                                it['checked'] = True
+                                break
+                else:
+                    # wall
+                    if not any(it for it in wall_list if it['pos'][0] == pos_check[0] + y and it['pos'][1] == pos_check[1] + x):
+                        wall_list.append({
+                            'pos': [pos_check[0] + y, pos_check[1] + x],
+                            'dist': pos_input['dist'] + (0 if (x == 0 and y == 0) else 1)
+                        })
+
+
     def init(self):
         self.score = 0 #reset score
         self.is_game_over = False
@@ -151,13 +183,29 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
 
         self.map_ = self._make_maze()
 
+        pos_list = []
+        wall_list = []
+        check_list = []
+        pos_input = {
+            'pos': self.pos.astype(np.int)[0],
+            'dist': 0,
+            'checked': False
+        }
+        pos_list.append(pos_input)
+        check_list.append(pos_input)
+        while len(check_list):
+            for pos_each in check_list:
+                self.getFiltredPositions(pos_each, pos_list, wall_list)
+            check_list = [it for it in pos_list if not it['checked']]
+
+
         available_positions = []
-        for y in range(self.map_size):
-            for x in range(self.map_size):
+        for y in range(self.map_size + 1):
+            for x in range(self.map_size + 1):
                 # in a wall
                 if self.map_[y, x] == 1:
                     # check access to this point
-                    if self.map_[y-1, x] == 0 or self.map_[y+1, x] == 0 or self.map_[y, x-1] == 0 or self.map_[y, x-1] == 0:
+                    if any(it for it in wall_list if it['dist'] <= self.init_pos_distance_to_target and it['pos'][0] == y and it['pos'][1] == x):
                         available_positions.append([y,x])
 
 
