@@ -247,7 +247,6 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
             dist = np.sqrt(np.sum((self.pos[0] - (self.obj_loc[0] + 0.5))**2.0))
             # Close to target object and in sight
             if dist < 0.9 and self.angle_to_obj_rad() < 0.8:
-                print self.pos, self.obj_loc
                 self.score += self.rewards["win"]
                 self.is_game_over = True
 
