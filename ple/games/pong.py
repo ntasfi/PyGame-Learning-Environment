@@ -3,11 +3,11 @@ import sys
 
 import pygame
 from pygame.constants import K_w, K_s
-from .utils.vec2d import vec2d
-from .utils import percent_round_int
+from utils.vec2d import vec2d
+from utils import percent_round_int
 
 #import base
-from .base.pygamewrapper import PyGameWrapper
+from base.pygamewrapper import PyGameWrapper
 
 class Ball(pygame.sprite.Sprite):
 
@@ -63,7 +63,7 @@ class Ball(pygame.sprite.Sprite):
             if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y - agentPlayer.rect_height / 2, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y + agentPlayer.rect_height / 2):
                 self.pos.x = max(0, self.pos.x)
                 self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
-                self.vel.y += agentPlayer.vel.y * 0.01
+                self.vel.y += agentPlayer.vel.y * 2.0
                 self.pos.x += self.radius
 
         if self.pos.x >= cpuPlayer.pos.x - cpuPlayer.rect_width:
@@ -174,10 +174,19 @@ class Pong(PyGameWrapper):
 
     MAX_SCORE : int (default: 11)
         The max number of points the agent or cpu need to score to cause a terminal state.
+        
+    cpu_speed_ratio: float (default: 0.5)
+        Speed of opponent (useful for curriculum learning)
+        
+    players_speed_ratio: float (default: 0.25)
+        Speed of player (useful for curriculum learning)
+
+    ball_speed_ratio: float (default: 0.75)
+        Speed of ball (useful for curriculum learning)
 
     """
 
-    def __init__(self, width=64, height=48, MAX_SCORE=11):
+    def __init__(self, width=64, height=48, cpu_speed_ratio=0.5, players_speed_ratio = 0.25, ball_speed_ratio=0.75,  MAX_SCORE=11):
 
         actions = {
             "up": K_w,
@@ -189,9 +198,11 @@ class Pong(PyGameWrapper):
         # the %'s come from original values, wanted to keep same ratio when you
         # increase the resolution.
         self.ball_radius = percent_round_int(height, 0.03)
-        self.players_speed = 0.22 * height
-        self.cpu_speed = 0.7 * height
-        self.ball_speed = 0.75 * height
+
+        self.cpu_speed_ratio = cpu_speed_ratio
+        self.ball_speed_ratio = ball_speed_ratio
+        self.players_speed_ratio = players_speed_ratio
+
         self.paddle_width = percent_round_int(width, 0.023)
         self.paddle_height = percent_round_int(height, 0.15)
         self.paddle_dist_to_wall = percent_round_int(width, 0.0625)
@@ -206,18 +217,19 @@ class Pong(PyGameWrapper):
 
     def _handle_player_events(self):
         self.dy = 0
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
 
-            if event.type == pygame.KEYDOWN:
-                key = event.key
-                if key == self.actions['up']:
-                    self.dy -= self.players_speed
+        keys = pygame.key.get_pressed()
 
-                if key == self.actions['down']:
-                    self.dy += self.players_speed
+        if keys[self.actions['up']]:
+            self.dy = -self.agentPlayer.speed
+        elif keys[self.actions['down']]:
+            self.dy = self.agentPlayer.speed
+
+        if keys[pygame.QUIT]:
+            pygame.quit()
+            sys.exit()
+
+        pygame.event.pump()
 
     def getGameState(self):
         """
@@ -267,14 +279,14 @@ class Pong(PyGameWrapper):
         self.score_sum = 0.0
         self.ball = Ball(
             self.ball_radius,
-            self.ball_speed,
+            self.ball_speed_ratio * self.height,
             (self.width / 2, self.height / 2),
             self.width,
             self.height
         )
 
         self.agentPlayer = Player(
-            self.players_speed,
+            self.players_speed_ratio * self.height,
             self.paddle_width,
             self.paddle_height,
             (self.paddle_dist_to_wall, self.height / 2),
@@ -282,7 +294,7 @@ class Pong(PyGameWrapper):
             self.height)
 
         self.cpuPlayer = Player(
-            self.cpu_speed,
+            self.cpu_speed_ratio * self.height,
             self.paddle_width,
             self.paddle_height,
             (self.width - self.paddle_dist_to_wall, self.height / 2),
@@ -300,13 +312,17 @@ class Pong(PyGameWrapper):
         self.ball.pos.x = self.width / 2  # move it to the center
 
         # we go in the same direction that they lost in but at starting vel.
-        self.ball.vel.x = self.ball_speed * direction
+        self.ball.vel.x = self.ball.speed * direction
         self.ball.vel.y = (self.rng.random_sample() *
-                           self.ball_speed) - self.ball_speed
+                           self.ball.speed) - self.ball.speed
 
     def step(self, dt):
         dt /= 1000.0
         self.screen.fill((0, 0, 0))
+
+        self.agentPlayer.speed = self.players_speed_ratio * self.height
+        self.cpuPlayer.speed = self.cpu_speed_ratio * self.height
+        self.ball.speed = self.ball_speed_ratio * self.height
 
         self._handle_player_events()
 
