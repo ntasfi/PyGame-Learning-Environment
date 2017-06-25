@@ -218,6 +218,8 @@ class Pong(PyGameWrapper):
     def _handle_player_events(self):
         self.dy = 0
 
+        # consume events
+        pygame.event.get()
         keys = pygame.key.get_pressed()
 
         if keys[self.actions['up']]:
