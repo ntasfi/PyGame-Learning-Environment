@@ -222,9 +222,9 @@ class Pong(PyGameWrapper):
         pygame.event.get()
         keys = pygame.key.get_pressed()
 
-        if keys[self.actions['up']]:
+        if self.actions['up'] in keys:
             self.dy = -self.agentPlayer.speed
-        elif keys[self.actions['down']]:
+        elif self.actions['down'] in keys:
             self.dy = self.agentPlayer.speed
 
         if keys[pygame.QUIT]:
