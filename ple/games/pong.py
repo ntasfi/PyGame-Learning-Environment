@@ -218,20 +218,35 @@ class Pong(PyGameWrapper):
     def _handle_player_events(self):
         self.dy = 0
 
-        # consume events
-        pygame.event.get()
-        keys = pygame.key.get_pressed()
+        if __name__ == "__main__":
+            # for debugging mode
+            pygame.event.get()
+            keys = pygame.key.get_pressed()
+            if keys[self.actions['up']]:
+                self.dy = -self.agentPlayer.speed
+            elif keys[self.actions['down']]:
+                self.dy = self.agentPlayer.speed
 
-        if keys[self.actions['up']]:
-            self.dy = -self.agentPlayer.speed
-        elif keys[self.actions['down']]:
-            self.dy = self.agentPlayer.speed
+            if keys[pygame.QUIT]:
+                pygame.quit()
+                sys.exit()
+            pygame.event.pump()
+        else:
+            # consume events from act
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-        if keys[pygame.QUIT]:
-            pygame.quit()
-            sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    key = event.key
+                    if key == self.actions['up']:
+                        self.dy = -self.agentPlayer.speed
 
-        pygame.event.pump()
+                    if key == self.actions['down']:
+                        self.dy = self.agentPlayer.speed
+
+
 
     def getGameState(self):
         """
