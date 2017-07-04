@@ -7,6 +7,7 @@ import pygame
 import numpy as np
 from pygame.constants import K_w, K_a, K_d, K_s
 
+import copy
 
 class RayCastPlayer():
     """
@@ -115,6 +116,7 @@ class RayCastPlayer():
 
                     self.plane[0, 0] = _planeX
                     self.plane[0, 1] = _planeY
+
 
     def draw(self):
         #N = width/resolution
@@ -327,9 +329,6 @@ if __name__ == "__main__":
         actions,
         block_types
     )
-
-    print(map_grid)
-
     pygame.init()
 
     screen = pygame.display.set_mode((width, height), 0, 24)
