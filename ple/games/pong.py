@@ -194,7 +194,7 @@ class Pong(PyGameWrapper):
 
     """
 
-    def __init__(self, width=64, height=48, cpu_speed_ratio=0.5, players_speed_ratio = 0.25, ball_speed_ratio=0.75,  MAX_SCORE=11):
+    def __init__(self, width=64, height=48, cpu_speed_ratio=0.6, players_speed_ratio = 0.4, ball_speed_ratio=0.75,  MAX_SCORE=11):
 
         actions = {
             "up": K_w,
