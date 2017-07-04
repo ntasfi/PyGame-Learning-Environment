@@ -11,11 +11,12 @@ from base.pygamewrapper import PyGameWrapper
 
 class Ball(pygame.sprite.Sprite):
 
-    def __init__(self, radius, speed,
+    def __init__(self, radius, speed, rng,
                  pos_init, SCREEN_WIDTH, SCREEN_HEIGHT):
 
         pygame.sprite.Sprite.__init__(self)
 
+        self.rng = rng
         self.radius = radius
         self.speed = speed
         self.pos = vec2d(pos_init)
@@ -58,6 +59,7 @@ class Ball(pygame.sprite.Sprite):
         self.pos.x += self.vel.x * dt
         self.pos.y += self.vel.y * dt
 
+        is_pad_hit = False
 
         if self.pos.x <= agentPlayer.pos.x + agentPlayer.rect_width:
             if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y - agentPlayer.rect_height / 2, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y + agentPlayer.rect_height / 2):
@@ -65,6 +67,7 @@ class Ball(pygame.sprite.Sprite):
                 self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
                 self.vel.y += agentPlayer.vel.y * 2.0
                 self.pos.x += self.radius
+                is_pad_hit = True
 
         if self.pos.x >= cpuPlayer.pos.x - cpuPlayer.rect_width:
             if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y - cpuPlayer.rect_height / 2, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y + cpuPlayer.rect_height / 2):
@@ -72,6 +75,11 @@ class Ball(pygame.sprite.Sprite):
                 self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
                 self.vel.y += cpuPlayer.vel.y * 0.006
                 self.pos.x -= self.radius
+                is_pad_hit = True
+
+        # Little randomness in order not to stuck in a static loop
+        if is_pad_hit:
+            self.vel.y += self.rng.random_sample() * 0.001 - 0.0005
 
         if self.pos.y - self.radius <= 0:
             self.vel.y *= -0.99
@@ -297,6 +305,7 @@ class Pong(PyGameWrapper):
         self.ball = Ball(
             self.ball_radius,
             self.ball_speed_ratio * self.height,
+            self.rng,
             (self.width / 2, self.height / 2),
             self.width,
             self.height
@@ -325,13 +334,20 @@ class Pong(PyGameWrapper):
         self.ball_group = pygame.sprite.Group()
         self.ball_group.add(self.ball)
 
+
+    def reset(self):
+        self.init()
+        # after game over set random direction of ball otherwise it will always be the same
+        self._reset_ball(1 if self.rng.random_sample() > 0.5 else -1)
+
+
     def _reset_ball(self, direction):
         self.ball.pos.x = self.width / 2  # move it to the center
 
         # we go in the same direction that they lost in but at starting vel.
         self.ball.vel.x = self.ball.speed * direction
         self.ball.vel.y = (self.rng.random_sample() *
-                           self.ball.speed) - self.ball.speed
+                           self.ball.speed) - self.ball.speed * 0.5
 
     def step(self, dt):
         dt /= 1000.0
@@ -347,27 +363,33 @@ class Pong(PyGameWrapper):
         self.score_sum += self.rewards["tick"]
 
         self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
+
+        is_terminal_state = False
+
         # logic
         if self.ball.pos.x <= 0:
             self.score_sum += self.rewards["negative"]
             self.score_counts["cpu"] += 1.0
             self._reset_ball(-1)
+            is_terminal_state = True
 
         if self.ball.pos.x >= self.width:
             self.score_sum += self.rewards["positive"]
             self.score_counts["agent"] += 1.0
             self._reset_ball(1)
+            is_terminal_state = True
 
-        # winning
-        if self.score_counts['agent'] == self.MAX_SCORE:
-            self.score_sum += self.rewards["win"]
+        if is_terminal_state:
+            # winning
+            if self.score_counts['agent'] == self.MAX_SCORE:
+                self.score_sum += self.rewards["win"]
 
-        # losing
-        if self.score_counts['cpu'] == self.MAX_SCORE:
-            self.score_sum += self.rewards["loss"]
-
-        self.agentPlayer.update(self.dy, dt)
-        self.cpuPlayer.updateCpu(self.ball, dt)
+            # losing
+            if self.score_counts['cpu'] == self.MAX_SCORE:
+                self.score_sum += self.rewards["loss"]
+        else:
+            self.agentPlayer.update(self.dy, dt)
+            self.cpuPlayer.updateCpu(self.ball, dt)
 
         self.players_group.draw(self.screen)
         self.ball_group.draw(self.screen)
