@@ -3,6 +3,7 @@
 from .base.pygamewrapper import PyGameWrapper
 import pygame
 import numpy as np
+import math
 from .raycast import RayCastPlayer
 from pygame.constants import K_w, K_a, K_d, K_s
 
@@ -31,13 +32,16 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
 
     height : int (default: 48)
         Screen height, recommended to be same dimension as width.
-
+        
+     init_pos_distance_to_target : int (default None aka. map_size*map_size)
+        Useful for curriculum learning, slowly move target away from init position to improve learning
+  
     """
 
     def __init__(self,
                  init_pos=(1, 1), resolution=1,
                  move_speed=20, turn_speed=13,
-                 map_size=10, height=48, width=48):
+                 map_size=10, height=48, width=48, init_pos_distance_to_target=None):
 
         assert map_size > 5, "map_size must be gte 5"
 
@@ -72,12 +76,16 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
                                init_pos, init_dir, width, height, resolution,
                                move_speed, turn_speed, init_plane, actions, block_types)
 
+        if init_pos_distance_to_target is None:
+            init_pos_distance_to_target = map_size * map_size
+        self.init_pos_distance_to_target = max(1, init_pos_distance_to_target)
         self.init_pos = np.array([init_pos], dtype=np.float32)
         self.init_dir = np.array([init_dir], dtype=np.float32)
         self.init_plane = np.array([init_plane], dtype=np.float32)
 
         self.obj_loc = None
         self.map_size = map_size
+        self.is_game_over = False
 
     def _make_maze(self, complexity=0.75, density=0.75):
         """
@@ -138,45 +146,117 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
         return self.score
 
     def game_over(self):
-        obj_loc = self.obj_loc + 0.5
-        dist = np.sqrt(np.sum((self.pos - obj_loc)**2.0))
+        return self.is_game_over
 
-        if dist < 1.0:
-            self.score += self.rewards["win"]
-            return True
-        else:
-            return False
+    def getFiltredPositions(self, pos_input, pos_list, wall_list):
+        pos_check = pos_input['pos']
+        if self.map_[pos_check[0], pos_check[1]] == 0:
+            for y, x in [(0, 0), (-1, 0), (1, 0), (0, -1), (0, 1)]:
+                if self.map_[pos_check[0] + y, pos_check[1] + x] == 0:
+                    # aile
+                    if not any(it for it in pos_list if it['pos'][0] == pos_check[0] + y and it['pos'][1] == pos_check[1] + x):
+                        pos_list.append({
+                            'pos': [pos_check[0] + y, pos_check[1] + x],
+                            'dist': pos_input['dist'] + (0 if (x == 0 and y == 0) else 1),
+                            'checked': (x == 0 and y == 0)
+                        })
+                    else:
+                        for it in pos_list:
+                            if it['pos'][0] == pos_check[0] + y and it['pos'][1] == pos_check[1] + x:
+                                it['checked'] = True
+                                break
+                else:
+                    # wall
+                    if not any(it for it in wall_list if it['pos'][0] == pos_check[0] + y and it['pos'][1] == pos_check[1] + x):
+                        wall_list.append({
+                            'pos': [pos_check[0] + y, pos_check[1] + x],
+                            'dist': pos_input['dist'] + (0 if (x == 0 and y == 0) else 1)
+                        })
+
 
     def init(self):
+        self.score = 0 #reset score
+        self.is_game_over = False
         self.pos = np.copy(self.init_pos)
         self.dir = np.copy(self.init_dir)
         self.plane = np.copy(self.init_plane)
 
         self.map_ = self._make_maze()
 
-        self.obj_loc = self.rng.randint(3, high=self.map_size - 1, size=(2))
-        self.map_[self.obj_loc[0], self.obj_loc[1]] = 2
+        pos_list = []
+        wall_list = []
+        check_list = []
+        pos_input = {
+            'pos': self.pos.astype(np.int)[0],
+            'dist': 0,
+            'checked': False
+        }
+        pos_list.append(pos_input)
+        check_list.append(pos_input)
+        while len(check_list):
+            for pos_each in check_list:
+                self.getFiltredPositions(pos_each, pos_list, wall_list)
+            check_list = [it for it in pos_list if not it['checked']]
+
+
+        available_positions = []
+        for y in range(self.map_size + 1):
+            for x in range(self.map_size + 1):
+                # in a wall
+                if self.map_[y, x] == 1:
+                    # check access to this point
+                    if any(it for it in wall_list if it['dist'] <= self.init_pos_distance_to_target and it['pos'][0] == y and it['pos'][1] == x):
+                        available_positions.append([y,x])
+
+
+        self.obj_loc = np.array([available_positions[self.rng.randint(0, high=len(available_positions))]])
+        self.map_[self.obj_loc[0][0], self.obj_loc[0][1]] = 2
+
+        if self.angle_to_obj_rad() < 1.5:
+            # turn away from target at init state
+            self.dir *= -1.0
+            self.plane *= -1.0
 
     def reset(self):
         self.init()
+
+    def normalize(self, vector):
+        norm = math.sqrt(vector[0][0] ** 2 + vector[0][1] ** 2)
+        vector[0][0] /= norm
+        vector[0][1] /= norm
+        return vector
 
     def step(self, dt):
         self.screen.fill((0, 0, 0))
         pygame.draw.rect(self.screen, (92, 92, 92),
                          (0, self.height / 2, self.width, self.height))
 
-        self.score += self.rewards["tick"]
+        if not self.is_game_over:
+            self.score += self.rewards["tick"]
 
-        self._handle_player_events(dt)
+            self._handle_player_events(dt)
 
-        c, t, b, col = self.draw()
+            c, t, b, col = self.draw()
 
-        for i in range(len(c)):
-            color = (col[i][0], col[i][1], col[i][2])
-            p0 = (c[i], t[i])
-            p1 = (c[i], b[i])
+            for i in range(len(c)):
+                color = (col[i][0], col[i][1], col[i][2])
+                p0 = (c[i], t[i])
+                p1 = (c[i], b[i])
 
-            pygame.draw.line(self.screen, color, p0, p1, self.resolution)
+                pygame.draw.line(self.screen, color, p0, p1, self.resolution)
+
+            dist = np.sqrt(np.sum((self.pos[0] - (self.obj_loc[0] + 0.5))**2.0))
+            # Close to target object and in sight
+            if dist < 1.1 and self.angle_to_obj_rad() < 0.8:
+                self.score += self.rewards["win"]
+                self.is_game_over = True
+
+    def angle_to_obj_rad(self):
+        dir_to_loc = (self.obj_loc + 0.5) - self.pos
+        dir_to_loc = self.normalize(dir_to_loc)
+        dir_norm = self.normalize(np.copy(self.dir))
+        angle_rad = np.arccos(np.dot(dir_to_loc[0], dir_norm[0]))
+        return angle_rad
 
 if __name__ == "__main__":
     import numpy as np

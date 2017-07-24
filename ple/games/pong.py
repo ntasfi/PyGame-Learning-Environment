@@ -3,19 +3,20 @@ import sys
 
 import pygame
 from pygame.constants import K_w, K_s
-from .utils.vec2d import vec2d
-from .utils import percent_round_int
+from utils.vec2d import vec2d
+from utils import percent_round_int
 
 #import base
-from .base.pygamewrapper import PyGameWrapper
+from base.pygamewrapper import PyGameWrapper
 
 class Ball(pygame.sprite.Sprite):
 
-    def __init__(self, radius, speed,
+    def __init__(self, radius, speed, rng,
                  pos_init, SCREEN_WIDTH, SCREEN_HEIGHT):
 
         pygame.sprite.Sprite.__init__(self)
 
+        self.rng = rng
         self.radius = radius
         self.speed = speed
         self.pos = vec2d(pos_init)
@@ -58,13 +59,15 @@ class Ball(pygame.sprite.Sprite):
         self.pos.x += self.vel.x * dt
         self.pos.y += self.vel.y * dt
 
+        is_pad_hit = False
 
         if self.pos.x <= agentPlayer.pos.x + agentPlayer.rect_width:
             if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y - agentPlayer.rect_height / 2, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y + agentPlayer.rect_height / 2):
                 self.pos.x = max(0, self.pos.x)
                 self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
-                self.vel.y += agentPlayer.vel.y * 0.01
+                self.vel.y += agentPlayer.vel.y * 2.0
                 self.pos.x += self.radius
+                is_pad_hit = True
 
         if self.pos.x >= cpuPlayer.pos.x - cpuPlayer.rect_width:
             if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y - cpuPlayer.rect_height / 2, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y + cpuPlayer.rect_height / 2):
@@ -72,6 +75,11 @@ class Ball(pygame.sprite.Sprite):
                 self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
                 self.vel.y += cpuPlayer.vel.y * 0.006
                 self.pos.x -= self.radius
+                is_pad_hit = True
+
+        # Little randomness in order not to stuck in a static loop
+        if is_pad_hit:
+            self.vel.y += self.rng.random_sample() * 0.001 - 0.0005
 
         if self.pos.y - self.radius <= 0:
             self.vel.y *= -0.99
@@ -174,10 +182,19 @@ class Pong(PyGameWrapper):
 
     MAX_SCORE : int (default: 11)
         The max number of points the agent or cpu need to score to cause a terminal state.
+        
+    cpu_speed_ratio: float (default: 0.5)
+        Speed of opponent (useful for curriculum learning)
+        
+    players_speed_ratio: float (default: 0.25)
+        Speed of player (useful for curriculum learning)
+
+    ball_speed_ratio: float (default: 0.75)
+        Speed of ball (useful for curriculum learning)
 
     """
 
-    def __init__(self, width=64, height=48, MAX_SCORE=11):
+    def __init__(self, width=64, height=48, cpu_speed_ratio=0.6, players_speed_ratio = 0.4, ball_speed_ratio=0.75,  MAX_SCORE=11):
 
         actions = {
             "up": K_w,
@@ -189,9 +206,11 @@ class Pong(PyGameWrapper):
         # the %'s come from original values, wanted to keep same ratio when you
         # increase the resolution.
         self.ball_radius = percent_round_int(height, 0.03)
-        self.players_speed = 0.22 * height
-        self.cpu_speed = 0.7 * height
-        self.ball_speed = 0.75 * height
+
+        self.cpu_speed_ratio = cpu_speed_ratio
+        self.ball_speed_ratio = ball_speed_ratio
+        self.players_speed_ratio = players_speed_ratio
+
         self.paddle_width = percent_round_int(width, 0.023)
         self.paddle_height = percent_round_int(height, 0.15)
         self.paddle_dist_to_wall = percent_round_int(width, 0.0625)
@@ -206,18 +225,36 @@ class Pong(PyGameWrapper):
 
     def _handle_player_events(self):
         self.dy = 0
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+
+        if __name__ == "__main__":
+            # for debugging mode
+            pygame.event.get()
+            keys = pygame.key.get_pressed()
+            if keys[self.actions['up']]:
+                self.dy = -self.agentPlayer.speed
+            elif keys[self.actions['down']]:
+                self.dy = self.agentPlayer.speed
+
+            if keys[pygame.QUIT]:
                 pygame.quit()
                 sys.exit()
+            pygame.event.pump()
+        else:
+            # consume events from act
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-            if event.type == pygame.KEYDOWN:
-                key = event.key
-                if key == self.actions['up']:
-                    self.dy -= self.players_speed
+                if event.type == pygame.KEYDOWN:
+                    key = event.key
+                    if key == self.actions['up']:
+                        self.dy = -self.agentPlayer.speed
 
-                if key == self.actions['down']:
-                    self.dy += self.players_speed
+                    if key == self.actions['down']:
+                        self.dy = self.agentPlayer.speed
+
+
 
     def getGameState(self):
         """
@@ -267,14 +304,15 @@ class Pong(PyGameWrapper):
         self.score_sum = 0.0
         self.ball = Ball(
             self.ball_radius,
-            self.ball_speed,
+            self.ball_speed_ratio * self.height,
+            self.rng,
             (self.width / 2, self.height / 2),
             self.width,
             self.height
         )
 
         self.agentPlayer = Player(
-            self.players_speed,
+            self.players_speed_ratio * self.height,
             self.paddle_width,
             self.paddle_height,
             (self.paddle_dist_to_wall, self.height / 2),
@@ -282,7 +320,7 @@ class Pong(PyGameWrapper):
             self.height)
 
         self.cpuPlayer = Player(
-            self.cpu_speed,
+            self.cpu_speed_ratio * self.height,
             self.paddle_width,
             self.paddle_height,
             (self.width - self.paddle_dist_to_wall, self.height / 2),
@@ -296,17 +334,28 @@ class Pong(PyGameWrapper):
         self.ball_group = pygame.sprite.Group()
         self.ball_group.add(self.ball)
 
+
+    def reset(self):
+        self.init()
+        # after game over set random direction of ball otherwise it will always be the same
+        self._reset_ball(1 if self.rng.random_sample() > 0.5 else -1)
+
+
     def _reset_ball(self, direction):
         self.ball.pos.x = self.width / 2  # move it to the center
 
         # we go in the same direction that they lost in but at starting vel.
-        self.ball.vel.x = self.ball_speed * direction
+        self.ball.vel.x = self.ball.speed * direction
         self.ball.vel.y = (self.rng.random_sample() *
-                           self.ball_speed) - self.ball_speed
+                           self.ball.speed) - self.ball.speed * 0.5
 
     def step(self, dt):
         dt /= 1000.0
         self.screen.fill((0, 0, 0))
+
+        self.agentPlayer.speed = self.players_speed_ratio * self.height
+        self.cpuPlayer.speed = self.cpu_speed_ratio * self.height
+        self.ball.speed = self.ball_speed_ratio * self.height
 
         self._handle_player_events()
 
@@ -314,27 +363,33 @@ class Pong(PyGameWrapper):
         self.score_sum += self.rewards["tick"]
 
         self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
+
+        is_terminal_state = False
+
         # logic
         if self.ball.pos.x <= 0:
             self.score_sum += self.rewards["negative"]
             self.score_counts["cpu"] += 1.0
             self._reset_ball(-1)
+            is_terminal_state = True
 
         if self.ball.pos.x >= self.width:
             self.score_sum += self.rewards["positive"]
             self.score_counts["agent"] += 1.0
             self._reset_ball(1)
+            is_terminal_state = True
 
-        # winning
-        if self.score_counts['agent'] == self.MAX_SCORE:
-            self.score_sum += self.rewards["win"]
+        if is_terminal_state:
+            # winning
+            if self.score_counts['agent'] == self.MAX_SCORE:
+                self.score_sum += self.rewards["win"]
 
-        # losing
-        if self.score_counts['cpu'] == self.MAX_SCORE:
-            self.score_sum += self.rewards["loss"]
-
-        self.agentPlayer.update(self.dy, dt)
-        self.cpuPlayer.updateCpu(self.ball, dt)
+            # losing
+            if self.score_counts['cpu'] == self.MAX_SCORE:
+                self.score_sum += self.rewards["loss"]
+        else:
+            self.agentPlayer.update(self.dy, dt)
+            self.cpuPlayer.updateCpu(self.ball, dt)
 
         self.players_group.draw(self.screen)
         self.ball_group.draw(self.screen)
