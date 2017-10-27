@@ -4,11 +4,11 @@ import numpy as np
 
 import pygame
 from pygame.constants import K_w
-from .. import base
+
+from ple.games.base import PyGameWrapper
 
 
 class BirdPlayer(pygame.sprite.Sprite):
-
     def __init__(self,
                  SCREEN_WIDTH, SCREEN_HEIGHT, init_pos,
                  image_assets, rng, color="red", scale=1.0):
@@ -94,11 +94,9 @@ class BirdPlayer(pygame.sprite.Sprite):
 
 
 class Pipe(pygame.sprite.Sprite):
-
     def __init__(self,
                  SCREEN_WIDTH, SCREEN_HEIGHT, gap_start, gap_size, image_assets, scale,
                  offset=0, color="green"):
-
         self.speed = 4.0 * scale
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
@@ -137,7 +135,6 @@ class Pipe(pygame.sprite.Sprite):
 
 
 class Backdrop():
-
     def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT,
                  image_background, image_base, scale):
         self.SCREEN_WIDTH = SCREEN_WIDTH
@@ -163,7 +160,7 @@ class Backdrop():
         screen.blit(self.background_image, (0, 0))
 
 
-class FlappyBird(base.PyGameWrapper):
+class FlappyBird(PyGameWrapper):
     """
     Used physics values from sourabhv's `clone`_.
 
@@ -191,7 +188,7 @@ class FlappyBird(base.PyGameWrapper):
 
         fps = 30
 
-        base.PyGameWrapper.__init__(self, width, height, actions=actions)
+        PyGameWrapper.__init__(self, width, height, actions=actions)
 
         self.scale = 30.0 / fps
 
@@ -397,14 +394,14 @@ class FlappyBird(base.PyGameWrapper):
             hit = pygame.sprite.spritecollide(
                 self.player, self.pipe_group, False)
 
-            is_in_pipe = (p.x - p.width/2 - 20) <= self.player.pos_x < (p.x + p.width/2)
+            is_in_pipe = (p.x - p.width / 2 - 20) <= self.player.pos_x < (p.x + p.width / 2)
             for h in hit:  # do check to see if its within the gap.
                 top_pipe_check = (
-                    (self.player.pos_y - self.player.height/2 + 12) <= h.gap_start) and is_in_pipe
+                                     (self.player.pos_y - self.player.height / 2 + 12) <= h.gap_start) and is_in_pipe
                 bot_pipe_check = (
-                    (self.player.pos_y +
-                     self.player.height) > h.gap_start +
-                    self.pipe_gap) and is_in_pipe
+                                     (self.player.pos_y +
+                                      self.player.height) > h.gap_start +
+                                     self.pipe_gap) and is_in_pipe
 
                 if top_pipe_check:
                     self.lives -= 1
