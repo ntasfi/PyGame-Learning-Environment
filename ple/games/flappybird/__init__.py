@@ -5,7 +5,7 @@ import numpy as np
 import pygame
 from pygame.constants import K_w
 from .. import base
-
+from collections import OrderedDict
 
 class BirdPlayer(pygame.sprite.Sprite):
 
@@ -330,7 +330,26 @@ class FlappyBird(base.PyGameWrapper):
         if next_next_pipe.x < next_pipe.x:
             next_pipe, next_next_pipe = next_next_pipe, next_pipe
 
+
+        # ordered dictionary outputs the keys value pairs in same order as they are inserted
+        state  = OrderedDict()
+        state['player_y'] = self.player.pos_y
+        state['player_vel'] = self.player.vel
+
+        state['next_pipe_dist_to_player'] =  next_pipe.x + next_pipe.width/2 - self.player.pos_x 
+        state['next_pipe_top_y'] = next_pipe.gap_start
+        state['next_pipe_bottom_y'] = next_pipe.gap_start + self.pipe_gap
+
+        state['next_next_pipe_dist_to_player'] =  next_next_pipe.x + next_next_pipe.width/2 - self.player.pos_x
+        state['next_next_pipe_top_y'] =  next_next_pipe.gap_start
+        state['next_next_pipe_bottom_y'] = next_next_pipe.gap_start + self.pipe_gap
+
+        # this does not maintains the order of key value pairs 
+        
+        '''
+        
         state = {
+            
             "player_y": self.player.pos_y,
             "player_vel": self.player.vel,
 
@@ -342,7 +361,7 @@ class FlappyBird(base.PyGameWrapper):
             "next_next_pipe_top_y": next_next_pipe.gap_start,
             "next_next_pipe_bottom_y": next_next_pipe.gap_start + self.pipe_gap
         }
-
+        '''
         return state
 
     def getScore(self):
