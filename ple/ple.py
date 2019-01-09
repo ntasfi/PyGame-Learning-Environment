@@ -348,8 +348,10 @@ class PLE(object):
 
         """
         state = self.game.getGameState()
-        if state is not None and self.state_preprocessor is not None:
-            return self.state_preprocessor(state)
+        if state is not None:
+            if self.state_preprocessor is not None:
+                return self.state_preprocessor(state)
+            return state
         else:
             raise ValueError(
                 "Was asked to return state vector for game that does not support it!")
