@@ -135,6 +135,9 @@ class Pixelcopter(PyGameWrapper):
     """
 
     def __init__(self, width=48, height=48):
+        assert 0<width<2000 , "Invalid Width Size: "+str(width)
+        assert 0<height<2000 , "Invalid Width Size: "+str(height)
+
         actions = {
             "up": K_w
         }
@@ -256,9 +259,15 @@ class Pixelcopter(PyGameWrapper):
     def _add_blocks(self):
         x_pos = self.rng.randint(self.width, int(self.width * 1.5))
         y_pos = self.rng.randint(
-            int(self.height * 0.25),
-            int(self.height * 0.75)
+            int(self.height * -0.25),
+            int(self.height * 0.25)
         )
+        if y_pos<0:
+            y_pos-=int(self.height * 0.10)
+        if y_pos>0:
+            y_pos+=int(self.height * 0.10)
+        y_pos+=int(self.height * 0.50)
+
         self.block_group.add(
             Block(
                 (x_pos, y_pos),

@@ -75,6 +75,9 @@ class PuckWorld(PyGameWrapper):
                  width=64,
                  height=64):
 
+        assert 0<width<2000 , "Invalid Width Size: "+str(width)
+        assert 0<height<2000 , "Invalid Width Size: "+str(height)
+
         actions = {
             "up": K_w,
             "left": K_a,
@@ -216,7 +219,7 @@ class PuckWorld(PyGameWrapper):
         self.creeps = pygame.sprite.Group()
         self.creeps.add(self.good_creep)
         self.creeps.add(self.bad_creep)
-
+        self.creeps.add(self.player)
         self.score = 0
         self.ticks = 0
         self.lives = -1
@@ -245,8 +248,7 @@ class PuckWorld(PyGameWrapper):
         reward = -dist_to_good
         if dist_to_bad < self.CREEP_BAD['radius_outer']:
             reward += 2.0 * \
-                (dist_to_bad - self.CREEP_BAD['radius_outer']
-                 ) / float(self.CREEP_BAD['radius_outer'])
+                (dist_to_bad - self.CREEP_BAD['radius_outer'])
 
         self.score += reward
 
@@ -261,7 +263,7 @@ class PuckWorld(PyGameWrapper):
         self.bad_creep.update(ndx, ndy, dt)
         self.good_creep.update(dt)
 
-        self.player.draw(self.screen)
+        #self.player.draw(self.screen)
         self.creeps.draw(self.screen)
 
 

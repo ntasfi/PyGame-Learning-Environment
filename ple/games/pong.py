@@ -1,7 +1,7 @@
 import math
 import sys
 
-import pygame
+import pygame, pygame.sprite
 from pygame.constants import K_w, K_s
 from ple.games.utils.vec2d import vec2d
 from ple.games.utils import percent_round_int
@@ -42,18 +42,6 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos_init
 
-    def line_intersection(self, p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y):
-
-        s1_x = p1_x - p0_x
-        s1_y = p1_y - p0_y
-        s2_x = p3_x - p2_x
-        s2_y = p3_y - p2_y
-
-        s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y)
-        t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y)
-
-        return (s >= 0 and s <= 1 and t >= 0 and t <= 1)
-
     def update(self, agentPlayer, cpuPlayer, dt):
 
         self.pos.x += self.vel.x * dt
@@ -61,21 +49,21 @@ class Ball(pygame.sprite.Sprite):
 
         is_pad_hit = False
 
-        if self.pos.x <= agentPlayer.pos.x + agentPlayer.rect_width:
-            if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y - agentPlayer.rect_height / 2, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y + agentPlayer.rect_height / 2):
-                self.pos.x = max(0, self.pos.x)
-                self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
-                self.vel.y += agentPlayer.vel.y * 2.0
-                self.pos.x += self.radius
-                is_pad_hit = True
+        #Using pygame collision detection, we can pass in the objects directly, first the player
+        if pygame.sprite.collide_rect(self, agentPlayer):
+            self.pos.x = max(0, self.pos.x)
+            self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
+            self.vel.y += agentPlayer.vel.y * 2.0
+            self.pos.x += self.radius
+            is_pad_hit = True
 
-        if self.pos.x >= cpuPlayer.pos.x - cpuPlayer.rect_width:
-            if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y - cpuPlayer.rect_height / 2, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y + cpuPlayer.rect_height / 2):
-                self.pos.x = min(self.SCREEN_WIDTH, self.pos.x)
-                self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
-                self.vel.y += cpuPlayer.vel.y * 0.006
-                self.pos.x -= self.radius
-                is_pad_hit = True
+        #then we test the cpu, much cleaner!
+        if pygame.sprite.collide_rect(self, cpuPlayer):
+            self.pos.x = min(self.SCREEN_WIDTH, self.pos.x)
+            self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
+            self.vel.y += cpuPlayer.vel.y * 0.006
+            self.pos.x -= self.radius
+            is_pad_hit = True
 
         # Little randomness in order not to stuck in a static loop
         if is_pad_hit:
@@ -195,6 +183,13 @@ class Pong(PyGameWrapper):
     """
 
     def __init__(self, width=64, height=48, cpu_speed_ratio=0.6, players_speed_ratio = 0.4, ball_speed_ratio=0.75,  MAX_SCORE=11):
+
+        assert width > 0, "Error: width must be greater than 0"
+        assert height > 0, "Error: height must be greater than 0"
+        assert cpu_speed_ratio > 0, "Error: cpu_speed_ratio must be greater than 0"
+        assert players_speed_ratio > 0, "Error: player_speed_ratio must be greater than 0"
+        assert ball_speed_ratio > 0, "Error: ball_speed_ration must be greater than 0"
+        assert MAX_SCORE > 0, "Error: MAX_SCORE must be greater than 0"
 
         actions = {
             "up": K_w,
