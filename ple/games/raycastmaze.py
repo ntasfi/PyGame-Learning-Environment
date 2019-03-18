@@ -43,7 +43,15 @@ class RaycastMaze(PyGameWrapper, RayCastPlayer):
                  move_speed=20, turn_speed=13,
                  map_size=10, height=48, width=48, init_pos_distance_to_target=None):
 
-        assert map_size > 5, "map_size must be gte 5"
+        for x in init_pos:
+            assert (x >= 0) and (x < map_size), "Error: init_pos must be on the map (0 to map_size)"
+        assert resolution > 0, "Error: resolution must be greater than 0"
+        assert move_speed > 0, "Error: move_speed must be greater than 0"
+        assert move_speed < 100, "Error: move_speed must be less than 100"
+        assert turn_speed > 0, "Error: turn_speed must be greater than 0"
+        assert turn_speed < 100, "Error: turn_speed must be less than 100"
+        assert (map_size > 5) and (map_size <= 100), "Error: map_size must be >= 5 and <= 100"
+        assert (height > 0) and (width > 0) and (height == width), "Error: height and width must be equal and greater than 0"
 
         # do not change
         init_dir = (1.0, 0.0)
