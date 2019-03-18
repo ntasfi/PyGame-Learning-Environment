@@ -113,7 +113,7 @@ class Pipe(pygame.sprite.Sprite):
         self.image.set_colorkey((0, 0, 0))
 
         self.init(gap_start, gap_size, offset, color)
-        	assert gap_size >=30, "Gap size not big enough!" #check if the bird can't fly through the pipes. Update to adjust after testing if needed
+        assert gap_size >=30, "Gap size not big enough!" #check if the bird can't fly through the pipes. Update to adjust after testing if needed
 
     def init(self, gap_start, gap_size, offset, color):
         self.image.fill((0, 0, 0))
