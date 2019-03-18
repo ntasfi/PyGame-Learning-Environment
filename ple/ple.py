@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image  # pillow
 import sys
-
+from time import sleep
 import pygame
 from .games.base.pygamewrapper import PyGameWrapper
 
@@ -373,6 +373,8 @@ class PLE(object):
             Returns the reward that the agent has accumlated while performing the action.
 
         """
+        if self.display_screen:
+            sleep(1/float(self.fps))
         return sum(self._oneStepAct(action) for i in range(self.frame_skip))
 
     def _draw_frame(self):
