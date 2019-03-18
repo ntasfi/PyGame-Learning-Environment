@@ -196,6 +196,13 @@ class Pong(PyGameWrapper):
 
     def __init__(self, width=64, height=48, cpu_speed_ratio=0.6, players_speed_ratio = 0.4, ball_speed_ratio=0.75,  MAX_SCORE=11):
 
+        assert width > 0, "Error: width must be greater than 0"
+        assert height > 0, "Error: height must be greater than 0"
+        assert cpu_speed_ratio > 0, "Error: cpu_speed_ratio must be greater than 0"
+        assert players_speed_ratio > 0, "Error: player_speed_ratio must be greater than 0"
+        assert ball_speed_ratio > 0, "Error: ball_speed_ration must be greater than 0"
+        assert MAX_SCORE > 0, "Error: MAX_SCORE must be greater than 0"
+
         actions = {
             "up": K_w,
             "down": K_s
