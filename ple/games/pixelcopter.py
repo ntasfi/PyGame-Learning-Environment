@@ -326,6 +326,9 @@ class Pixelcopter(PyGameWrapper):
         self.block_group.draw(self.screen)
         self.terrain_group.draw(self.screen)
 
+# alias name for class so the env can be made by gym
+PixelCopter = Pixelcopter
+
 if __name__ == "__main__":
     import numpy as np
 
