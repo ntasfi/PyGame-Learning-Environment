@@ -1,5 +1,8 @@
+from math import tan, radians, degrees
+
 import pygame
-import math
+from pygame.math import Vector2
+
 from .utils.vec2d import vec2d
 
 
@@ -109,7 +112,7 @@ class Player(pygame.sprite.Sprite):
                  speed,
                  pos_init,
                  SCREEN_WIDTH,
-                 SCREEN_HEIGHT):
+                 SCREEN_HEIGHT, angle=0.0, length=4, max_steering=30, max_acceleration=10.0):
 
         pygame.sprite.Sprite.__init__(self)
 
@@ -117,7 +120,19 @@ class Player(pygame.sprite.Sprite):
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
 
         self.pos = vec2d(pos_init)
+        self.position = Vector2(0.0, 0.0)
         self.vel = vec2d((0, 0))
+        self.velocity = Vector2(0.0, 0.0)
+        self.angle = angle
+        self.length = length
+        self.max_acceleration = max_acceleration
+        self.max_steering = max_steering
+        self.max_velocity = 40
+        self.brake_deceleration = 10
+        self.free_deceleration = 2
+
+        self.acceleration = 0.0
+        self.steering = 0.0
 
         image = pygame.Surface([radius * 2, radius * 2])
         image.set_colorkey((0, 0, 0))
@@ -134,9 +149,22 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = radius
 
-    def update(self, dx, dy, dt):
-        self.vel.x += dx
-        self.vel.y += dy
+    def update(self, dt):
+        self.velocity += (self.acceleration * dt, 0)
+        self.velocity.x = max(-self.max_velocity, min(self.velocity.x, self.max_velocity))
+
+        if self.steering:
+            turning_radius = self.length / tan(radians(self.steering))
+            angular_velocity = self.velocity.x / turning_radius
+        else:
+            angular_velocity = 0
+
+        self.position += self.velocity.rotate(-self.angle) * dt
+        self.angle += degrees(angular_velocity) * dt
+
+        self.vel = self.velocity.rotate(-self.angle)
+
+        print(self.angle)
 
         new_x = self.pos.x + self.vel.x * dt
         new_y = self.pos.y + self.vel.y * dt

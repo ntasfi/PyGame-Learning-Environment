@@ -1,14 +1,13 @@
-import pygame
-import sys
 import math
+import sys
 
-#import .base
-from .base.pygamewrapper import PyGameWrapper
-
-from .utils.vec2d import vec2d
-from .utils import percent_round_int
-from pygame.constants import K_w, K_a, K_s, K_d
-from .primitives import Player, Creep
+import pygame
+# import .base
+from ple.games.base import PyGameWrapper
+from ple.games.primitives import Player, Creep
+from ple.games.utils import percent_round_int
+from ple.games.utils.vec2d import vec2d
+from pygame.constants import K_z, K_q, K_s, K_d
 
 
 class WaterWorld(PyGameWrapper):
@@ -35,8 +34,8 @@ class WaterWorld(PyGameWrapper):
                  num_creeps=3):
 
         actions = {
-            "up": K_w,
-            "left": K_a,
+            "up": K_z,
+            "left": K_q,
             "right": K_d,
             "down": K_s
         }
@@ -79,16 +78,33 @@ class WaterWorld(PyGameWrapper):
                 key = event.key
 
                 if key == self.actions["left"]:
-                    self.dx -= self.AGENT_SPEED
+                    self.player.steering += .5 * dt
 
-                if key == self.actions["right"]:
-                    self.dx += self.AGENT_SPEED
+                elif key == self.actions["right"]:
+                    self.player.steering -= .5 * dt
+
+                else:
+                    if dt != 0:
+                        self.player.steering = 0
 
                 if key == self.actions["up"]:
-                    self.dy -= self.AGENT_SPEED
+                    if self.player.velocity.x < 0:
+                        self.player.acceleration = self.player.brake_deceleration
+                    else:
+                        self.player.acceleration += 1 * dt
 
                 if key == self.actions["down"]:
-                    self.dy += self.AGENT_SPEED
+                    if self.player.velocity.x > 0:
+                        self.player.acceleration = -self.player.brake_deceleration
+                    else:
+                        self.player.acceleration -= 1 * dt
+
+
+            else:
+                if dt != 0:
+                    self.player.acceleration = max(-self.player.max_acceleration,
+                                                   min(self.player.acceleration, self.player.max_acceleration))
+                    self.player.steering = 0
 
     def _add_creep(self):
         creep_type = self.rng.choice([0, 1])
@@ -101,7 +117,7 @@ class WaterWorld(PyGameWrapper):
             radius = self.CREEP_RADII[creep_type] * 1.5
             pos = self.rng.uniform(radius, self.height - radius, size=2)
             dist = math.sqrt(
-                (self.player.pos.x - pos[0])**2 + (self.player.pos.y - pos[1])**2)
+                (self.player.pos.x - pos[0]) ** 2 + (self.player.pos.y - pos[1]) ** 2)
 
         creep = Creep(
             self.CREEP_COLORS[creep_type],
@@ -207,7 +223,7 @@ class WaterWorld(PyGameWrapper):
         self.score += self.rewards["tick"]
 
         self._handle_player_events()
-        self.player.update(self.dx, self.dy, dt)
+        self.player.update(dt)
 
         hits = pygame.sprite.spritecollide(self.player, self.creeps, True)
         for creep in hits:
