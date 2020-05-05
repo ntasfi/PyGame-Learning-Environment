@@ -220,7 +220,7 @@ class TRex(base.PyGameWrapper):
         Screen height.
     """
 
-    def __init__(self, max_score=150):
+    def __init__(self, max_score=50):
         actions = {
             'jump': K_SPACE,
             'duck': K_DOWN,
@@ -258,8 +258,9 @@ class TRex(base.PyGameWrapper):
         self.images['dino_ducking'] = SpriteAsset(images=dino_ducking, rect=dino_ducking_rect)
 
         bg, bg_rect = self.load_image('ground.png', -1, -1, -1)
+        bg_swap, bg_swap_rect = self.load_image('ground.png', -1, -1, -1)
         self.images['background'] = SpriteAsset(images=bg, rect=bg_rect)
-        self.images['background_swap'] = SpriteAsset(images=bg, rect=bg_rect)
+        self.images['background_swap'] = SpriteAsset(images=bg_swap, rect=bg_swap_rect)
 
         numbers, numbers_rect = self.load_sprite_sheet('numbers.png', 12, 1, 11, int(11 * 6 / 5), -1)
         self.images['numbers'] = SpriteAsset(images=numbers, rect=numbers_rect)
@@ -350,18 +351,18 @@ class TRex(base.PyGameWrapper):
             if (p.x - p.width / 2) <= self.player.pos_x < (p.x - p.width / 2 + 4):
                 self.score += self.rewards["positive"]
 
-        if len(self.cacti) < 2:
+        if len(self.cacti) < 4:
             cactus_asset = self.images['cactus']
             if len(self.cacti) == 0:
                 self.last_obstacle.empty()
                 self.last_obstacle.add(Cactus(cactus_asset.images, cactus_asset.rect, self.game_speed))
             else:
                 for l in self.last_obstacle:
-                    if l.rect.right < SCREEN_WIDTH * 0.7 and random.randrange(0, 50) == 10:
+                    if l.rect.right < SCREEN_WIDTH * 0.7 and random.randrange(0, 10) == 0:
                         self.last_obstacle.empty()
                         self.last_obstacle.add(Cactus(cactus_asset.images, cactus_asset.rect, self.game_speed))
 
-        if len(self.pteras) == 0 and random.randrange(0, 200) == 10 and self.counter > 500:
+        if len(self.pteras) == 0 and random.randrange(0, 50) == 0 and self.counter > 500:
             pteras_asset = self.images['pteras']
             for l in self.last_obstacle:
                 if l.rect.right < SCREEN_WIDTH * 0.8:
