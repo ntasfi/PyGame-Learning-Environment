@@ -85,6 +85,11 @@ class MyTestCase(unittest.TestCase):
         def invoke_doom():
             DoomWrapper
         assert_raises(NameError,invoke_doom)
+    
+    def test_t_rex(self):
+        from ple.games.trex import TRex
+        game = TRex()
+        self.run_a_game(game)
 
 
 if __name__ == "__main__":

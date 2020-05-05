@@ -11,3 +11,4 @@ from ple.games.puckworld import PuckWorld
 from ple.games.raycastmaze import RaycastMaze
 from ple.games.snake import Snake
 from ple.games.waterworld import WaterWorld
+from ple.games.trex import TRex
