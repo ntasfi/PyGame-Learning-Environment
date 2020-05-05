@@ -220,7 +220,7 @@ class TRex(base.PyGameWrapper):
         Screen height.
     """
 
-    def __init__(self):
+    def __init__(self, max_score=150):
         actions = {
             'jump': K_SPACE,
             'duck': K_DOWN,
@@ -232,6 +232,7 @@ class TRex(base.PyGameWrapper):
         self.score = 0.0
         self.game_tick = 0
         self.game_speed = 4
+        self.max_score = max_score
 
         self.dino = None
         self.ground = None
@@ -387,7 +388,7 @@ class TRex(base.PyGameWrapper):
         return self.score
 
     def game_over(self):
-        return self.dino.isDead or self.score >= 150
+        return self.dino.isDead or self.score >= self.max_score
 
     def getGameState(self):
         return {}
