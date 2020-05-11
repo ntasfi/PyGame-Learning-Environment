@@ -6,8 +6,9 @@ from pygame.constants import K_w, K_s
 from ple.games.utils.vec2d import vec2d
 from ple.games.utils import percent_round_int
 
-#import base
+# import base
 from ple.games.base.pygamewrapper import PyGameWrapper
+
 
 class Ball(pygame.sprite.Sprite):
 
@@ -61,16 +62,27 @@ class Ball(pygame.sprite.Sprite):
 
         is_pad_hit = False
 
+        agent_hit_pad = False
+
         if self.pos.x <= agentPlayer.pos.x + agentPlayer.rect_width:
-            if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y - agentPlayer.rect_height / 2, agentPlayer.pos.x + agentPlayer.rect_width / 2, agentPlayer.pos.y + agentPlayer.rect_height / 2):
+            if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y,
+                                      agentPlayer.pos.x + agentPlayer.rect_width / 2,
+                                      agentPlayer.pos.y - agentPlayer.rect_height / 2,
+                                      agentPlayer.pos.x + agentPlayer.rect_width / 2,
+                                      agentPlayer.pos.y + agentPlayer.rect_height / 2):
                 self.pos.x = max(0, self.pos.x)
                 self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
                 self.vel.y += agentPlayer.vel.y * 2.0
                 self.pos.x += self.radius
                 is_pad_hit = True
+                agent_hit_pad = True
 
         if self.pos.x >= cpuPlayer.pos.x - cpuPlayer.rect_width:
-            if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y - cpuPlayer.rect_height / 2, cpuPlayer.pos.x - cpuPlayer.rect_width / 2, cpuPlayer.pos.y + cpuPlayer.rect_height / 2):
+            if self.line_intersection(self.pos_before.x, self.pos_before.y, self.pos.x, self.pos.y,
+                                      cpuPlayer.pos.x - cpuPlayer.rect_width / 2,
+                                      cpuPlayer.pos.y - cpuPlayer.rect_height / 2,
+                                      cpuPlayer.pos.x - cpuPlayer.rect_width / 2,
+                                      cpuPlayer.pos.y + cpuPlayer.rect_height / 2):
                 self.pos.x = min(self.SCREEN_WIDTH, self.pos.x)
                 self.vel.x = -1 * (self.vel.x + self.speed * 0.05)
                 self.vel.y += cpuPlayer.vel.y * 0.006
@@ -93,6 +105,8 @@ class Ball(pygame.sprite.Sprite):
         self.pos_before.y = self.pos.y
 
         self.rect.center = (self.pos.x, self.pos.y)
+
+        return agent_hit_pad
 
 
 class Player(pygame.sprite.Sprite):
@@ -182,10 +196,10 @@ class Pong(PyGameWrapper):
 
     MAX_SCORE : int (default: 11)
         The max number of points the agent or cpu need to score to cause a terminal state.
-        
+
     cpu_speed_ratio: float (default: 0.5)
         Speed of opponent (useful for curriculum learning)
-        
+
     players_speed_ratio: float (default: 0.25)
         Speed of player (useful for curriculum learning)
 
@@ -194,7 +208,8 @@ class Pong(PyGameWrapper):
 
     """
 
-    def __init__(self, width=64, height=48, cpu_speed_ratio=0.6, players_speed_ratio = 0.4, ball_speed_ratio=0.75,  MAX_SCORE=11):
+    def __init__(self, width=64, height=48, cpu_speed_ratio=0.6, players_speed_ratio=0.4, ball_speed_ratio=0.75,
+                 MAX_SCORE=11):
 
         actions = {
             "up": K_w,
@@ -221,6 +236,15 @@ class Pong(PyGameWrapper):
         self.score_counts = {
             "agent": 0.0,
             "cpu": 0.0
+        }
+
+        self.rewards = {
+            "least_positive": .01,
+            "positive": 1.0,
+            "negative": -1.0,
+            "tick": 0,
+            "loss": -5.0,
+            "win": 5.0
         }
 
     def _handle_player_events(self):
@@ -253,8 +277,6 @@ class Pong(PyGameWrapper):
 
                     if key == self.actions['down']:
                         self.dy = self.agentPlayer.speed
-
-
 
     def getGameState(self):
         """
@@ -293,7 +315,7 @@ class Pong(PyGameWrapper):
     def game_over(self):
         # pong used 11 as max score
         return (self.score_counts['agent'] == self.MAX_SCORE) or (
-            self.score_counts['cpu'] == self.MAX_SCORE)
+                self.score_counts['cpu'] == self.MAX_SCORE)
 
     def init(self):
         self.score_counts = {
@@ -334,12 +356,10 @@ class Pong(PyGameWrapper):
         self.ball_group = pygame.sprite.Group()
         self.ball_group.add(self.ball)
 
-
     def reset(self):
         self.init()
         # after game over set random direction of ball otherwise it will always be the same
         self._reset_ball(1 if self.rng.random_sample() > 0.5 else -1)
-
 
     def _reset_ball(self, direction):
         self.ball.pos.x = self.width / 2  # move it to the center
@@ -362,7 +382,10 @@ class Pong(PyGameWrapper):
         # doesnt make sense to have this, but include if needed.
         self.score_sum += self.rewards["tick"]
 
-        self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
+        agent_hit_pad = self.ball.update(self.agentPlayer, self.cpuPlayer, dt)
+
+        if agent_hit_pad:
+            self.score_sum += self.rewards["least_positive"]
 
         is_terminal_state = False
 
@@ -393,6 +416,7 @@ class Pong(PyGameWrapper):
 
         self.players_group.draw(self.screen)
         self.ball_group.draw(self.screen)
+
 
 if __name__ == "__main__":
     import numpy as np
