@@ -145,7 +145,7 @@ class PLE(object):
 
         if game.allowed_fps is not None and self.fps != game.allowed_fps:
             raise ValueError("Game requires %dfps, was given %d." %
-                             (game.allowed_fps, game.allowed_fps))
+                             (game.allowed_fps, self.fps))
 
     def _tick(self):
         """
