@@ -228,3 +228,41 @@ class MonsterKong(PyGameWrapper):
         # Update all the monsters
         for enemy in self.newGame.Enemies:
             enemy.continuousUpdate(self.wallGroup, self.ladderGroup)
+
+    def getGameState(self):
+        fireballs = {}
+        for i in range(len(self.newGame.Enemies) * 5):
+            try:
+                fireball_pos = self.newGame.Fireballs[i].getPosition()
+            except IndexError:
+                fireball_pos = (0.0, 0.0)
+            fireballs['fireball' + str(i) + '_x_position'] = fireball_pos[0]
+            fireballs['fireball' + str(i) + '_y_position'] = fireball_pos[1]
+
+        enemies = {}
+        for i, enemy in enumerate(self.newGame.Enemies):
+            enemies['enemy' + str(i) + '_x_position'] = enemy.getPosition()[0]
+            enemies['enemy' + str(i) + '_y_position'] = enemy.getPosition()[1]
+
+        allies = {}
+        for i, allie in enumerate(self.newGame.Allies):
+            allies['allie' + str(i) + '_x_position'] = allie.getPosition()[0]
+            allies['allie' + str(i) + '_y_position'] = allie.getPosition()[1]
+
+        coins = {}
+        for i in range(25):
+            try:
+                coin_pos = self.newGame.Coins[i].getPosition()
+            except IndexError:
+                coin_pos = (0.0, 0.0)
+            coins['coin' + str(i) + '_x_position'] = coin_pos[0]
+            coins['coin' + str(i) + '_y_position'] = coin_pos[1]
+
+        return {
+            'player_x_position': self.newGame.Players[0].getPosition()[0],
+            'player_y_position': self.newGame.Players[0].getPosition()[1],
+            **fireballs,
+            **enemies,
+            **allies,
+            **coins
+        }
