@@ -69,7 +69,7 @@ class PyGameWrapper(object):
         if action is None:
             action = self.NOOP
 
-        if last_action is None:
+        if last_action is None or last_action==[]:
             last_action = self.NOOP
 
         kd = pygame.event.Event(KEYDOWN, {"key": action})
