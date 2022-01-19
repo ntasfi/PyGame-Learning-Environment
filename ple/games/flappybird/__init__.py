@@ -98,7 +98,7 @@ class BirdPlayer(pygame.sprite.Sprite):
 
     def draw(self, screen):
         rotated_image = pygame.transform.rotate(self.image, self.tilt)
-        screen.blit(rotated_image, self.rect.center)
+        screen.blit(rotated_image, self.rect)
 
 
 class Pipe(pygame.sprite.Sprite):
