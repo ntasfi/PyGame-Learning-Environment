@@ -30,9 +30,13 @@ class BirdPlayer(pygame.sprite.Sprite):
 
         # all in terms of y
         self.vel = 0
+        self.tilt = 0.0
         self.FLAP_POWER = 9 * self.scale
         self.MAX_DROP_SPEED = 10.0
         self.GRAVITY = 1.0 * self.scale
+        self.TILT_FLAP = 30.0
+        self.TILT_FALLING = -70.0
+        self.TILT_SPEED = 120.0
 
         self.rng = rng
 
@@ -50,6 +54,7 @@ class BirdPlayer(pygame.sprite.Sprite):
         self.game_tick = 0
         self.pos_x = init_pos[0]
         self.pos_y = init_pos[1]
+        self.tilt = 0.0
 
     def _oscillateStartPos(self):
         offset = 8 * np.sin(self.rng.rand() * np.pi)
@@ -58,6 +63,7 @@ class BirdPlayer(pygame.sprite.Sprite):
     def flap(self):
         if self.pos_y > -2.0 * self.image.get_height():
             self.vel = 0.0
+            self.tilt = self.TILT_FLAP
             self.flapped = True
 
     def update(self, dt):
@@ -76,6 +82,7 @@ class BirdPlayer(pygame.sprite.Sprite):
 
         if self.vel < self.MAX_DROP_SPEED and self.thrust_time == 0.0:
             self.vel += self.GRAVITY
+            self.tilt = max(self.tilt - self.TILT_SPEED*dt, self.TILT_FALLING)
 
         # the whole point is to spread this out over the same time it takes in
         # 30fps.
@@ -90,7 +97,8 @@ class BirdPlayer(pygame.sprite.Sprite):
         self.rect.center = (self.pos_x, self.pos_y)
 
     def draw(self, screen):
-        screen.blit(self.image, self.rect.center)
+        rotated_image = pygame.transform.rotate(self.image, self.tilt)
+        screen.blit(rotated_image, self.rect.center)
 
 
 class Pipe(pygame.sprite.Sprite):
